@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\PolyCars\Framework\Main.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\PolyCars\Framework\Render.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\PolyCars\Framework\World.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Wheeler.cpp">
+      <Filter>Game\Creatures</Filter>
+    </ClCompile>
+    <ClCompile Include="Grass.cpp">
+      <Filter>Game\Creatures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\PolyCars\Framework\GameWorlds.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Seed.cpp">
+      <Filter>Game\Creatures</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\PolyCars\Framework\Render.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\StringUtils.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h">
+      <Filter>Game\Worlds</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\World.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\OldGeneticAlgorithm.h">
+      <Filter>Classes\Genetics</Filter>
+    </ClInclude>
+    <ClInclude Include="Wheeler.h">
+      <Filter>Game\Creatures</Filter>
+    </ClInclude>
+    <ClInclude Include="Grass.h">
+      <Filter>Game\Creatures</Filter>
+    </ClInclude>
+    <ClInclude Include="Seed.h">
+      <Filter>Game\Creatures</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{61987254-afb8-4f53-9252-0f5eae3d73c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{b75c933d-6cce-48b9-829d-b4f7660dec6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\Genetics">
+      <UniqueIdentifier>{2869cbb7-cd8c-4519-8fcd-8605700644eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Classes\File System">
+      <UniqueIdentifier>{8a8b6477-c454-458a-a4ab-12703e6af72d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{aff6a071-e910-433e-b281-d8805c404869}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Creatures">
+      <UniqueIdentifier>{3a71b501-5a88-4e33-a024-e9817ed3486f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Worlds">
+      <UniqueIdentifier>{f47b14d9-d964-4709-93ad-2d9c34550353}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
