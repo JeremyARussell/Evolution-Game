@@ -76,7 +76,7 @@ public:
 		}
 		activeWheeler = wheelers[cW];
 	}
-
+	
 	void previusWheeler() {
 		if (wheelers.size() == 0) return;
 		cW--;
@@ -84,6 +84,16 @@ public:
 			cW = wheelers.size();
 		}
 		activeWheeler = wheelers[cW];
+	}
+
+	void destroyCreature() {
+		if ( activeWheeler != NULL && following) {
+			if (wheelers.size() == 0) return;
+			wheelersToDelete.push_back(*activeWheeler);
+			wheelers.erase( std::find(wheelers.begin(), wheelers.end(), activeWheeler ) );
+			activeWheeler = NULL;
+		}
+
 	}
 
 	void saveWorld() {
@@ -208,6 +218,7 @@ public:
 		cW = 0;
 		activeWheeler = NULL;
 		grassSpawnCounter = 0;
+		following = false;
 
 		m_world->SetContactListener(&thisWheelerContactListener);
 
@@ -347,6 +358,12 @@ public:
 
 	void Step(Settings* settings) {
 
+		if (settings->followCreature == true) {
+			following = true;
+		} else {
+			following = false;
+		}
+
 		if (activeWheeler != NULL && activeWheeler->health > -1 && settings->followCreature == 1) {
 			settings->viewCenter.Set(activeWheeler->cart->GetPosition().x, activeWheeler->cart->GetPosition().y);
 		}
@@ -419,14 +436,14 @@ public:
 				if (!settings->pause) { wheelers[i]->minutesToLive--; }
 			} else {
 				Wheeler *dying = wheelers[i];
-				toDelete.push_back(*dying);
+				wheelersToDelete.push_back(*dying);
 				wheelers.erase( std::find(wheelers.begin(), wheelers.end(), dying ) );
 				break;
 			}
 			//Dying
 			if (wheelers[i]->health < 0) {
 				Wheeler *dying = wheelers[i];
-				toDelete.push_back(*dying);
+				wheelersToDelete.push_back(*dying);
 				wheelers.erase( std::find(wheelers.begin(), wheelers.end(), dying ) );
 			} else {
 				if (wheelers[i]->healthDownCounter > 0) {
@@ -442,11 +459,11 @@ public:
 
 		World::Step(settings);
 
-		for (int i = 0; i < toDelete.size(); i ++) {
+		for (int i = 0; i < wheelersToDelete.size(); i ++) {
 			if (cW >= wheelers.size()) {
 				cW = 0;
 			}
-			toDelete[i].die();
+			wheelersToDelete[i].die();
 			if (wheelers.size() == 0) {
 				activeWheeler = NULL;
 			}
@@ -454,7 +471,7 @@ public:
 		for (int i = 0; i < grassToDelete.size(); i ++) {
 			grassToDelete[i].die();
 		}
-		toDelete.clear();
+		wheelersToDelete.clear();
 		grassToDelete.clear();
 	}
 
@@ -463,11 +480,13 @@ public:
 	}
 
 private:
-	vector<Wheeler> toDelete;
+	vector<Wheeler> wheelersToDelete;
 	vector<Grass> grassToDelete;
 
 	int cW;
 	int grassSpawnCounter;
+
+	bool following;
 };
 
 #endif

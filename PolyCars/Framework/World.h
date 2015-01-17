@@ -134,6 +134,7 @@ public:
 
 	virtual void nextWheeler() = 0;
 	virtual void previusWheeler() = 0;
+	virtual void destroyCreature() = 0;
 	virtual void saveWorld() = 0;
 	virtual void loadWorld() = 0;
 

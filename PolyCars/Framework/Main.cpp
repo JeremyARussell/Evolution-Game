@@ -367,6 +367,10 @@ static void previusWheeler(int) {
 	world->nextWheeler();
 }
 
+static void destroyCreature(int) {
+	world->destroyCreature();
+}
+
 int main(int argc, char** argv)
 {
 	worldCount = 0;
@@ -470,15 +474,19 @@ int main(int argc, char** argv)
 		
 	glui->add_column(true);
 
-	glui->add_button(">>", 0, nextWheeler);
-	glui->add_button("<<", 0, previusWheeler);
 	glui->add_checkbox("Follow Creature", &settings.followCreature);
+	glui->add_button("Next", 0, nextWheeler);
+	glui->add_button("Previous", 0, previusWheeler);
 
 	GLUI_Spinner* grassSpawnSpinner =
 		glui->add_spinner("Grass Rate", GLUI_SPINNER_INT, &settings.grassSpawnRate);
 
-	grassSpawnSpinner->set_int_limits(1, 60);
+	grassSpawnSpinner->set_int_limits(1, 10);
 	grassSpawnSpinner->set_speed(0.1f);
+
+	glui->add_column(true);
+
+	glui->add_button("Destroy", 0, destroyCreature);
 
 	glui->set_main_gfx_window( mainWindow );
 	

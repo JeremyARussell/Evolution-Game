@@ -12,3 +12,4 @@ Build/vs2010/Release/MountainRidingWorld.sav
 *.suo
 *.user
 Build/PolyCars/MountainRidingWorld.sav
+*.ilk
