@@ -210,6 +210,103 @@ public:
 		loadFile.close();
 	}
 
+	void exportCreature() {
+		if ( activeWheeler != NULL && following) {
+			if (wheelers.size() == 0) return;
+			ofstream saveFile("WheelerExport.sav");
+
+			saveFile << "wPos" << ' ' << -200.0f << ' ' << 15.0f << endl;
+			float32 directionAndSpeed;
+			if (activeWheeler->spinDirection < 0) {
+				directionAndSpeed = -activeWheeler->spinDirection;
+			} else {
+				directionAndSpeed = activeWheeler->spinDirection;
+			}
+			saveFile << "wAngleAndDirection" << ' ' << 0.0f << ' ' << directionAndSpeed << endl;//Setting Angle probably doesn't matter, it's set to zero on Wheeler creation anyways regardless.
+			saveFile << "wLife" << ' ' << 50/*TODO - MAX HEALTH LATER ON*/ << ' ' << 28800 << endl;
+
+			saveFile << "spokeAngles1" << ' ' << activeWheeler->spokeAngles[0] << ' ' << activeWheeler->spokeAngles[1] << endl;
+			saveFile << "spokeAngles2" << ' ' << activeWheeler->spokeAngles[2] << ' ' << activeWheeler->spokeAngles[3] << endl;
+			saveFile << "spokeAngles3" << ' ' << activeWheeler->spokeAngles[4] << ' ' << activeWheeler->spokeAngles[5] << endl;
+			saveFile << "spokeAngles4" << ' ' << activeWheeler->spokeAngles[6] << ' ' << activeWheeler->spokeAngles[7] << endl;
+
+			saveFile << "spokeLengths1" << ' ' << activeWheeler->spokeLengths[0] << ' ' << activeWheeler->spokeLengths[1] << endl;
+			saveFile << "spokeLengths2" << ' ' << activeWheeler->spokeLengths[2] << ' ' << activeWheeler->spokeLengths[3] << endl;
+			saveFile << "spokeLengths3" << ' ' << activeWheeler->spokeLengths[4] << ' ' << activeWheeler->spokeLengths[5] << endl;
+			saveFile << "spokeLengths4" << ' ' << activeWheeler->spokeLengths[6] << ' ' << activeWheeler->spokeLengths[7] << endl;
+
+			saveFile << "hasWheel1" << ' ' << activeWheeler->hasWheel[0] << ' ' << activeWheeler->hasWheel[1] << endl;
+			saveFile << "hasWheel2" << ' ' << activeWheeler->hasWheel[2] << ' ' << activeWheeler->hasWheel[3] << endl;
+			saveFile << "hasWheel3" << ' ' << activeWheeler->hasWheel[4] << ' ' << activeWheeler->hasWheel[5] << endl;
+			saveFile << "hasWheel4" << ' ' << activeWheeler->hasWheel[6] << ' ' << activeWheeler->hasWheel[7] << endl;
+
+			saveFile << "axleAngle1" << ' ' << activeWheeler->axleAngle[0] << ' ' << activeWheeler->axleAngle[1] << endl;
+			saveFile << "axleAngle2" << ' ' << activeWheeler->axleAngle[2] << ' ' << activeWheeler->axleAngle[3] << endl;
+			saveFile << "axleAngle3" << ' ' << activeWheeler->axleAngle[4] << ' ' << activeWheeler->axleAngle[5] << endl;
+			saveFile << "axleAngle4" << ' ' << activeWheeler->axleAngle[6] << ' ' << activeWheeler->axleAngle[7] << endl;
+
+			saveFile << "wheelRadius1" << ' ' << activeWheeler->wheelRadius[0] << ' ' << activeWheeler->wheelRadius[1] << endl;
+			saveFile << "wheelRadius2" << ' ' << activeWheeler->wheelRadius[2] << ' ' << activeWheeler->wheelRadius[3] << endl;
+			saveFile << "wheelRadius3" << ' ' << activeWheeler->wheelRadius[4] << ' ' << activeWheeler->wheelRadius[5] << endl;
+			saveFile << "wheelRadius4" << ' ' << activeWheeler->wheelRadius[6] << ' ' << activeWheeler->wheelRadius[7] << endl;
+		
+			saveFile.close();
+		}
+	}
+
+	void importCreature() {
+		ifstream loadFile("WheelerExport.sav");
+
+		string loadType = "";
+		float32 var1;
+		float32 var2;
+
+		vector<float32> genes;
+		bool readyToWheel = false;
+
+		while (loadFile >> loadType >> var1 >> var2 ) {
+
+
+			if (loadType == "wPos") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "wAngleAndDirection") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "wLife") { genes.push_back(var1); genes.push_back(var2); }
+			
+			if (loadType == "spokeAngles1") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeAngles2") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeAngles3") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeAngles4") { genes.push_back(var1); genes.push_back(var2); }
+
+			if (loadType == "spokeLengths1") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeLengths2") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeLengths3") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "spokeLengths4") { genes.push_back(var1); genes.push_back(var2); }
+
+			if (loadType == "hasWheel1") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "hasWheel2") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "hasWheel3") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "hasWheel4") { genes.push_back(var1); genes.push_back(var2); }
+
+			if (loadType == "axleAngle1") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "axleAngle2") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "axleAngle3") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "axleAngle4") { genes.push_back(var1); genes.push_back(var2); }
+
+			if (loadType == "wheelRadius1") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "wheelRadius2") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "wheelRadius3") { genes.push_back(var1); genes.push_back(var2); }
+			if (loadType == "wheelRadius4") { genes.push_back(var1); genes.push_back(var2); readyToWheel = true;}
+
+			//bool readyToWheel = true;
+
+			if (readyToWheel) {
+				wheelers.push_back(new Wheeler(m_world, genes));
+				genes.clear();
+				readyToWheel = false;
+			}
+		}
+		loadFile.close();
+	}
+
 	vector<Wheeler*> wheelers;
 	vector<Grass*> grasses;
 
@@ -348,11 +445,6 @@ public:
 		case 'w':
 			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.5f));
 			break;
-		//case 't':
-		//	for (int i = 0; i < wheelers.size(); i ++) {
-		//		wheelers[i]->turnAround();
-		//	}
-		//	break;
 		}
 	}
 

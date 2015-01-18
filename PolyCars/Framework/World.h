@@ -137,6 +137,8 @@ public:
 	virtual void destroyCreature() = 0;
 	virtual void saveWorld() = 0;
 	virtual void loadWorld() = 0;
+	virtual void exportCreature() = 0;
+	virtual void importCreature() = 0;
 
 	Wheeler* activeWheeler;
 

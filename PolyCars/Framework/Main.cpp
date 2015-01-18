@@ -371,6 +371,14 @@ static void destroyCreature(int) {
 	world->destroyCreature();
 }
 
+static void exportCreature(int) {
+	world->exportCreature();
+}
+
+static void importCreature(int) {
+	world->importCreature();
+}
+
 int main(int argc, char** argv)
 {
 	worldCount = 0;
@@ -461,10 +469,9 @@ int main(int argc, char** argv)
 
 	glui->add_button("Save", 0, Save);
 	glui->add_button("Load", 0, Load);
+	glui->add_button("Import", 0, importCreature);
 
 	glui->add_column(true);
-
-
 	glui->add_button("Pause", 0, Pause);
 	/*#if defined (_DEBUG)*/ glui->add_button("Single Step", 0, SingleStep);
 	/*#endif*/
@@ -473,7 +480,6 @@ int main(int argc, char** argv)
 	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
 		
 	glui->add_column(true);
-
 	glui->add_checkbox("Follow Creature", &settings.followCreature);
 	glui->add_button("Next", 0, nextWheeler);
 	glui->add_button("Previous", 0, previusWheeler);
@@ -485,8 +491,10 @@ int main(int argc, char** argv)
 	grassSpawnSpinner->set_speed(0.1f);
 
 	glui->add_column(true);
-
 	glui->add_button("Destroy", 0, destroyCreature);
+
+	glui->add_column(true);
+	glui->add_button("Export", 0, exportCreature);
 
 	glui->set_main_gfx_window( mainWindow );
 	
