@@ -27,7 +27,7 @@ namespace
 {
 	int32 major = 0;
 	int32 minor = 0;
-	int32 revision = 4;
+	int32 revision = 5;
 
 
 	int32 worldIndex = 0;
