@@ -11,6 +11,56 @@ class Wheeler
 {
 public:
 
+	//Getters and Setters for Private vars
+	b2Vec2 getOldShortPos() {
+		return oldShortPos;
+	}
+
+	b2Vec2 getNewShortPos() {
+		return newShortPos;
+	}
+
+	void setNewShortPos(b2Vec2 pos) {
+		if (oldShortPos == b2Vec2(0.0f, 0.0f)) {
+			oldShortPos = pos;
+			newShortPos = pos;
+		} else {
+			oldShortPos = newShortPos;
+			newShortPos = pos;
+			hasGoodShortDistance = true;
+		}
+	}
+
+	b2Vec2 getOldLongPos() {
+		return oldLongPos;
+	}
+
+	b2Vec2 getNewLongPos() {
+		return newLongPos;
+	}
+
+	void setNewLongPos(b2Vec2 pos) {
+		if (oldLongPos == b2Vec2(0.0f, 0.0f)) {
+			oldLongPos = pos;
+			newLongPos = pos;
+		} else {
+			oldLongPos = newLongPos;
+			newLongPos = pos;
+			hasGoodLongDistance = true;
+		}
+	}
+	bool hasGoodShortDistance;
+	bool hasGoodLongDistance;
+	int longCounter;
+	float32 shortDistance() {
+		float32 dist = sqrt((newShortPos.x - oldShortPos.x)*(newShortPos.x - oldShortPos.x) + (newShortPos.y - oldShortPos.y)*(newShortPos.y - oldShortPos.y));
+		return dist;
+	}
+	float32 longDistance() {
+		float32 dist = sqrt((newLongPos.x - oldLongPos.x)*(newLongPos.x - oldLongPos.x) + (newLongPos.y - oldLongPos.y)*(newLongPos.y - oldLongPos.y));
+		return dist;
+	}
+
 	//GA relates variables
 	float32 spokeAngles[8];
 	float32 spokeLengths[8];
@@ -89,7 +139,7 @@ private:
 	b2Fixture* axleFixture[8];
 	b2Fixture* cartFixture[8];
 
-		
+
 	float32 torque;
 	int32 wheelsOn;
 	int32 maxWheels;
@@ -102,6 +152,13 @@ private:
 	//REFACTOR
 	float32 totalAngleValue;
 
+	b2Vec2 oldShortPos;
+	b2Vec2 newShortPos;
+
+	b2Vec2 oldLongPos;
+	b2Vec2 newLongPos;
+	//float32 positionDistance;
+	//float32 minimumPositionDistance;
 
 };
 

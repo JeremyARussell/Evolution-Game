@@ -156,6 +156,15 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	reproductionCounter = 0;
 	minutesToLive = 28800;//8 minutes of life in a 1/60 timestep
 
+	//Initializing vars
+	oldShortPos = b2Vec2(0.0f, 0.0f);
+	newShortPos = b2Vec2(0.0f, 0.0f);
+	//oldLongPos = b2Vec2(0.0f, 0.0f);Maybe? it already works.
+	//newLongPos = b2Vec2(0.0f, 0.0f);
+	hasGoodShortDistance = false;
+	hasGoodLongDistance = false;
+	longCounter = 0;
+
     int spoke_index;
 	b2BodyDef m_cart_body;
     b2PolygonShape cartWorkingPiece;
@@ -328,7 +337,7 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	fd.density = 0.0f;
 	fd.isSensor = true;
 	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0001 | 0x0002/*WALL*/;
+	fd.filter.maskBits = 0x0002;
 			
 	//Add the walls to the world
 	cart->CreateFixture(&fd);
@@ -539,7 +548,7 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	fd.density = 0.0f;
 	fd.isSensor = true;
 	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0001 | 0x0002/*WALL*/;
+	fd.filter.maskBits = 0x0002/*GRASS*/;
 			
 	//Add the walls to the world
 	cart->CreateFixture(&fd);

@@ -8,7 +8,7 @@
 #include "Build\PolyCars\Grass.h"
 
 enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
-    WALL		     =  0x0001,
+    //WALL		     =  0x0001,
     GRASS            =  0x0002,
     WHEELER		     =  0x0004,
     //CARNIVORE	     =  0x0008,
@@ -24,16 +24,16 @@ class WheelerContactListener : public b2ContactListener {
 		b2Fixture* fixtureB = contact->GetFixtureB();
 
 		//Wheeler hitting the wall
-		if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
-			fixtureB->GetFilterData().categoryBits == 0x0001) {
-			Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
-				activeWheeler->nearWall = true;
-		}
-		if (fixtureB->GetFilterData().categoryBits == 0x0004 && 
-			fixtureA->GetFilterData().categoryBits == 0x0001) {
-			Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
-			activeWheeler->nearWall = true;
-		}
+		//if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
+		//	fixtureB->GetFilterData().categoryBits == 0x0001) {
+		//	Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
+		//		activeWheeler->nearWall = true;
+		//}
+		//if (fixtureB->GetFilterData().categoryBits == 0x0004 && 
+		//	fixtureA->GetFilterData().categoryBits == 0x0001) {
+		//	Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
+		//	activeWheeler->nearWall = true;
+		//}
 
 		//Wheeler colliding with grass
 		if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
@@ -391,48 +391,11 @@ public:
 			fd.filter.categoryBits = NON_INTERACTOR;
 
 			hex->CreateFixture(&fd);
-		}
-
-
-		{
-			//Sensor walls to trigger the basic Wheeler's to "turn around"
-			//Left wall
-			b2BodyDef leftWallbd;
-			leftWallbd.position = b2Vec2(-225.0f, 30.0f);
-			b2Body* leftWall = m_world->CreateBody(&leftWallbd);
-			//Right wall
-			b2BodyDef rightWallbd;
-			rightWallbd.position = b2Vec2(225.0f, 30.0f);
-			b2Body* rightWall = m_world->CreateBody(&rightWallbd);
-			
-			//The shape for the walls
-			b2PolygonShape box;
-			box.SetAsBox(2.0f, 60.0f);
-			//--
-			//The fixture for the walls
-			b2FixtureDef fd;
-			fd.shape = &box;
-			fd.density = 0.0f;
-			//fd.isSensor = true;
-			fd.filter.categoryBits = WALL;
-			//fd.filter.maskBits = ENEMY_AIRCRAFT;//radar only collides with aircraft
-			
-			//Add the walls to the world
-			leftWall->CreateFixture(&fd);
-			rightWall->CreateFixture(&fd);
-		}
-		
-
+		}		
 	}
 
 	float32 xpos;
 	
-    float32 randomNumber(float32 low = 0, float32 high = 1) {
-		float retNum;
-		retNum = low + (float)rand() / ((float)RAND_MAX / (high-low));
-        return retNum;
-    }
-
 	void Keyboard(unsigned char key) {
 		switch (key) {
 		case 'a':
@@ -494,7 +457,7 @@ public:
 					if (!settings->pause) { wheelers[i]->nearWallCounter++; }
 				} else {
 					wheelers[i]->nearWall = false;
-					wheelers[i]->turnAround();
+					//wheelers[i]->turnAround();
 					wheelers[i]->nearWallCounter = 0;
 				}
 			}
@@ -541,6 +504,20 @@ public:
 				if (wheelers[i]->healthDownCounter > 0) {
 					if (!settings->pause) { wheelers[i]->healthDownCounter--; }
 				} else { 
+
+					wheelers[i]->setNewShortPos(wheelers[i]->cart->GetPosition());
+					if (wheelers[i]->hasGoodShortDistance && wheelers[i]->longDistance() < 1.0f) { 
+						wheelers[i]->turnAround();
+					}
+					if (wheelers[i]->longCounter < 4) {
+						wheelers[i]->longCounter++;
+					} else {
+						wheelers[i]->setNewLongPos(wheelers[i]->cart->GetPosition());
+						if (wheelers[i]->hasGoodLongDistance && wheelers[i]->longDistance() < 5.0f) { 
+							wheelers[i]->turnAround();
+						}
+						wheelers[i]->longCounter = 0;
+					}
 					wheelers[i]->healthDownCounter = 60;
 					wheelers[i]->health--;
 				}
@@ -572,6 +549,13 @@ public:
 	}
 
 private:
+
+    float32 randomNumber(float32 low = 0, float32 high = 1) {
+		float retNum;
+		retNum = low + (float)rand() / ((float)RAND_MAX / (high-low));
+        return retNum;
+    }
+
 	vector<Wheeler> wheelersToDelete;
 	vector<Grass> grassToDelete;
 
