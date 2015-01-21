@@ -109,9 +109,8 @@ public:
 	b2Fixture* m_fixture;
 };
 
-void World::MouseDown(const b2Vec2& p) {//TODO - Take these functions and move them into the Main.cpp
-										// file, controls should be universal unless I need them
-										// to be different per world.
+void World::MouseDown(const b2Vec2& p) {
+										
 	m_mouseWorld = p;
 	
 	if (m_mouseJoint != NULL) {
@@ -177,9 +176,6 @@ void World::Step(Settings* settings) {
 		m_debugDraw.DrawString(5, m_textLine, "****PAUSED****");
 		m_textLine += 15;
 	}
-
-	//m_debugDraw.DrawString(5, m_textLine, );
-	//m_textLine += 15;
 
 	uint32 flags = 0;
 	flags += settings->drawShapes			* b2Draw::e_shapeBit;

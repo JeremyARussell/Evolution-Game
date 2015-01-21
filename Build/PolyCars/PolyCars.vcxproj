@@ -93,9 +93,7 @@
     <ClCompile Include="Wheeler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PolyCars\Framework\OldGeneticAlgorithm.h" />
     <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\StringUtils.h" />
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
     <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h" />
     <ClInclude Include="Grass.h" />

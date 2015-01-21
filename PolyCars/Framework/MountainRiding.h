@@ -1,20 +1,20 @@
-#ifndef TEST_CARS_H
-#define TEST_CARS_H
+#ifndef MTN_RIDING_H
+#define MTN_RIDING_H
+#pragma once
 
 #include <fstream>
 #include <string>
-#include "OldGeneticAlgorithm.h"
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Grass.h"
 
 enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
-    //WALL		     =  0x0001,
+    //EMPTY		     =  0x0001,
     GRASS            =  0x0002,
     WHEELER		     =  0x0004,
     //CARNIVORE	     =  0x0008,
     NON_INTERACTOR   =  0x0010,
-    //FRIENDLY_TOWER =  0x0020,
-    //SENSOR		 =  0x0040,
+    //EMPTY          =  0x0020,
+    //EMPTY		     =  0x0040,
   };
 
 //Sensing
@@ -22,18 +22,6 @@ class WheelerContactListener : public b2ContactListener {
 	void BeginContact(b2Contact* contact) {
 		b2Fixture* fixtureA = contact->GetFixtureA();
 		b2Fixture* fixtureB = contact->GetFixtureB();
-
-		//Wheeler hitting the wall
-		//if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
-		//	fixtureB->GetFilterData().categoryBits == 0x0001) {
-		//	Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
-		//		activeWheeler->nearWall = true;
-		//}
-		//if (fixtureB->GetFilterData().categoryBits == 0x0004 && 
-		//	fixtureA->GetFilterData().categoryBits == 0x0001) {
-		//	Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
-		//	activeWheeler->nearWall = true;
-		//}
 
 		//Wheeler colliding with grass
 		if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
@@ -76,7 +64,6 @@ public:
 		}
 		activeWheeler = wheelers[cW];
 	}
-	
 	void previusWheeler() {
 		if (wheelers.size() == 0) return;
 		cW--;
@@ -93,7 +80,6 @@ public:
 			wheelers.erase( std::find(wheelers.begin(), wheelers.end(), activeWheeler ) );
 			activeWheeler = NULL;
 		}
-
 	}
 
 	void saveWorld() {
@@ -138,15 +124,9 @@ public:
 			saveFile << "wheelRadius3" << ' ' << wheelers[i]->wheelRadius[4] << ' ' << wheelers[i]->wheelRadius[5] << endl;
 			saveFile << "wheelRadius4" << ' ' << wheelers[i]->wheelRadius[6] << ' ' << wheelers[i]->wheelRadius[7] << endl;
 		}
-
-		//SetEndOfFile(saveFile);
 		saveFile.close();
-
 	}
-
 	void loadWorld() {
-		//Load file
-
 		ifstream loadFile("MountainRidingWorld.sav");
 
 		string loadType = "";
@@ -157,10 +137,12 @@ public:
 		bool readyToWheel = false;
 
 		while (loadFile >> loadType >> var1 >> var2 ) {
+			//Load the grass
 			if (loadType == "grassPos") {
 				grasses.push_back(new Grass(m_world, var1, var2 ));
 			}
 
+			//Load the Wheelers
 			if (loadType == "wPos") { genes.push_back(var1); genes.push_back(var2); }
 			if (loadType == "wAngleAndDirection") { genes.push_back(var1); genes.push_back(var2); }
 			if (loadType == "wLife") { genes.push_back(var1); genes.push_back(var2); }
@@ -190,23 +172,12 @@ public:
 			if (loadType == "wheelRadius3") { genes.push_back(var1); genes.push_back(var2); }
 			if (loadType == "wheelRadius4") { genes.push_back(var1); genes.push_back(var2); readyToWheel = true;}
 
-			//bool readyToWheel = true;
-
 			if (readyToWheel) {
 				wheelers.push_back(new Wheeler(m_world, genes));
 				genes.clear();
 				readyToWheel = false;
 			}
-
 		}
-
-		///Load all the Grass
-
-
-
-		///Load all the Wheelers
-		///////Will need to rebuild a new Wheeler at each spot,
-		///////make a new overloaded Wheeler generation method
 		loadFile.close();
 	}
 
@@ -253,7 +224,6 @@ public:
 			saveFile.close();
 		}
 	}
-
 	void importCreature() {
 		ifstream loadFile("WheelerExport.sav");
 
@@ -265,7 +235,6 @@ public:
 		bool readyToWheel = false;
 
 		while (loadFile >> loadType >> var1 >> var2 ) {
-
 
 			if (loadType == "wPos") { genes.push_back(var1); genes.push_back(var2); }
 			if (loadType == "wAngleAndDirection") { genes.push_back(var1); genes.push_back(var2); }
@@ -296,8 +265,6 @@ public:
 			if (loadType == "wheelRadius3") { genes.push_back(var1); genes.push_back(var2); }
 			if (loadType == "wheelRadius4") { genes.push_back(var1); genes.push_back(var2); readyToWheel = true;}
 
-			//bool readyToWheel = true;
-
 			if (readyToWheel) {
 				wheelers.push_back(new Wheeler(m_world, genes));
 				genes.clear();
@@ -307,11 +274,8 @@ public:
 		loadFile.close();
 	}
 
-	vector<Wheeler*> wheelers;
-	vector<Grass*> grasses;
-
+	//Level building, and default creature placement go here.
     MountainRiding() {
-
 		cW = 0;
 		activeWheeler = NULL;
 		grassSpawnCounter = 0;
@@ -322,9 +286,9 @@ public:
 		{
 			//The box that is the ground, ceiling and walls which keep everyone inside.
 			b2BodyDef bd;
-			b2Body* ground = m_world->CreateBody(&bd);
+			b2Body* world = m_world->CreateBody(&bd);
 			
-			//Setup a 4 point array to hold the four corners of the world.
+			//Setup an array to hold the vertices of the world.
 			b2Vec2 vs[12];
 			vs[0].Set(-225.0f, 70.0f);
 			vs[1].Set(-225.0f, 10.0f);
@@ -339,7 +303,7 @@ public:
 			vs[10].Set(225.0f, 10.0f);
 			vs[11].Set(225.0f, 70.0f);
 
-			//Shape and fixture for the world's corners.
+			//Shape and fixture for the world's boundaries.
 			b2ChainShape loop;
 			loop.CreateLoop(vs, 12);
 			b2FixtureDef fd;
@@ -347,8 +311,8 @@ public:
 			fd.density = 0.0f;
 			fd.filter.categoryBits = NON_INTERACTOR;
 
-			//Add the walls to our world
-			ground->CreateFixture(&fd);
+			//Add the boundaries to our world
+			world->CreateFixture(&fd);
 		}
 
 		{
@@ -356,11 +320,9 @@ public:
 			b2BodyDef bd;
 			b2Body* hex = m_world->CreateBody(&bd);
 			
-			//Setup a 4 point array to hold the four corners of the world.
 			b2Vec2 vs[12];
 
 			float32 wallLength = 15.0f;
-
 			b2Vec2 S;
 			S.Set(-wallLength / 2, 40.0f);
 
@@ -393,8 +355,6 @@ public:
 			hex->CreateFixture(&fd);
 		}		
 	}
-
-	float32 xpos;
 	
 	void Keyboard(unsigned char key) {
 		switch (key) {
@@ -413,16 +373,19 @@ public:
 
 	void Step(Settings* settings) {
 
+		//For knowing if our settings file has the following flag triggered
 		if (settings->followCreature == true) {
 			following = true;
 		} else {
 			following = false;
 		}
 
+		//For tracking/following the active Wheeler
 		if (activeWheeler != NULL && activeWheeler->health > -1 && settings->followCreature == 1) {
 			settings->viewCenter.Set(activeWheeler->cart->GetPosition().x, activeWheeler->cart->GetPosition().y);
 		}
 
+		//Game text
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
 		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to generate some grass, hit 'A' to randomly generate Wheelers");
@@ -446,23 +409,10 @@ public:
 
 		//Wheeler Step code
 		for (int i = 0; i < wheelers.size(); i ++) {
-
+			//Call to render
 			wheelers[i]->render();
-
-			if (!settings->pause) { wheelers[i]->reproductionCounter++; }
 			
-			//Sensing
-			if (wheelers[i]->nearWall) {
-				if (wheelers[i]->nearWallCounter < 120) {
-					if (!settings->pause) { wheelers[i]->nearWallCounter++; }
-				} else {
-					wheelers[i]->nearWall = false;
-					//wheelers[i]->turnAround();
-					wheelers[i]->nearWallCounter = 0;
-				}
-			}
-
-		//REPRODUCING STUFF
+			//REPRODUCING STUFF
 			if (!settings->pause) { wheelers[i]->reproductionCounter++; }
 			if (wheelers[i]->needsToReproduce) {
 				wheelers[i]->reproductionCounter = 0;
@@ -470,18 +420,6 @@ public:
 				wheelers.push_back(new Wheeler(*wheelers[i], m_world,  wheelers[i]->cart->GetPosition().x,  wheelers[i]->cart->GetPosition().y + 5.0f));
 			}
 
-			/*
-			//DEBUGGING STUFF
-			string test;
-			if (wheelers[i]->nearWall) {test = "true";} else {test = "false";}
-			const char * ttest = test.c_str();
-			m_debugDraw.DrawString(10, m_textLine, ttest);
-			m_textLine += 15;
-			m_debugDraw.DrawString(10, m_textLine, "Wheeler spin = %d", (const char)wheelers[i]->spinDirection);
-			m_textLine += 15;
-			m_debugDraw.DrawString(10, m_textLine, "Wheeler health = %d", (const char)wheelers[i]->health);
-			m_textLine += 15;
-			*/
 			//Dying stuff is done at the end of the for loop, this ways they don't cause
 			//subscript exceptions, the top dying method causes a break to prevent
 			//the buttom dying code from breaking things. there's probably a better
@@ -504,7 +442,7 @@ public:
 				if (wheelers[i]->healthDownCounter > 0) {
 					if (!settings->pause) { wheelers[i]->healthDownCounter--; }
 				} else { 
-
+					//Movement sensing
 					wheelers[i]->setNewShortPos(wheelers[i]->cart->GetPosition());
 					if (wheelers[i]->hasGoodShortDistance && wheelers[i]->longDistance() < 1.0f) { 
 						wheelers[i]->turnAround();
@@ -518,13 +456,12 @@ public:
 						}
 						wheelers[i]->longCounter = 0;
 					}
+					//Health stuff again
 					wheelers[i]->healthDownCounter = 60;
 					wheelers[i]->health--;
 				}
 			}
 		}
-		//m_debugDraw.DrawString(10, m_textLine, "========== End Debug Info ==========");
-		//m_textLine += 15;
 
 		World::Step(settings);
 
@@ -550,22 +487,28 @@ public:
 
 private:
 
+	//Random number generation - I tried putting this stuff in it's own file, I failed :(
     float32 randomNumber(float32 low = 0, float32 high = 1) {
 		float retNum;
 		retNum = low + (float)rand() / ((float)RAND_MAX / (high-low));
         return retNum;
     }
 
+	//Live creatures
+	vector<Wheeler*> wheelers;
+	vector<Grass*> grasses;
+	//Dying creatures
 	vector<Wheeler> wheelersToDelete;
 	vector<Grass> grassToDelete;
 
+	//Used to place random generated Wheelers
+	float32 xpos;
+
+	//Used for tracking Wheelers
 	int cW;
-	int grassSpawnCounter;
-
 	bool following;
+
+	//Grass spawn counter - Kind of self explinatory
+	int grassSpawnCounter;
 };
-
 #endif
-
-
-

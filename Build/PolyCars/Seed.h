@@ -1,8 +1,11 @@
+#ifndef SEED_H
+#define SEED_H
+
 #pragma once
-class Seed
-{
+class Seed {
 public:
 	Seed(void);
 	~Seed(void);
 };
 
+#endif

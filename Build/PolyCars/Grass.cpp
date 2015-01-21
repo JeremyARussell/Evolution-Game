@@ -1,12 +1,8 @@
 #include "Grass.h"
 
-
 //Use collision of seeds to find the ground anchor point to grow the new grass.
 
-
-
-Grass::Grass(b2World *m_world, float32 x,float32 y)
-{
+Grass::Grass(b2World *m_world, float32 x,float32 y) {
 	myWorld = m_world;
 
 	beingEaten = false;
@@ -36,12 +32,10 @@ Grass::Grass(b2World *m_world, float32 x,float32 y)
 
 }
 
-void Grass::die()
-{
+void Grass::die() {
 	myWorld->DestroyBody(stalk);
 }
 
-Grass::~Grass(void)
-{
-	//myWorld->DestroyBody(stalk);
+Grass::~Grass(void) {
+
 }

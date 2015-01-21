@@ -132,6 +132,7 @@ struct ContactPoint {
 class World : public b2ContactListener {
 public:
 
+	//Pure virtual functions to tie the UI in with functions in the world files.
 	virtual void nextWheeler() = 0;
 	virtual void previusWheeler() = 0;
 	virtual void destroyCreature() = 0;
