@@ -366,7 +366,7 @@ public:
 			}			
 			break;
 		case 'w':
-			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.5f));
+			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
 			break;
 		}
 	}
@@ -393,6 +393,9 @@ public:
 
 		//Check if grass is being eaten this step
 		for (int i = 0; i < grasses.size(); i ++) {
+
+			grasses[i]->step();
+
 			if (grasses[i]->beingEaten) {
 				Grass *dying = grasses[i];
 				grassToDelete.push_back(*dying);
@@ -404,7 +407,7 @@ public:
 		if (!settings->pause) { grassSpawnCounter++; }
 		if (grassSpawnCounter > settings->grassSpawnRate * 60) {
 			grassSpawnCounter = 0;
-			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.5f));
+			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
 		}
 
 		//Wheeler Step code
