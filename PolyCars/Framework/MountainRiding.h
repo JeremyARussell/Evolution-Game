@@ -41,10 +41,7 @@ class WheelerContactListener : public b2ContactListener {
 			Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
 
 			if (activeWheeler->health < 30) {
-				if (activeGrass->fresh) { 
-					activeGrass->fresh = false; 
-					return;
-				}
+				if (activeGrass->fresh)	return;
 				activeGrass->beingEaten = true;
 				activeWheeler->needsToReproduce = true;
 				activeWheeler->health = 50;
