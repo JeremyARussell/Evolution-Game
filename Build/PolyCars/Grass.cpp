@@ -7,8 +7,6 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 	myWorld = m_world;
 
-	beingEaten = false;
-
 	xp = x;
 	yp = y;
 
@@ -19,8 +17,8 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 	stalkShape.SetAsBox(0.4f, 0.2f);//0.2 per hp
 
 	stalkFixture.filter.categoryBits = 0x0002;
-	stalkFixture.filter.maskBits = 0x0004;
-	stalkFixture.isSensor = true;
+	stalkFixture.filter.maskBits = 0x0002 | 0x0004;
+	//stalkFixture.isSensor = true;
     stalkFixture.shape = &stalkShape;
     stalkFixture.density = 2.0f;
     stalkFixture.friction = 10.0f;
@@ -29,6 +27,35 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
     stalk = myWorld->CreateBody(&m_stalkBody);
 	stalkFix = stalk->CreateFixture(&stalkFixture);
 	stalk->SetUserData( this );
+
+
+	//////
+    m_stalkSensorBody.position.Set(xp, yp);
+    m_stalkSensorBody.angle = 0;
+	m_stalkSensorBody.type = b2_dynamicBody;
+	m_stalkSensorBody.gravityScale = 0;
+
+	stalkSensorShape.SetAsBox(0.4f, 0.2f);//0.2 per hp
+
+	stalkSensorFixture.filter.categoryBits = 0x0040;
+	stalkSensorFixture.filter.maskBits = 0x0040;
+	stalkSensorFixture.isSensor = true;
+    stalkSensorFixture.shape = &stalkShape;
+    stalkSensorFixture.density = 2.0f;
+    stalkSensorFixture.friction = 10.0f;
+    stalkSensorFixture.restitution = 0.05f;
+
+    stalkSensor = myWorld->CreateBody(&m_stalkSensorBody);
+	stalkSensorFix = stalkSensor->CreateFixture(&stalkSensorFixture);
+	stalkSensor->SetUserData( this );
+
+	testweld.bodyA = stalk;
+	testweld.bodyB = stalkSensor;
+
+	testweld.localAnchorA = b2Vec2(0.0, 0.0);
+	testweld.localAnchorB = b2Vec2(0.0, 0.0);
+
+	myWorld->CreateJoint(&testweld);
 
 }
 
@@ -39,10 +66,16 @@ void Grass::prep() {//Later 0'd out and then a randomizer function will be born.
 	growthPoint = 5.0f;
 	maxHp = 10.0f;
 	hp = 1;
+	seeding = false;
+	beingEaten = false;
+	crowded = false;
+	crowdTimer = 0;
+
+	fresh = false;
 }
 
 void Grass::step() {
-	if (second < 60) {
+	if (second < 120) {
 		second++;
 	} else {//A second went by
 
@@ -51,8 +84,17 @@ void Grass::step() {
 			hp++;
 		}
 
-		if (en > (int)(maxEn - 1)) {
-			//seed(myWorld);
+		if (en > (int)(maxEn - 1) && !crowded) {
+			seed();
+		}
+
+		if (crowded) {
+			if (crowdTimer < 11) {
+				crowdTimer++;
+			} else {
+				crowded = false;
+				crowdTimer = 0;
+			}
 		}
 
 		en++;
@@ -61,6 +103,17 @@ void Grass::step() {
 }
 
 void Grass::grow(int) {
+	fresh = true;
+	stalkSensor->DestroyFixture(stalkSensorFix);
+
+	stalkSensor->SetTransform(b2Vec2(xp, yp + (0.2f * hp)), 0);
+
+	stalkSensorShape.SetAsBox(0.4f, 0.2f + (0.2f * hp));//0.2 per hp
+    stalkSensorFixture.shape = &stalkSensorShape;
+
+	stalkSensorFix = stalkSensor->CreateFixture(&stalkSensorFixture);
+
+
 	stalk->DestroyFixture(stalkFix);
 
 	stalk->SetTransform(b2Vec2(xp, yp + (0.2f * hp)), 0);
@@ -68,6 +121,7 @@ void Grass::grow(int) {
 	stalkShape.SetAsBox(0.4f, 0.2f + (0.2f * hp));//0.2 per hp
     stalkFixture.shape = &stalkShape;
 
+	fresh = true;
 	stalkFix = stalk->CreateFixture(&stalkFixture);
 }
 
@@ -84,13 +138,18 @@ int Grass::bitten(int) {
 	return 1;
 }
 
-void Grass::seed(b2World*) {
+void Grass::seed() {
 	//Generate a seed and shoot it out. 
 	//- --- Seeds generate with an angle, a force, and a parents gene.
+	en = en = 1;
+	hp = hp = 1;
+	grow(hp);
+	seeding = true;
 }
 
 void Grass::die() {
 	myWorld->DestroyBody(stalk);
+	myWorld->DestroyBody(stalkSensor);
 }
 
 Grass::~Grass(void) {

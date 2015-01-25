@@ -5,17 +5,18 @@
 #include <fstream>
 #include <string>
 #include "Build\PolyCars\Wheeler.h"
+#include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
 
 enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
-    //EMPTY		     =  0x0001,
+    SEED		     =  0x0001,
     GRASS            =  0x0002,
     WHEELER		     =  0x0004,
     //CARNIVORE	     =  0x0008,
     NON_INTERACTOR   =  0x0010,
-    //EMPTY          =  0x0020,
-    //EMPTY		     =  0x0040,
-  };
+    WALL             =  0x0020,
+    GRASS_SENSOR	 =  0x0040,
+};
 
 //Sensing
 class WheelerContactListener : public b2ContactListener { 
@@ -24,26 +25,50 @@ class WheelerContactListener : public b2ContactListener {
 		b2Fixture* fixtureB = contact->GetFixtureB();
 
 		//Wheeler colliding with grass
-		if (fixtureA->GetFilterData().categoryBits == 0x0004 && 
-			fixtureB->GetFilterData().categoryBits == 0x0002) {
-			Grass* activeGrass = (Grass *)fixtureB->GetBody()->GetUserData();
-			Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
-			if (activeWheeler->health < 30) {
-				activeGrass->beingEaten = true;
-				activeWheeler->needsToReproduce = true;
-				activeWheeler->health = 50;
-			}
-		}
-		if (fixtureB->GetFilterData().categoryBits == 0x0004 && 
-			fixtureA->GetFilterData().categoryBits == 0x0002) {
+//		if (fixtureA->GetFilterData().categoryBits == WHEELER && 
+//			fixtureB->GetFilterData().categoryBits == GRASS) {
+//			Grass* activeGrass = (Grass *)fixtureB->GetBody()->GetUserData();
+//			Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
+//			if (activeWheeler->health < 30) {
+//				activeGrass->beingEaten = true;
+//				activeWheeler->needsToReproduce = true;
+//				activeWheeler->health = 50;
+//			}
+//		}
+		if (fixtureB->GetFilterData().categoryBits == WHEELER && 
+			fixtureA->GetFilterData().categoryBits == GRASS) {
 			Grass* activeGrass = (Grass *)fixtureA->GetBody()->GetUserData();
 			Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
+
 			if (activeWheeler->health < 30) {
+				if (activeGrass->fresh) { 
+					activeGrass->fresh = false; 
+					return;
+				}
 				activeGrass->beingEaten = true;
 				activeWheeler->needsToReproduce = true;
 				activeWheeler->health = 50;
 			}
+		}		
+		if (fixtureA->GetFilterData().categoryBits == WALL && 
+			fixtureB->GetFilterData().categoryBits == SEED) {
+				Seed* seedTest = (Seed *)fixtureB->GetBody()->GetUserData(); 
+				//fixtureB->GetBody()->GetPosition();
+				seedTest->timetoSeed = true;
+				//Make grass here
+				//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
 		}
+		if (fixtureA->GetFilterData().categoryBits == GRASS_SENSOR && 
+			fixtureB->GetFilterData().categoryBits == GRASS_SENSOR) {
+				Grass* seedTest = (Grass *)fixtureB->GetBody()->GetUserData(); 
+				Grass* seedTest2 = (Grass *)fixtureA->GetBody()->GetUserData(); 
+				seedTest->crowded = true;
+				seedTest2->crowded = true;
+		}
+//		if (fixtureB->GetFilterData().categoryBits == NON_INTERACTOR && 
+//			fixtureA->GetFilterData().categoryBits == SEED) {
+//
+//		}
 	}
   
     void EndContact(b2Contact* contact) {
@@ -309,7 +334,8 @@ public:
 			b2FixtureDef fd;
 			fd.shape = &loop;
 			fd.density = 0.0f;
-			fd.filter.categoryBits = NON_INTERACTOR;
+			fd.filter.categoryBits = WALL;
+			//fd.filter.maskBits = ;
 
 			//Add the boundaries to our world
 			world->CreateFixture(&fd);
@@ -350,7 +376,7 @@ public:
 			b2FixtureDef fd;
 			fd.shape = &loop;
 			fd.density = 0.0f;
-			fd.filter.categoryBits = NON_INTERACTOR;
+			fd.filter.categoryBits = WALL;
 
 			hex->CreateFixture(&fd);
 		}		
@@ -366,7 +392,13 @@ public:
 			}			
 			break;
 		case 'w':
-			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
+			//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
+
+			float32 xt = randomNumber(-3.0f, 3.0f);
+			float32 yt = randomNumber(1.0f, 3.0f);
+			
+			//new Seed(m_world, b2Vec2(xt, yt)
+			seeds.push_back(new Seed(m_world, b2Vec2(0.0f, 20.0f), b2Vec2(xt, yt)));
 			break;
 		}
 	}
@@ -391,10 +423,37 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to generate some grass, hit 'A' to randomly generate Wheelers");
 		m_textLine += 15;
 
+		for (int i = 0; i < seeds.size(); i ++) {
+			if (!settings->pause) { 
+				if (seeds[i]->timetoSeed) {
+					Seed *dying = seeds[i];
+					float32 xt2 = dying->seed->GetPosition().x;
+					float32 yt2 = dying->seed->GetPosition().y;
+					seedsToDelete.push_back(*dying);
+					seeds.erase( std::find(seeds.begin(), seeds.end(), dying ) );
+					grasses.push_back(new Grass(m_world, xt2,  yt2));
+				}
+			}
+		}
+
 		//Check if grass is being eaten this step
 		for (int i = 0; i < grasses.size(); i ++) {
 
-			grasses[i]->step();
+			if (!settings->pause) { grasses[i]->step(); }
+			
+			if (grasses[i]->seeding && !(grasses[i]->crowded)) {
+
+				float32 xt = randomNumber(-3.0f, 3.0f);
+				float32 yt = randomNumber(1.0f, 3.0f);
+				float32 xt2 = grasses[i]->stalk->GetPosition().x;
+				float32 yt2 = grasses[i]->stalk->GetPosition().y;
+
+
+				seeds.push_back(new Seed(m_world, b2Vec2(xt2, yt2), b2Vec2(xt, yt)));
+				//But with grass as parent once genes for them are setup.
+				
+				grasses[i]->seeding = false;
+			}
 
 			if (grasses[i]->beingEaten) {
 				Grass *dying = grasses[i];
@@ -404,11 +463,11 @@ public:
 		}
 
 		//Timer and code for the spawning of grass
-		if (!settings->pause) { grassSpawnCounter++; }
-		if (grassSpawnCounter > settings->grassSpawnRate * 60) {
-			grassSpawnCounter = 0;
-			grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
-		}
+		//if (!settings->pause) { grassSpawnCounter++; }
+		//if (grassSpawnCounter > settings->grassSpawnRate * 60) {
+		//	grassSpawnCounter = 0;
+		//	grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
+		//}
 
 		//Wheeler Step code
 		for (int i = 0; i < wheelers.size(); i ++) {
@@ -480,8 +539,12 @@ public:
 		for (int i = 0; i < grassToDelete.size(); i ++) {
 			grassToDelete[i].die();
 		}
+		for (int i = 0; i < seedsToDelete.size(); i ++) {
+			seedsToDelete[i].destroy();
+		}
 		wheelersToDelete.clear();
 		grassToDelete.clear();
+		seedsToDelete.clear();
 	}
 
 	static World* Create() {
@@ -500,9 +563,11 @@ private:
 	//Live creatures
 	vector<Wheeler*> wheelers;
 	vector<Grass*> grasses;
+	vector<Seed*> seeds;
 	//Dying creatures
 	vector<Wheeler> wheelersToDelete;
 	vector<Grass> grassToDelete;
+	vector<Seed> seedsToDelete;
 
 	//Used to place random generated Wheelers
 	float32 xpos;
