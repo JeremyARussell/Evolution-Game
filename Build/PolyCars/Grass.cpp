@@ -71,10 +71,11 @@ void Grass::prep() {//Later 0'd out and then a randomizer function will be born.
 	crowded = false;
 	crowdTimer = 0;
 
-	fresh = false;
+	fresh = true;
 }
 
 void Grass::step() {
+	if (second == 2) fresh = false;
 	if (second < 120) {
 		second++;
 	} else {//A second went by
