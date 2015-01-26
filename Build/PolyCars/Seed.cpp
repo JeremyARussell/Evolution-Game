@@ -13,7 +13,7 @@ Seed::Seed(b2World* world, b2Vec2 pos, b2Vec2 impulse) {
 	seedShape.m_radius = 0.2f;
 
 	seedFixDef.filter.categoryBits = 0x0001;
-	seedFixDef.filter.maskBits = 0x0020;
+	seedFixDef.filter.maskBits = 0x0020 | 0x0010;
     seedFixDef.shape = &seedShape;
     seedFixDef.density = 2.0f;
     seedFixDef.friction = 10.0f;

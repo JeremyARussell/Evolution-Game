@@ -338,7 +338,7 @@ public:
 			world->CreateFixture(&fd);
 		}
 
-		{
+		/*{
 			//Building the Hexagon for throwing away unwanted Wheelers
 			b2BodyDef bd;
 			b2Body* hex = m_world->CreateBody(&bd);
@@ -376,7 +376,112 @@ public:
 			fd.filter.categoryBits = WALL;
 
 			hex->CreateFixture(&fd);
-		}		
+		}*/
+
+		{
+			b2BodyDef bd;
+			b2Body* spawnerS1 = m_world->CreateBody(&bd);
+			
+			float32 spx; float32 spy;
+			spx = -50.0f; spy = 40.0f;
+
+			b2Vec2 vsS1[3];
+			vsS1[0].Set(spx, spy);
+			vsS1[1].Set(spx - 1, spy - 2);
+			vsS1[2].Set(spx + 1, spy - 2);
+
+			b2ChainShape loopS1;
+			loopS1.CreateLoop(vsS1, 3);
+			b2FixtureDef fdS1;
+			fdS1.shape = &loopS1;
+			fdS1.density = 0.0f;
+			fdS1.filter.categoryBits = NON_INTERACTOR;
+
+			spawnerS1->CreateFixture(&fdS1);
+
+			grasses.push_back(new Grass(m_world, spx, spy));
+			///
+			b2Body* spawnerS2 = m_world->CreateBody(&bd);
+			
+			spx = -40.0f; spy = 45.0f;
+
+			b2Vec2 vsS2[3];
+			vsS2[0].Set(spx, spy);
+			vsS2[1].Set(spx - 1, spy - 2);
+			vsS2[2].Set(spx + 1, spy - 2);
+
+			b2ChainShape loopS2;
+			loopS2.CreateLoop(vsS2, 3);
+			b2FixtureDef fdS2;
+			fdS2.shape = &loopS2;
+			fdS2.density = 0.0f;
+			fdS2.filter.categoryBits = NON_INTERACTOR;
+
+			spawnerS2->CreateFixture(&fdS2);
+
+			grasses.push_back(new Grass(m_world, spx, spy));
+			///
+			b2Body* spawnerS3 = m_world->CreateBody(&bd);
+			
+			spx = -30.0f; spy = 40.0f;
+
+			b2Vec2 vsS3[3];
+			vsS3[0].Set(spx, spy);
+			vsS3[1].Set(spx - 1, spy - 2);
+			vsS3[2].Set(spx + 1, spy - 2);
+
+			b2ChainShape loopS3;
+			loopS3.CreateLoop(vsS3, 3);
+			b2FixtureDef fdS3;
+			fdS3.shape = &loopS3;
+			fdS3.density = 0.0f;
+			fdS3.filter.categoryBits = NON_INTERACTOR;
+
+			spawnerS3->CreateFixture(&fdS3);
+
+			grasses.push_back(new Grass(m_world, spx, spy));
+			///
+			b2Body* spawnerS4 = m_world->CreateBody(&bd);
+			
+			spx = 15.0f; spy = 43.0f;
+
+			b2Vec2 vsS4[3];
+			vsS4[0].Set(spx, spy);
+			vsS4[1].Set(spx - 1, spy - 2);
+			vsS4[2].Set(spx + 1, spy - 2);
+
+			b2ChainShape loopS4;
+			loopS4.CreateLoop(vsS4, 3);
+			b2FixtureDef fdS4;
+			fdS4.shape = &loopS4;
+			fdS4.density = 0.0f;
+			fdS4.filter.categoryBits = NON_INTERACTOR;
+
+			spawnerS4->CreateFixture(&fdS4);
+
+			grasses.push_back(new Grass(m_world, spx, spy));
+			///
+			b2Body* spawnerS5 = m_world->CreateBody(&bd);
+			
+			spx = 20; spy = 40.0f;
+
+			b2Vec2 vsS5[3];
+			vsS5[0].Set(spx, spy);
+			vsS5[1].Set(spx - 1, spy - 2);
+			vsS5[2].Set(spx + 1, spy - 2);
+
+			b2ChainShape loopS5;
+			loopS5.CreateLoop(vsS5, 3);
+			b2FixtureDef fdS5;
+			fdS5.shape = &loopS5;
+			fdS5.density = 0.0f;
+			fdS5.filter.categoryBits = NON_INTERACTOR;
+
+			spawnerS5->CreateFixture(&fdS5);
+
+			grasses.push_back(new Grass(m_world, spx, spy));
+
+		}
 	}
 	
 	void Keyboard(unsigned char key) {
@@ -395,7 +500,7 @@ public:
 			float32 yt = randomNumber(1.0f, 3.0f);
 			
 			//new Seed(m_world, b2Vec2(xt, yt)
-			seeds.push_back(new Seed(m_world, b2Vec2(0.0f, 20.0f), b2Vec2(xt, yt)));
+			seeds.push_back(new Seed(m_world, b2Vec2(125.0f, 25.0f), b2Vec2(xt, yt)));
 			break;
 		}
 	}
