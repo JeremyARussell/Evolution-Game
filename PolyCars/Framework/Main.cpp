@@ -25,8 +25,8 @@ using namespace std;
 
 namespace {
 	int32 major = 0;
-	int32 minor = 0;
-	int32 revision = 7;
+	int32 minor = 1;
+	int32 revision = 0;
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -348,8 +348,8 @@ int main(int argc, char** argv) {
 
 	glui->add_column(true);
 	glui->add_button("Pause", 0, Pause);
-	/*#if defined (_DEBUG)*/ glui->add_button("Single Step", 0, SingleStep);
-	/*#endif*/
+	///*#if defined (_DEBUG)*/ glui->add_button("Single Step", 0, SingleStep);
+	///*#endif*/
 	glui->add_button("Restart", 0, Restart);
 	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
 		
@@ -358,10 +358,10 @@ int main(int argc, char** argv) {
 	glui->add_button("Next", 0, nextWheeler);
 	glui->add_button("Previous", 0, previusWheeler);
 
-	GLUI_Spinner* grassSpawnSpinner =
-		glui->add_spinner("Grass Rate", GLUI_SPINNER_INT, &settings.grassSpawnRate);
-	grassSpawnSpinner->set_int_limits(1, 10);
-	grassSpawnSpinner->set_speed(0.1f);
+	//GLUI_Spinner* grassSpawnSpinner =
+	//	glui->add_spinner("Grass Rate", GLUI_SPINNER_INT, &settings.grassSpawnRate);
+	//grassSpawnSpinner->set_int_limits(1, 10);
+	//grassSpawnSpinner->set_speed(0.1f);
 
 	glui->add_column(true);
 	glui->add_button("Destroy", 0, destroyCreature);

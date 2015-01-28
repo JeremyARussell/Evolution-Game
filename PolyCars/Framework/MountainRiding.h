@@ -304,39 +304,95 @@ public:
 		following = false;
 
 		m_world->SetContactListener(&thisWheelerContactListener);
-
+		#pragma region World 
 		{
-			//The box that is the ground, ceiling and walls which keep everyone inside.
+			//The World's boundaries
 			b2BodyDef bd;
 			b2Body* world = m_world->CreateBody(&bd);
 			
-			//Setup an array to hold the vertices of the world.
-			b2Vec2 vs[12];
-			vs[0].Set(-225.0f, 70.0f);
-			vs[1].Set(-225.0f, 10.0f);
-			vs[2].Set(-175.0f, 10.0f);
-			vs[3].Set(-125.0f, 0.0f);
-			vs[4].Set(-75.0f, 0.0f);
-			vs[5].Set(-25.0f, 0.0f);
-			vs[6].Set(25.0f, 0.0f);
-			vs[7].Set(75.0f, 0.0f);
-			vs[8].Set(125.0f, 0.0f);
-			vs[9].Set(175.0f, 0.0f);
-			vs[10].Set(225.0f, 10.0f);
-			vs[11].Set(225.0f, 70.0f);
+			//Ground
+			b2Vec2 vsGround1[4];
+			vsGround1[0].Set(-225.0f, 1.0f);
+			vsGround1[1].Set(-225.0f, -1.0f);
+			vsGround1[2].Set(225.0f, -1.0f);
+			vsGround1[3].Set(225.0f, 1.0f);
 
-			//Shape and fixture for the world's boundaries.
-			b2ChainShape loop;
-			loop.CreateLoop(vs, 12);
-			b2FixtureDef fd;
-			fd.shape = &loop;
-			fd.density = 0.0f;
-			fd.filter.categoryBits = WALL;
-			//fd.filter.maskBits = ;
+			b2PolygonShape polyGround1;
+			polyGround1.Set(vsGround1, 4);
 
-			//Add the boundaries to our world
-			world->CreateFixture(&fd);
+			b2FixtureDef fdGround1;
+			fdGround1.shape = &polyGround1;
+			fdGround1.density = 0.0f;
+			fdGround1.filter.categoryBits = WALL;
+
+			world->CreateFixture(&fdGround1);
+			//Ground #2
+			//b2Vec2 vsGround2[4];
+			//vsGround2[0].Set(-225.0f, 1.0f);
+			//vsGround2[1].Set(-200.0f, -1.0f);
+			//vsGround2[2].Set(225.0f, -1.0f);
+			//vsGround2[3].Set(225.0f, 1.0f);
+
+			//b2PolygonShape polyGround2;
+			//polyGround2.Set(vsGround2, 4);
+
+			//b2FixtureDef fdGround2;
+			//fdGround2.shape = &polyGround2;
+			//fdGround2.density = 0.0f;
+			//fdGround2.filter.categoryBits = WALL;
+
+			//world->CreateFixture(&fdGround2);
+			//Left Wall
+			b2Vec2 vsLeftWall[4];
+			vsLeftWall[0].Set(-225.0f, 68.0f);
+			vsLeftWall[1].Set(-225.0f, 1.0f);
+			vsLeftWall[2].Set(-223.0f, 1.0f);
+			vsLeftWall[3].Set(-223.0f, 68.0f);
+
+			b2PolygonShape polyLeftWall;
+			polyLeftWall.Set(vsLeftWall, 4);
+
+			b2FixtureDef fdLeftWall;
+			fdLeftWall.shape = &polyLeftWall;
+			fdLeftWall.density = 0.0f;
+			fdLeftWall.filter.categoryBits = NON_INTERACTOR;
+
+			world->CreateFixture(&fdLeftWall);
+			//Ceiling
+			b2Vec2 vsCeiling[4];
+			vsCeiling[0].Set(-225.0f, 70.0f);
+			vsCeiling[1].Set(-225.0f, 68.0f);
+			vsCeiling[2].Set(225.0f, 68.0f);
+			vsCeiling[3].Set(225.0f, 70.0f);
+
+			b2PolygonShape polyCeiling;
+			polyCeiling.Set(vsCeiling, 4);
+
+			b2FixtureDef fdCeiling;
+			fdCeiling.shape = &polyCeiling;
+			fdCeiling.density = 0.0f;
+			fdCeiling.filter.categoryBits = NON_INTERACTOR;
+
+			world->CreateFixture(&fdCeiling);	
+			//Right Wall
+			b2Vec2 vsRightWall[4];
+			vsRightWall[0].Set(223.0f, 68.0f);
+			vsRightWall[1].Set(223.0f, 1.0f);
+			vsRightWall[2].Set(225.0f, 1.0f);
+			vsRightWall[3].Set(225.0f, 68.0f);
+
+			b2PolygonShape polyRightWall;
+			polyRightWall.Set(vsRightWall, 4);
+
+			b2FixtureDef fdRightWall;
+			fdRightWall.shape = &polyRightWall;
+			fdRightWall.density = 0.0f;
+			fdRightWall.filter.categoryBits = NON_INTERACTOR;
+
+			world->CreateFixture(&fdRightWall);
+
 		}
+		#pragma endregion Ground and Walls
 
 		/*{
 			//Building the Hexagon for throwing away unwanted Wheelers
@@ -378,6 +434,8 @@ public:
 			hex->CreateFixture(&fd);
 		}*/
 
+
+		#pragma region Spawners 
 		{
 			b2BodyDef bd;
 			b2Body* spawnerS1 = m_world->CreateBody(&bd);
@@ -399,7 +457,7 @@ public:
 
 			spawnerS1->CreateFixture(&fdS1);
 
-			grasses.push_back(new Grass(m_world, spx, spy));
+			grasses.push_back(new Grass(m_world, spx, spy));//TODO - Make a spawner specific set of grass.
 			///
 			b2Body* spawnerS2 = m_world->CreateBody(&bd);
 			
@@ -480,8 +538,8 @@ public:
 			spawnerS5->CreateFixture(&fdS5);
 
 			grasses.push_back(new Grass(m_world, spx, spy));
-
 		}
+		#pragma endregion Units for spawning
 	}
 	
 	void Keyboard(unsigned char key) {
@@ -522,7 +580,7 @@ public:
 		//Game text
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
-		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to generate some grass, hit 'A' to randomly generate Wheelers");
+		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to create some grass seeds, hit 'A' to randomly generate Wheelers");
 		m_textLine += 15;
 
 		for (int i = 0; i < seeds.size(); i ++) {
