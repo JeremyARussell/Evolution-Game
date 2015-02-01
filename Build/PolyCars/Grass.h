@@ -30,7 +30,7 @@ public:
 	void die();
 	~Grass(void);
 
-private:
+protected:
     float32 randomNumber(float32 low = 0, float32 high = 1) {
 		float retNum;
 		retNum = low + (float)rand() / ((float)RAND_MAX / (high-low));

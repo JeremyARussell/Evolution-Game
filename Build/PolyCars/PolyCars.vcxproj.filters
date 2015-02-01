@@ -22,6 +22,9 @@
     <ClCompile Include="Seed.cpp">
       <Filter>Game\Creatures</Filter>
     </ClCompile>
+    <ClCompile Include="GrassSpawner.cpp">
+      <Filter>Game\Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h">
@@ -42,6 +45,9 @@
     <ClInclude Include="Seed.h">
       <Filter>Game\Creatures</Filter>
     </ClInclude>
+    <ClInclude Include="GrassSpawner.h">
+      <Filter>Game\Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Framework">
@@ -55,6 +61,9 @@
     </Filter>
     <Filter Include="Game\Worlds">
       <UniqueIdentifier>{f47b14d9-d964-4709-93ad-2d9c34550353}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Items">
+      <UniqueIdentifier>{65a27752-fb3e-46f3-b058-3c8fd1f14875}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
