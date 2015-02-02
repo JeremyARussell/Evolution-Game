@@ -19,6 +19,14 @@ enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler 
     GRASS_SENSOR	 =  0x0040,
 };
 
+enum _power {
+    GRAB,
+    SELECT,
+	SEEDS,
+	DESTROY,
+	FEED
+};
+
 //Sensing
 class WheelerContactListener : public b2ContactListener { 
 	void BeginContact(b2Contact* contact) {
@@ -76,8 +84,33 @@ class WheelerContactListener : public b2ContactListener {
 
 WheelerContactListener thisWheelerContactListener;
 
+class QueryCallback : public b2QueryCallback {
+public:
+	QueryCallback(const b2Vec2& point) {
+		m_point = point;
+		m_fixture = NULL;
+	}
+
+	bool ReportFixture(b2Fixture* fixture) {
+		b2Body* body = fixture->GetBody();
+		if (body->GetType() == b2_dynamicBody) {
+			bool inside = fixture->TestPoint(m_point);
+			if (inside) {
+				m_fixture = fixture;
+				return false;
+			}
+		}
+		return true;
+	}
+
+	b2Vec2 m_point;
+	b2Fixture* m_fixture;
+};
+
 class MountainRiding : public World {
 public:
+
+	_power activePower;
 
 	void nextWheeler() {
 		if (wheelers.size() == 0) return;
@@ -303,6 +336,7 @@ public:
 		activeWheeler = NULL;
 		grassSpawnCounter = 0;
 		following = false;
+		activePower = GRAB;
 
 		m_world->SetContactListener(&thisWheelerContactListener);
 		#pragma region World 
@@ -457,6 +491,96 @@ public:
 		#pragma endregion Units for spawning
 	}
 	
+	void MountainRiding::RenderUI() {
+		/*
+		int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+
+		//b2Vec2 pos = cart->GetPosition();
+  
+		glPushMatrix();
+		//glTranslatef( 50 -, 50, 0 );
+		glColor3f(1,1,1);//white
+  
+		glRasterPos2i(2, 2);
+
+		char buf[256];
+		sprintf_s(buf, "%d", "test string ============     =======    **********");
+
+		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
+
+		glPopMatrix();
+		*/
+		/*
+		string unselectedLine = "============";
+		string selectedLine = "************";
+
+		string unselectedGrab = "====Grab====";
+		string selectedGrab = "****Grab****";
+		string unselectedSeeds = "****Seed****";
+		string selectedSeeds = "====Seed====";
+
+
+
+		m_debugDraw.DrawString(10, m_textLine, 
+			"%d    %d    %d"
+			, bodyCount, contactCount, jointCount
+			);
+		m_textLine += 15;
+		*/
+
+		string activePowerString = "";
+
+		if (activePower == GRAB) activePowerString = "Grab";
+		if (activePower == SEEDS) activePowerString = "Seed";
+		//activePowerString = "Seed";
+		m_debugDraw.DrawString(10, m_textLine, (const char*)&activePowerString);//DANGER - Playing around with memory here.
+
+	}
+
+	void MountainRiding::MouseDown(const b2Vec2& p) {
+										
+		m_mouseWorld = p;
+	
+		if (m_mouseJoint != NULL) {
+			return;
+		}
+
+		// Make a small box.
+		b2AABB aabb;
+		b2Vec2 d;
+		d.Set(0.001f, 0.001f);
+		aabb.lowerBound = p - d;
+		aabb.upperBound = p + d;
+
+		// Query the world for overlapping shapes.
+		QueryCallback callback(p);
+		m_world->QueryAABB(&callback, aabb);
+
+
+
+		if (activePower == SEEDS) {
+			float32 xt = randomNumber(-3.0f, 3.0f);
+			float32 yt = randomNumber(1.0f, 3.0f);
+			
+			//new Seed(m_world, b2Vec2(xt, yt)
+			seeds.push_back(new Seed(m_world, callback.m_point, b2Vec2(xt, yt)));
+			
+		}
+
+		if (callback.m_fixture) {
+			if (activePower == GRAB) {
+				b2Body* body = callback.m_fixture->GetBody();
+				b2MouseJointDef md;
+				md.bodyA = m_groundBody;
+				md.bodyB = body;
+				md.target = p;
+				md.maxForce = 1000.0f * body->GetMass();
+				m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&md);
+				body->SetAwake(true);
+			}
+		}
+	}
+
 	void Keyboard(unsigned char key) {
 		switch (key) {
 		case 'a':
@@ -465,6 +589,12 @@ public:
 				xpos = wheelers.size() * 5 - 50.0f;
 				wheelers.push_back(new Wheeler(m_world,  xpos, 5.0f));
 			}			
+			break;
+		case '1'://GRAB
+			activePower = GRAB;
+			break;
+		case '2'://SEEDS
+			activePower = SEEDS;
 			break;
 		case 'w':
 			//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
@@ -479,7 +609,6 @@ public:
 	}
 
 	void Step(Settings* settings) {
-
 		//For knowing if our settings file has the following flag triggered
 		if (settings->followCreature == true) {
 			following = true;
@@ -497,6 +626,9 @@ public:
 		m_textLine += 15;
 		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to create some grass seeds, hit 'A' to randomly generate Wheelers");
 		m_textLine += 15;
+
+		RenderUI();
+
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {
 			if (!settings->pause) { grassSpawners[i]->step(); }
@@ -571,7 +703,7 @@ public:
 			if (wheelers[i]->needsToReproduce) {
 				wheelers[i]->reproductionCounter = 0;
 				wheelers[i]->needsToReproduce = false;
-				wheelers.push_back(new Wheeler(*wheelers[i], m_world,  wheelers[i]->cart->GetPosition().x,  wheelers[i]->cart->GetPosition().y + 5.0f));
+				wheelers.push_back(new Wheeler(*wheelers[i], m_world,  wheelers[i]->cart->GetPosition().x,  wheelers[i]->cart->GetPosition().y + 1.0f));
 			}
 
 			//Dying stuff is done at the end of the for loop, this ways they don't cause
