@@ -52,7 +52,7 @@ inline float32 RandomFloat(float32 lo, float32 hi) {
 struct Settings {
 	Settings() :
 		viewCenter(0.0f, 20.0f),
-		//zoomLevel(3.5f),
+		zoomLevel(3.5f),
 		hz(60.0f),
 		grassSpawnRate(5),
 		velocityIterations(8),
@@ -77,7 +77,7 @@ struct Settings {
 		{}
 
 	b2Vec2 viewCenter;
-	//float32 zoomLevel;
+	float32 zoomLevel;
 	float32 hz;
 	int grassSpawnRate;
 	int32 velocityIterations;

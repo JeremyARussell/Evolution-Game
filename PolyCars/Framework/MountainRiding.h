@@ -3,11 +3,15 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
 #include "Build\PolyCars\GrassSpawner.h"
+
+#include "SOIL\SOIL.h";
+
 
 enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
     SEED		     =  0x0001,
@@ -21,8 +25,9 @@ enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler 
 
 enum _power {
     GRAB,
+	SPAWN_SEED,
+	SPAWN_WHEELER,
     SELECT,
-	SEEDS,
 	DESTROY,
 	FEED
 };
@@ -338,6 +343,12 @@ public:
 		following = false;
 		activePower = GRAB;
 
+		x = 0.0f;
+		y = 0.0f;
+		rsize = 8;
+		i[0] = 0;
+		i[1] = 0;
+
 		m_world->SetContactListener(&thisWheelerContactListener);
 		#pragma region World 
 		{
@@ -491,7 +502,14 @@ public:
 		#pragma endregion Units for spawning
 	}
 	
-	void MountainRiding::RenderUI() {
+	GLuint tex_2d[8];
+
+	int i[8];
+	GLfloat x;
+	GLfloat y;
+	GLfloat rsize;
+
+	void MountainRiding::RenderUI(Settings *settings) {
 		/*
 		int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 
@@ -527,14 +545,135 @@ public:
 			);
 		m_textLine += 15;
 		*/
-
-		string activePowerString = "";
-
-		if (activePower == GRAB) activePowerString = "Grab";
-		if (activePower == SEEDS) activePowerString = "Seed";
+		//string activePowerString = "";
+		//if (activePower == GRAB) activePowerString = "Grab";
+		//if (activePower == SPAWN_SEED) activePowerString = "Seed";
 		//activePowerString = "Seed";
-		m_debugDraw.DrawString(10, m_textLine, (const char*)&activePowerString);//DANGER - Playing around with memory here.
+		//m_debugDraw.DrawString(10, m_textLine, (const char*)&activePowerString);//DANGER - Playing around with memory here.
 
+		//glPushMatrix();
+		//glTranslatef(50.0f, 0.0f, 0.0f);
+		//Clears the window with current clearing color
+		//glClear(GL_COLOR_BUFFER_BIT);
+
+		   //Sets current drawing color
+		   //NOTE: Values are in float format, so 1.0f is full intensity
+		glColor3f(0.0f, 0.0f, 0.0f);
+
+		//Draws a square/rectangle with above drawing color
+		glRectf(x, y, x + rsize, y - rsize);
+
+		glEnable(GL_TEXTURE_2D);
+		
+		float32 tWidth = glutGet(GLUT_WINDOW_WIDTH);
+		float32 tHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+	
+
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+		if (i[0] == 0) {
+			glGenTextures(1, &tex_2d[0]);
+
+			tex_2d[0] = SOIL_load_OGL_texture
+			(
+				"D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_PowersHUD.bmp",
+				SOIL_LOAD_RGBA,
+				SOIL_CREATE_NEW_ID,
+				SOIL_FLAG_NTSC_SAFE_RGB
+			);
+			i[0] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[0]);
+
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		//std::cout << tex_2d << std::endl;
+		//printf( "SOIL loading error: '%s'\n", SOIL_last_result() );
+
+
+		glBegin(GL_POLYGON);// * settings->zoomLevel
+		//glTexCoord2f(0.0, 0.0); glVertex2f(((-4.0f * settings->zoomLevel)  + settings->viewCenter.x ) + (tWidth - 1000),      //Bottom Left
+		//									(-2.0f * settings->zoomLevel)  + settings->viewCenter.y );		
+		//glTexCoord2f(1.0, 0.0); glVertex2f((( 4.0f * settings->zoomLevel)  + settings->viewCenter.x ) + (tWidth - 1000),		//Bottom Right
+		//									(-2.0f * settings->zoomLevel)  + settings->viewCenter.y );		
+		//glTexCoord2f(1.0, 1.0); glVertex2f((( 4.0f * settings->zoomLevel)  + settings->viewCenter.x ) + (tWidth - 1000),		//Top Right
+		//									 (2.0f * settings->zoomLevel)  + settings->viewCenter.y );
+		//glTexCoord2f(0.0, 1.0); glVertex2f(((-4.0f * settings->zoomLevel)  + settings->viewCenter.x ) + (tWidth - 1000),		//Top Left
+		//									 (2.0f * settings->zoomLevel)  + settings->viewCenter.y );
+		
+		//float32 widthOffset = tWidth
+														    //Size			--Aplying zoom to retain size		--Adding the new center to maintain position
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( -4.0f/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),    //Bottom Left
+											   (   18.0f						* settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 0.0); glVertex2f((   ((  4.0f/* + ((tWidth) / 20)*/)  * settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	//Bottom Right
+											   (   18.0f						* settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 1.0); glVertex2f((   ((  4.0f/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	//Top Right
+											   (   20.0f						* settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( -4.0f/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	//Top Left
+											   (   20.0f						* settings->zoomLevel)  + settings->viewCenter.y );
+		
+		
+		//glTexCoord2f(0.0, 0.0); glVertex2f(-4.0f ,
+		//									-2.0f );
+		//glTexCoord2f(1.0, 0.0); glVertex2f(4.0f ,
+		//									-2.0f  );
+		//glTexCoord2f(1.0, 1.0); glVertex2f(4.0f, 
+		//									 2.0f  );
+		//glTexCoord2f(0.0, 1.0); glVertex2f(-4.0f   ,
+		//									2.0f   );
+		glEnd();
+
+
+		if (i[1] == 0) {
+			glGenTextures(1, &tex_2d[1]);
+
+			tex_2d[1] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Seed.bmp", 
+				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+			i[1] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[1]);
+
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		float32 padSeeds = 0;
+		if (activePower == SPAWN_SEED) {
+			padSeeds = 0.25f;
+		} else {
+			padSeeds = 0;
+		}
+
+		float32 testX = -1.5f;
+		float32 testY = 19.5f;
+		float32 testHeight = 1.0f;
+		float32 testWidth = 1.0f;
+
+		glBegin(GL_POLYGON);// * settings->zoomLevel										|--Aplying zoom 
+														    //Size + position from center	v--to retain size		--Adding the new center to maintain position
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( testX - padSeeds/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),    
+											   ((  testY - testHeight - padSeeds	)					* settings->zoomLevel)  + settings->viewCenter.y );		
+												//Left Bottom 
+
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( testX + padSeeds + testWidth/* + ((tWidth) / 20)*/) * settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	
+											   (( testY - padSeeds - testHeight )						* settings->zoomLevel)  + settings->viewCenter.y );		
+												//Right Bottom 
+
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( testX + padSeeds + testWidth/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	
+											   (( testY + padSeeds)						* settings->zoomLevel)  + settings->viewCenter.y );
+												//Right Top
+
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( testX - padSeeds/* + ((tWidth) / 20)*/)	* settings->zoomLevel)  + settings->viewCenter.x ),// + (tWidth - 1000),	
+											   (( testY + padSeeds	)					* settings->zoomLevel)  + settings->viewCenter.y );
+												//Left Top 
+		
+		glEnd();
+
+		//Swaps the onscreen and offscreen buffers and flushes them
+		//glutSwapBuffers();
+		//glDisable(GL_TEXTURE_2D);
+		//glPopMatrix();
 	}
 
 	void MountainRiding::MouseDown(const b2Vec2& p) {
@@ -558,7 +697,7 @@ public:
 
 
 
-		if (activePower == SEEDS) {
+		if (activePower == SPAWN_SEED) {
 			float32 xt = randomNumber(-3.0f, 3.0f);
 			float32 yt = randomNumber(1.0f, 3.0f);
 			
@@ -593,8 +732,8 @@ public:
 		case '1'://GRAB
 			activePower = GRAB;
 			break;
-		case '2'://SEEDS
-			activePower = SEEDS;
+		case '2'://SPAWN_SEED
+			activePower = SPAWN_SEED;
 			break;
 		case 'w':
 			//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
@@ -627,7 +766,7 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to create some grass seeds, hit 'A' to randomly generate Wheelers");
 		m_textLine += 15;
 
-		RenderUI();
+		RenderUI(settings);
 
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {

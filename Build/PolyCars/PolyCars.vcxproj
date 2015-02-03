@@ -55,7 +55,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\vs2010\bin\Debug\Box2D.lib;..\vs2010\bin\Debug\FreeGLUT.lib;..\vs2010\bin\Debug\GLUI.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\vs2010\bin\Debug\Box2D.lib;..\vs2010\bin\Debug\FreeGLUT.lib;..\vs2010\bin\Debug\GLUI.lib;..\..\SOIL\SOIL.lib;glu32.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

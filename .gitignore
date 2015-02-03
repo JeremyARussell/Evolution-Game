@@ -1,6 +1,5 @@
 Documentation/
 *.obj
-*.lib
 *.log
 *.pdb
 *.idb
@@ -16,3 +15,9 @@ Build/PolyCars/MountainRidingWorld.sav
 Build/PolyCars/WheelerExport.sav
 Build/vs2010/Release/WheelerExport.sav
 *.sav
+Build/vs2010/bin/Debug/Box2D.lib
+Build/vs2010/bin/Debug/FreeGLUT.lib
+Build/vs2010/bin/Debug/GLUI.lib
+Build/vs2010/bin/Release/Box2D.lib
+Build/vs2010/bin/Release/FreeGLUT.lib
+Build/vs2010/bin/Release/GLUI.lib

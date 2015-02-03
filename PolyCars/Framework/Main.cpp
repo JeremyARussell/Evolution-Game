@@ -100,6 +100,7 @@ static void SimulationLoop() {
 	world->SetTextLine(30);
 	b2Vec2 oldCenter = settings.viewCenter;
 	settings.hz = settingsHz;
+	settings.zoomLevel = viewZoom;
 	world->Step(&settings);
 	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)
 	{
