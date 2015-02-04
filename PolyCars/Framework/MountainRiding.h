@@ -523,6 +523,7 @@ public:
 	void MountainRiding::RenderUI(Settings *settings) {
 
 		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.0, 1.0, 1.0);
 		
 		if (i[0] == 0) {
 			glGenTextures(1, &tex_2d[0]);
@@ -539,19 +540,19 @@ public:
 		glBegin(GL_POLYGON);				   // from center +		  |--Aplying zoom		  |--Adding the new center
 											   // pad adjust		  v--to retain size		  v--to maintain position
 		glTexCoord2f(0.0, 1.0); glVertex2f((   (( -4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( 18.0f	) * settings->zoomLevel)  + settings->viewCenter.y );		
+											   (( 17.5f	) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
 		glTexCoord2f(1.0, 1.0); glVertex2f((   (( 4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( 18.0f ) * settings->zoomLevel)  + settings->viewCenter.y );		
+											   (( 17.5f ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
 		glTexCoord2f(1.0, 0.0); glVertex2f((   (( 4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( 20.0f	) * settings->zoomLevel)  + settings->viewCenter.y );
+											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
 		glTexCoord2f(0.0, 0.0); glVertex2f((   (( -4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( 20.0f	) * settings->zoomLevel)  + settings->viewCenter.y );
+											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
 
 		///Grab
@@ -573,9 +574,9 @@ public:
 		}
 
 		phX[1] = -3.5f;
-		phY[1] = 19.5f;
-		phHeight[1] = 1.0f;
-		phWidth[1] = 1.0f;
+		phY[1] = 20.0f;
+		phHeight[1] = 2.0f;
+		phWidth[1] = 2.0f;
 
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
 											   // from center + pad adjust					v--to retain size		v--to maintain position
@@ -613,10 +614,10 @@ public:
 			padSeeds = 0;
 		}
 
-		phX[2] = -1.5f;//TODO - need to array
-		phY[2] = 19.5f;
-		phHeight[2] = 1.0f;
-		phWidth[2] = 1.0f;
+		phX[2] = -0.5f;//TODO - need to array
+		phY[2] = 20.0f;
+		phHeight[2] = 2.0f;
+		phWidth[2] = 2.0f;
 
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
 											   // from center + pad adjust					v--to retain size		v--to maintain position
