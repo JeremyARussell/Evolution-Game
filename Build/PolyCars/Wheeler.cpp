@@ -144,8 +144,6 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	maxWheels = 8;//TODO - Investigate why this is 3 and if that prevents 3 wheels if they
 				  //were only on later spokes --- UPDATE: It needs to run at 8 to prevent an
 				  //uninitialized pointer problem.
-	
-	cart->SetUserData( this );
 
 	cart_piece_fixture.filter.categoryBits = 0x0010;
     wheel_fixture.filter.categoryBits = 0x0010;
@@ -223,6 +221,7 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
             axleFixture[spoke_index] = cart->CreateFixture(&cart_piece_fixture);
             wheelOn[spoke_index] = wheelIndex;
             axle[spoke_index] = myWorld->CreateBody(&m_cart_body);
+			axle[spoke_index]->SetUserData( this );
             cartWorkingPiece.SetAsBox(0.2f, 0.05f, b2Vec2(cart_piece_edge_1_x - 0.3f * cos(wshock_angle), cart_piece_edge_1_y - 0.3f * sin(wshock_angle)), wshock_angle);
             cart_piece_fixture.density = 20;
             axle[spoke_index]->CreateFixture(&cart_piece_fixture);
@@ -240,6 +239,7 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
             wheel_bodyDef.allowSleep = false;
             wheel_bodyDef.type = b2_dynamicBody;
             wheel[spoke_index] = myWorld->CreateBody(&wheel_bodyDef);
+			wheel[spoke_index]->SetUserData( this );
             wheel[spoke_index]->CreateFixture(&wheel_fixture);
             wheel_motor_joint.enableMotor = true;
             wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());
@@ -283,6 +283,13 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	fd.filter.maskBits = 0x0002/*GRASS*/;
 			
 	cart->CreateFixture(&fd);
+
+	cart->SetUserData( this );
+
+	Wheeler *testWheeler = (Wheeler *)cart->GetUserData();
+	if (dynamic_cast<Wheeler*>(testWheeler) == NULL) {
+		int i = 0;
+	}
 }
 
 //Code for when we're loading Wheeler genes from a file
@@ -415,6 +422,7 @@ void Wheeler::loadWheeler(vector<float32> genes) {
             axleFixture[spoke_index] = cart->CreateFixture(&cart_piece_fixture);
             wheelOn[spoke_index] = wheelIndex;
             axle[spoke_index] = myWorld->CreateBody(&m_cart_body);
+			axle[spoke_index]->SetUserData( this );
             cartWorkingPiece.SetAsBox(0.2f, 0.05f, b2Vec2(cart_piece_edge_1_x - 0.3f * cos(wshock_angle), cart_piece_edge_1_y - 0.3f * sin(wshock_angle)), wshock_angle);
             cart_piece_fixture.density = 20;
             axle[spoke_index]->CreateFixture(&cart_piece_fixture);
@@ -432,6 +440,7 @@ void Wheeler::loadWheeler(vector<float32> genes) {
             wheel_bodyDef.allowSleep = false;
             wheel_bodyDef.type = b2_dynamicBody;
             wheel[spoke_index] = myWorld->CreateBody(&wheel_bodyDef);
+			wheel[spoke_index]->SetUserData( this );
             wheel[spoke_index]->CreateFixture(&wheel_fixture);
             wheel_motor_joint.enableMotor = true;
             wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());

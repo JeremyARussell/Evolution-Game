@@ -520,7 +520,7 @@ public:
 	GLfloat y;	  //Not using atm
 	GLfloat rsize;//Not using atm
 
-	void MountainRiding::RenderUI(Settings *settings) {
+	void RenderUI(Settings* settings) {
 
 		glEnable(GL_TEXTURE_2D);
 		glColor3f(1.0, 1.0, 1.0);
@@ -539,19 +539,19 @@ public:
 		//The main HUD background			      Size + position
 		glBegin(GL_POLYGON);				   // from center +		  |--Aplying zoom		  |--Adding the new center
 											   // pad adjust		  v--to retain size		  v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( -4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),    
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( -6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),    
 											   (( 17.5f	) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( 4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( 6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
 											   (( 17.5f ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( 4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( 6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),
 											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( -4.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( -6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
 											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
 
@@ -573,7 +573,7 @@ public:
 			padGrab = 0;
 		}
 
-		phX[1] = -3.5f;
+		phX[1] = -5.5f;
 		phY[1] = 20.0f;
 		phHeight[1] = 2.0f;
 		phWidth[1] = 2.0f;
@@ -614,7 +614,7 @@ public:
 			padSeeds = 0;
 		}
 
-		phX[2] = -0.5f;//TODO - need to array
+		phX[2] = -2.5f;
 		phY[2] = 20.0f;
 		phHeight[2] = 2.0f;
 		phWidth[2] = 2.0f;
@@ -636,7 +636,49 @@ public:
 		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[2] - padSeeds				) * settings->zoomLevel)  + settings->viewCenter.x ),	
 											   (( phY[2] + padSeeds				) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
+
+		//Wheelers
+		if (i[3] == 0) {
+			glGenTextures(1, &tex_2d[3]);
+			tex_2d[3] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Wheeler.bmp", 
+				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+			i[3] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[3]);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		float32 padWheeler = 0;
+		if (activePower == SPAWN_WHEELER) {
+			padWheeler = 0.25f;
+		} else {
+			padWheeler = 0;
+		}
+
+		phX[3] = 0.5f;
+		phY[3] = 20.0f;
+		phHeight[3] = 2.0f;
+		phWidth[3] = 2.0f;
+
+		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
+											   // from center + pad adjust					v--to retain size		v--to maintain position
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[3] - padWheeler				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[3] - padWheeler - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Left Bottom 
+
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[3] + padWheeler + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[3] - padWheeler - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Right Bottom 
+
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[3] + padWheeler + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[3] + padWheeler				) * settings->zoomLevel)  + settings->viewCenter.y );
+												//Right Top
+
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[3] - padWheeler				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[3] + padWheeler				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glEnd();								//Left Top 
 		
+
 		///
 
 		glDisable(GL_TEXTURE_2D);
@@ -672,6 +714,13 @@ public:
 			
 		}
 
+		if (activePower == SPAWN_WHEELER) {
+			if (wheelers.size() < 100) {
+				cW = 0;
+				wheelers.push_back(new Wheeler(m_world,  callback.m_point.x, callback.m_point.y));
+			}			
+		}
+
 		if (callback.m_fixture) {
 			if (activePower == GRAB) {
 				b2Body* body = callback.m_fixture->GetBody();
@@ -683,32 +732,35 @@ public:
 				m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&md);
 				body->SetAwake(true);
 			}
+			if (activePower == SELECT) {
+				//if (callback.m_fixture->GetFilterData().categoryBits == WHEELER) {
+					b2Body* body = callback.m_fixture->GetBody();
+
+					Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+
+					if (dynamic_cast<Wheeler*>(testWheeler) == NULL) {
+						std::cout << "NOT A WHEELER" << std::endl;
+					} else {
+						activeWheeler = testWheeler;
+					}
+				//}
+			}
 		}
 	}
 
 	void Keyboard(unsigned char key) {
 		switch (key) {
-		case 'a':
-			if (wheelers.size() < 30) {
-				cW = 0;
-				xpos = wheelers.size() * 5 - 50.0f;
-				wheelers.push_back(new Wheeler(m_world,  xpos, 5.0f));
-			}			
-			break;
 		case '1'://GRAB
 			activePower = GRAB;
 			break;
 		case '2'://SPAWN_SEED
 			activePower = SPAWN_SEED;
 			break;
-		case 'w':
-			//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
-
-			float32 xt = randomNumber(-3.0f, 3.0f);
-			float32 yt = randomNumber(1.0f, 3.0f);
-			
-			//new Seed(m_world, b2Vec2(xt, yt)
-			seeds.push_back(new Seed(m_world, b2Vec2(125.0f, 25.0f), b2Vec2(xt, yt)));
+		case '3'://SPAWN_WHEELER
+			activePower = SPAWN_WHEELER;
+			break;
+		case '4'://SPAWN_WHEELER
+			activePower = SELECT;
 			break;
 		}
 	}
@@ -732,7 +784,7 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to create some grass seeds, hit 'A' to randomly generate Wheelers");
 		m_textLine += 15;
 
-		RenderUI(settings);
+		//RenderUI(settings);
 
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {
