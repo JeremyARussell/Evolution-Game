@@ -314,6 +314,7 @@ static void importCreature(int) {
 }
 
 int main(int argc, char** argv) {
+	srand (time(NULL));
 	worldCount = 0;
 	//while (g_worldEntries[worldCount].createFcn != NULL) { ++worldCount; }//Keep for later
 
