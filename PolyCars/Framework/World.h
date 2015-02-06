@@ -141,6 +141,8 @@ public:
 	virtual void exportCreature() = 0;
 	virtual void importCreature() = 0;
 
+	virtual void RenderUI(Settings*) = 0;
+
 	Wheeler* activeWheeler;
 
 	World();

@@ -109,6 +109,8 @@ static void SimulationLoop() {
 
 	//world->DrawTitle(5, 20, entry->name);//TODO - Decide if we will keep
 
+	world->RenderUI(&settings);
+
 	glutSwapBuffers();
 
 	if (worldSelection != worldIndex) {
