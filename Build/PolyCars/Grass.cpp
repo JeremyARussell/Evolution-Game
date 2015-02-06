@@ -55,7 +55,7 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 	testweld.localAnchorA = b2Vec2(0.0, 0.0);
 	testweld.localAnchorB = b2Vec2(0.0, 0.0);
 
-	myWorld->CreateJoint(&testweld);
+	testweldJoint = (b2WeldJoint*)myWorld->CreateJoint(&testweld);
 
 }
 
@@ -78,9 +78,9 @@ void Grass::step() {
 	if (second == 2) fresh = false;
 	if (second < 120) {
 		second++;
-	} else {//A second went by
+	} else {//Two seconds went by
 
-		if (en > (int)growthPoint && hp != (int)maxHp) {
+		if (en > (int)growthPoint && hp != (int)maxHp && !crowded) {
 			grow(hp);
 			hp++;
 		}
@@ -91,14 +91,17 @@ void Grass::step() {
 
 		if (crowded) {
 			if (crowdTimer < 11) {
+				
 				crowdTimer++;
 			} else {
 				crowded = false;
 				crowdTimer = 0;
 			}
+		} else {
+			en++;
 		}
 
-		en++;
+		
 		second = 0;
 	}
 }
@@ -107,9 +110,13 @@ void Grass::grow(int) {
 	fresh = true;
 	stalkSensor->DestroyFixture(stalkSensorFix);
 
-	stalkSensor->SetTransform(b2Vec2(xp, yp + (0.2f * hp)), 0);
+	//stalkSensor->SetTransform(b2Vec2(xp, yp + (0.2f * hp)), 0);
+	//stalkSensorShape.SetAsBox(0.4f, 0.2f + (0.2f * hp));//0.2 per hp
 
-	stalkSensorShape.SetAsBox(0.4f, 0.2f + (0.2f * hp));//0.2 per hp
+	stalkSensor->SetTransform(b2Vec2(xp, yp ), 0);
+	stalkSensorShape.SetAsBox(0.4f + (0.1f * hp), 0.2f + (0.03f * hp));//0.2 per hp
+
+
     stalkSensorFixture.shape = &stalkSensorShape;
 
 	stalkSensorFix = stalkSensor->CreateFixture(&stalkSensorFixture);
@@ -124,6 +131,16 @@ void Grass::grow(int) {
 
 	fresh = true;
 	stalkFix = stalk->CreateFixture(&stalkFixture);
+
+	myWorld->DestroyJoint(testweldJoint);
+
+	//testweld.bodyA = stalk;
+	//testweld.bodyB = stalkSensor;
+	testweld.localAnchorA = b2Vec2(0.0, 0.0 - (0.22f * hp));
+	//testweld.localAnchorB = b2Vec2(0.0, 0.0);
+
+	testweldJoint = (b2WeldJoint*)myWorld->CreateJoint(&testweld);
+
 }
 
 int Grass::bitten(int) {

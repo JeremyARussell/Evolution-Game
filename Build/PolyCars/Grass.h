@@ -66,6 +66,7 @@ protected:
 	b2Fixture* stalkSensorFix;
 
 	b2WeldJointDef testweld;
+	b2WeldJoint* testweldJoint;
 
 };
 
