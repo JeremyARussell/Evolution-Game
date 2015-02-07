@@ -25,11 +25,11 @@ enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler 
 
 enum _power {
     GRAB,
-	SPAWN_SEED,
-	SPAWN_WHEELER,
     SELECT,
 	DESTROY,
-	FEED
+	SPAWN_SEED,
+	SPAWN_WHEELER//,
+	//FEED
 };
 
 //Sensing
@@ -78,7 +78,6 @@ class WheelerContactListener : public b2ContactListener {
 		}
 //		if (fixtureB->GetFilterData().categoryBits == NON_INTERACTOR && 
 //			fixtureA->GetFilterData().categoryBits == SEED) {
-//
 //		}
 	}
   
@@ -536,24 +535,89 @@ public:
 		glBindTexture(GL_TEXTURE_2D, tex_2d[0]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-		//The main HUD background			      Size + position
-		glBegin(GL_POLYGON);				   // from center +		  |--Aplying zoom		  |--Adding the new center
-											   // pad adjust		  v--to retain size		  v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( -6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( 17.5f	) * settings->zoomLevel)  + settings->viewCenter.y );		
+		phX[0] = -9.25f;
+		phY[0] = 20.75f;
+		phHeight[0] = 3.5f;
+		phWidth[0] = 19.0f;
+
+		//The main HUD background
+		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
+											   // from center + pad adjust					v--to retain size		v--to maintain position
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[0]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[0] - phHeight[0] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( 6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( 17.5f ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[0] + phWidth[0]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[0] - phHeight[0] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( 6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[0] + phWidth[0]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[0]				) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( -6.0f	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( 20.5f	) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[0]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[0]				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glEnd();								//Left Top
+		/////
+
+		//Hilighter
+		if (i[7] == 0) {
+			glGenTextures(1, &tex_2d[7]);
+			tex_2d[7] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Hilighter.bmp", 
+				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+			i[7] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[7]);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		switch (activePower) {
+		case GRAB:
+			phX[7] = -9.0f;
+			phY[7] = 20.5f;
+			break;
+		case SELECT:
+			phX[7] = -6.0f;
+			phY[7] = 20.5f;
+			break;
+		case DESTROY:
+			phX[7] = -3.0f;
+			phY[7] = 20.5f;
+			break;
+		case SPAWN_SEED:
+			phX[7] = 0.0f;
+			phY[7] = 20.5f;
+			break;
+		case SPAWN_WHEELER:
+			phX[7] = 3.0f;
+			phY[7] = 20.5f;
+			break;
+		}
+
+		//phX[7] = -9.0f;
+		//phY[7] = 20.5f;
+		phHeight[7] = 3.0f;
+		phWidth[7] = 3.0f;
+
+		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
+											   // from center + pad adjust					v--to retain size		v--to maintain position
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[7]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[7] - phHeight[7] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Left Bottom 
+
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[7] + phWidth[7]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[7] - phHeight[7] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Right Bottom 
+
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[7] + phWidth[7]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[7]				) * settings->zoomLevel)  + settings->viewCenter.y );
+												//Right Top
+
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[7]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[7]				) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
+		///
+		/////
 
 		///Grab
 		if (i[1] == 0) {
@@ -566,40 +630,33 @@ public:
 		glBindTexture(GL_TEXTURE_2D, tex_2d[1]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-		float32 padGrab = 0;
-		if (activePower == GRAB) {
-			padGrab = 0.25f;
-		} else {
-			padGrab = 0;
-		}
-
-		phX[1] = -5.5f;
-		phY[1] = 20.0f;
-		phHeight[1] = 2.0f;
-		phWidth[1] = 2.0f;
+		phX[1] = -8.75f;
+		phY[1] = 20.25f;
+		phHeight[1] = 2.5f;
+		phWidth[1] = 2.5f;
 
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
 											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[1] - padGrab				 ) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[1] - padGrab - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[1]				 ) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[1] - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[1] + padGrab + phWidth[1]	 ) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[1] - padGrab - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[1] + phWidth[1]	 ) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[1] - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[1] + padGrab + phWidth[1]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[1] + padGrab				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[1] + phWidth[1]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[1]				) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[1] - padGrab				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[1] + padGrab				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[1]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[1]				) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
 
-		//Seeds
+		///Select
 		if (i[2] == 0) {
 			glGenTextures(1, &tex_2d[2]);
-			tex_2d[2] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Seed.bmp", 
+			tex_2d[2] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Select.bmp", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[2] = 1;
 		}
@@ -607,40 +664,33 @@ public:
 		glBindTexture(GL_TEXTURE_2D, tex_2d[2]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-		float32 padSeeds = 0;
-		if (activePower == SPAWN_SEED) {
-			padSeeds = 0.25f;
-		} else {
-			padSeeds = 0;
-		}
-
-		phX[2] = -2.5f;
-		phY[2] = 20.0f;
-		phHeight[2] = 2.0f;
-		phWidth[2] = 2.0f;
+		phX[2] = -5.75f;
+		phY[2] = 20.25f;
+		phHeight[2] = 2.5f;
+		phWidth[2] = 2.5f;
 
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
 											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[2] - padSeeds				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[2] - padSeeds - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[2]				 ) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[2] - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[2] + padSeeds + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[2] - padSeeds - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[2] + phWidth[2]	 ) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[2] - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[2] + padSeeds + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[2] + padSeeds				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[2] + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[2]				) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[2] - padSeeds				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[2] + padSeeds				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[2]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[2]				) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
 
-		//Wheelers
+		//Destroy
 		if (i[3] == 0) {
 			glGenTextures(1, &tex_2d[3]);
-			tex_2d[3] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Wheeler.bmp", 
+			tex_2d[3] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Destroy.bmp", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[3] = 1;
 		}
@@ -648,38 +698,104 @@ public:
 		glBindTexture(GL_TEXTURE_2D, tex_2d[3]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-		float32 padWheeler = 0;
-		if (activePower == SPAWN_WHEELER) {
-			padWheeler = 0.25f;
-		} else {
-			padWheeler = 0;
-		}
-
-		phX[3] = 0.5f;
-		phY[3] = 20.0f;
-		phHeight[3] = 2.0f;
-		phWidth[3] = 2.0f;
+		phX[3] = -2.75f;
+		phY[3] = 20.25f;
+		phHeight[3] = 2.5f;
+		phWidth[3] = 2.5f;
 
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
 											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[3] - padWheeler				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[3] - padWheeler - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[3]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[3] - phHeight[3] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Left Bottom 
 
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[3] + padWheeler + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[3] - padWheeler - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[3] + phWidth[3]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[3] - phHeight[3] ) * settings->zoomLevel)  + settings->viewCenter.y );		
 												//Right Bottom 
 
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[3] + padWheeler + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[3] + padWheeler				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[3] + phWidth[3]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[3]				) * settings->zoomLevel)  + settings->viewCenter.y );
 												//Right Top
 
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[3] - padWheeler				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[3] + padWheeler				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[3]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[3]				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glEnd();								//Left Top 
+
+		//Seeds
+		if (i[4] == 0) {
+			glGenTextures(1, &tex_2d[4]);
+			tex_2d[4] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Seed.bmp", 
+				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+			i[4] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[4]);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		phX[4] = 0.25f;
+		phY[4] = 20.25f;
+		phHeight[4] = 2.5f;
+		phWidth[4] = 2.5f;
+
+		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
+											   // from center + pad adjust					v--to retain size		v--to maintain position
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[4]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[4] - phHeight[4] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Left Bottom 
+
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[4] + phWidth[4]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[4] - phHeight[4] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Right Bottom 
+
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[4] + phWidth[4]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[4]				) * settings->zoomLevel)  + settings->viewCenter.y );
+												//Right Top
+
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[4]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[4]				) * settings->zoomLevel)  + settings->viewCenter.y );
+		glEnd();								//Left Top 
+
+		//Wheelers
+		if (i[5] == 0) {
+			glGenTextures(1, &tex_2d[5]);
+			tex_2d[5] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Wheeler.bmp", 
+				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+			i[5] = 1;
+		}
+
+		glBindTexture(GL_TEXTURE_2D, tex_2d[5]);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		//float32 padWheeler = 0;
+		//if (activePower == SPAWN_WHEELER) {
+		//	padWheeler = 0.25f;
+		//} else {
+		//	padWheeler = 0;
+		//}
+
+		phX[5] = 3.25f;
+		phY[5] = 20.25f;
+		phHeight[5] = 2.5f;
+		phWidth[5] = 2.5f;
+
+		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
+											   // from center + pad adjust					v--to retain size		v--to maintain position
+		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[5]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
+											   (( phY[5] - phHeight[5] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Left Bottom 
+
+		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[5] + phWidth[5]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[5] - phHeight[5] ) * settings->zoomLevel)  + settings->viewCenter.y );		
+												//Right Bottom 
+
+		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[5] + phWidth[5]	) * settings->zoomLevel)  + settings->viewCenter.x ),
+											   (( phY[5]				) * settings->zoomLevel)  + settings->viewCenter.y );
+												//Right Top
+
+		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[5]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
+											   (( phY[5]				) * settings->zoomLevel)  + settings->viewCenter.y );
 		glEnd();								//Left Top 
 		
-
-		///
 
 		glDisable(GL_TEXTURE_2D);
 	}
@@ -750,17 +866,20 @@ public:
 
 	void Keyboard(unsigned char key) {
 		switch (key) {
-		case '1'://GRAB
+		case '1':
 			activePower = GRAB;
 			break;
-		case '2'://SPAWN_SEED
+		case '2':
+			activePower = SELECT;
+			break;
+		case '3':
+			activePower = DESTROY;
+			break;
+		case '4':
 			activePower = SPAWN_SEED;
 			break;
-		case '3'://SPAWN_WHEELER
+		case '5':
 			activePower = SPAWN_WHEELER;
-			break;
-		case '4'://SPAWN_WHEELER
-			activePower = SELECT;
 			break;
 		}
 	}
