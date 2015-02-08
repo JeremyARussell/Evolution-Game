@@ -849,17 +849,27 @@ public:
 				body->SetAwake(true);
 			}
 			if (activePower == SELECT) {
-				//if (callback.m_fixture->GetFilterData().categoryBits == WHEELER) {
-					b2Body* body = callback.m_fixture->GetBody();
+				b2Body* body = callback.m_fixture->GetBody();
 
-					Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
+					//callback.m_fixture->GetFilterData().categoryBits == GRASS |
+					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
 
-					if (dynamic_cast<Wheeler*>(testWheeler) == NULL) {
-						std::cout << "NOT A WHEELER" << std::endl;
-					} else {
-						activeWheeler = testWheeler;
-					}
-				//}
+				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+				activeWheeler = testWheeler;
+			}
+			if (activePower == DESTROY) {
+				b2Body* body = callback.m_fixture->GetBody();
+
+				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
+					//callback.m_fixture->GetFilterData().categoryBits == GRASS | - Grass doesn't trigger a callback thingy anyways
+					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
+				
+				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+				wheelersToDelete.push_back(*testWheeler);
+				wheelers.erase( std::find(wheelers.begin(), wheelers.end(), testWheeler ) );
+				activeWheeler = NULL;
+				testWheeler = NULL;
 			}
 		}
 	}
