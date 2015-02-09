@@ -364,8 +364,8 @@ public:
 			//Ground
 			b2Vec2 vsGround1[4];
 			vsGround1[0].Set(-225.0f, 1.0f);
-			vsGround1[1].Set(-225.0f, -1.0f);
-			vsGround1[2].Set(225.0f, -1.0f);
+			vsGround1[1].Set(-225.0f, -4.0f);
+			vsGround1[2].Set(225.0f, -4.0f);
 			vsGround1[3].Set(225.0f, 1.0f);
 
 			b2PolygonShape polyGround1;
