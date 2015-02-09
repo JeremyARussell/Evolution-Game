@@ -26,7 +26,7 @@ using namespace std;
 namespace {
 	int32 major = 0;
 	int32 minor = 1;
-	int32 revision = 0;
+	int32 revision = 5;
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -135,21 +135,6 @@ static void Keyboard(unsigned char key, int x, int y) {
 		glutLeaveMainLoop();
 #endif
 		exit(0);
-		break;
-	// Press 'z' to zoom out.
-	case 'z':
-		viewZoom = b2Min(1.1f * viewZoom, 20.0f);
-		Resize(width, height);
-		break;
-	// Press 'x' to zoom in.
-	case 'x':
-		viewZoom = b2Max(0.9f * viewZoom, 0.02f);
-		Resize(width, height);
-		break;
-	// Press 'r' to reset.
-	case 'r':
-		delete world;
-		world = entry->createFcn();
 		break;
 	case ' ':
 		break;

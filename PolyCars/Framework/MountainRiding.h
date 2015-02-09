@@ -522,7 +522,7 @@ public:
 	void RenderUI(Settings* settings) {
 
 		glEnable(GL_TEXTURE_2D);
-		glColor3f(1.0, 1.0, 1.0);
+		glColor3f(10.0, 10.0, 10.0);
 		
 		if (i[0] == 0) {
 			glGenTextures(1, &tex_2d[0]);
@@ -538,7 +538,7 @@ public:
 		phX[0] = -9.25f;
 		phY[0] = 20.75f;
 		phHeight[0] = 3.5f;
-		phWidth[0] = 19.0f;
+		phWidth[0] = 15.5f;
 
 		//The main HUD background
 		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
@@ -571,26 +571,48 @@ public:
 		glBindTexture(GL_TEXTURE_2D, tex_2d[7]);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+		char buf[256];
+
 		switch (activePower) {
 		case GRAB:
 			phX[7] = -9.0f;
 			phY[7] = 20.5f;
+			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
+						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
+			sprintf_s(buf, "Grab - Throw those Wheelers around, they don't mind.");
+			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 			break;
 		case SELECT:
 			phX[7] = -6.0f;
 			phY[7] = 20.5f;
+			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
+						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
+			sprintf_s(buf, "Select - When you want to pick a favorite.");
+			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 			break;
 		case DESTROY:
 			phX[7] = -3.0f;
 			phY[7] = 20.5f;
+			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
+						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
+			sprintf_s(buf, "Destroy - When you have a least favorite.");
+			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 			break;
 		case SPAWN_SEED:
 			phX[7] = 0.0f;
 			phY[7] = 20.5f;
+			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
+						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
+			sprintf_s(buf, "Spawn a Seed - Pull food from the ether.");
+			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 			break;
 		case SPAWN_WHEELER:
 			phX[7] = 3.0f;
 			phY[7] = 20.5f;
+			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
+						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
+			sprintf_s(buf, "Spawn Wheeler - Spawn a random Wheeler, results may vary.");
+			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 			break;
 		}
 
@@ -800,6 +822,9 @@ public:
 		glDisable(GL_TEXTURE_2D);
 	}
 
+	float32 clickZoomLevel;
+	b2Vec2  clickViewCenter;
+
 	void MountainRiding::MouseDown(const b2Vec2& p) {
 										
 		m_mouseWorld = p;
@@ -819,13 +844,57 @@ public:
 		QueryCallback callback(p);
 		m_world->QueryAABB(&callback, aabb);
 
+		//Mouse clicking on HUD stuff
+		if (p.x > phX[1] * clickZoomLevel + clickViewCenter.x &&				//Left Side
+			p.x < (phX[1] + phWidth[1]) * clickZoomLevel + clickViewCenter.x && //Right Side
+			p.y < phY[1] * clickZoomLevel + clickViewCenter.y &&				//Top Side
+			p.y > (phY[1] - phHeight[1]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
+		{
+			activePower = GRAB;
+			return;
+		}
 
+		if (p.x > phX[2] * clickZoomLevel + clickViewCenter.x &&				//Left Side
+			p.x < (phX[2] + phWidth[2]) * clickZoomLevel + clickViewCenter.x && //Right Side
+			p.y < phY[2] * clickZoomLevel + clickViewCenter.y &&				//Top Side
+			p.y > (phY[2] - phHeight[2]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
+		{
+			activePower = SELECT;
+			return;
+		}
 
+		if (p.x > phX[3] * clickZoomLevel + clickViewCenter.x &&				//Left Side
+			p.x < (phX[3] + phWidth[3]) * clickZoomLevel + clickViewCenter.x && //Right Side
+			p.y < phY[3] * clickZoomLevel + clickViewCenter.y &&				//Top Side
+			p.y > (phY[3] - phHeight[3]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
+		{
+			activePower = DESTROY;
+			return;
+		}
+
+		if (p.x > phX[4] * clickZoomLevel + clickViewCenter.x &&				//Left Side
+			p.x < (phX[4] + phWidth[4]) * clickZoomLevel + clickViewCenter.x && //Right Side
+			p.y < phY[4] * clickZoomLevel + clickViewCenter.y &&				//Top Side
+			p.y > (phY[4] - phHeight[4]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
+		{
+			activePower = SPAWN_SEED;
+			return;
+		}
+
+		if (p.x > phX[5] * clickZoomLevel + clickViewCenter.x &&				//Left Side
+			p.x < (phX[5] + phWidth[5]) * clickZoomLevel + clickViewCenter.x && //Right Side
+			p.y < phY[5] * clickZoomLevel + clickViewCenter.y &&				//Top Side
+			p.y > (phY[5] - phHeight[5]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
+		{
+			activePower = SPAWN_WHEELER;
+			return;
+		}
+
+		//Power implementation code
 		if (activePower == SPAWN_SEED) {
 			float32 xt = randomNumber(-3.0f, 3.0f);
 			float32 yt = randomNumber(1.0f, 3.0f);
-			
-			//new Seed(m_world, b2Vec2(xt, yt)
+			//new Seed(m_world, b2Vec2(xt, yt);//<-- Maybe do an option to have them randomly fly off or not?
 			seeds.push_back(new Seed(m_world, callback.m_point, b2Vec2(xt, yt)));
 			
 		}
@@ -895,6 +964,12 @@ public:
 	}
 
 	void Step(Settings* settings) {
+
+		if (clickZoomLevel != settings->zoomLevel) clickZoomLevel = settings->zoomLevel ;
+		if (clickViewCenter.x != settings->viewCenter.x &&
+			clickViewCenter.y != settings->viewCenter.y) clickViewCenter = settings->viewCenter ;
+
+
 		//For knowing if our settings file has the following flag triggered
 		if (settings->followCreature == true) {
 			following = true;
@@ -910,11 +985,6 @@ public:
 		//Game text
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
-		m_debugDraw.DrawString(10, m_textLine, "Hit 'W' to create some grass seeds, hit 'A' to randomly generate Wheelers");
-		m_textLine += 15;
-
-		//RenderUI(settings);
-
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {
 			if (!settings->pause) { grassSpawners[i]->step(); }
