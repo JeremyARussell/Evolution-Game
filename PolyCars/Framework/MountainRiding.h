@@ -527,7 +527,7 @@ public:
 		if (i[0] == 0) {
 			glGenTextures(1, &tex_2d[0]);
 
-			tex_2d[0] = SOIL_load_OGL_texture("D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_PowersHUD.bmp",
+			tex_2d[0] = SOIL_load_OGL_texture("images\\Simple_PowersHUD.tex",
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[0] = 1;
 		}
@@ -563,7 +563,7 @@ public:
 		//Hilighter
 		if (i[7] == 0) {
 			glGenTextures(1, &tex_2d[7]);
-			tex_2d[7] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Hilighter.bmp", 
+			tex_2d[7] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Hilighter.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[7] = 1;
 		}
@@ -644,7 +644,7 @@ public:
 		///Grab
 		if (i[1] == 0) {
 			glGenTextures(1, &tex_2d[1]);
-			tex_2d[1] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Grab.bmp", 
+			tex_2d[1] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Grab.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[1] = 1;
 		}
@@ -678,7 +678,7 @@ public:
 		///Select
 		if (i[2] == 0) {
 			glGenTextures(1, &tex_2d[2]);
-			tex_2d[2] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Select.bmp", 
+			tex_2d[2] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Select.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[2] = 1;
 		}
@@ -712,7 +712,7 @@ public:
 		//Destroy
 		if (i[3] == 0) {
 			glGenTextures(1, &tex_2d[3]);
-			tex_2d[3] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Destroy.bmp", 
+			tex_2d[3] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Destroy.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[3] = 1;
 		}
@@ -746,7 +746,7 @@ public:
 		//Seeds
 		if (i[4] == 0) {
 			glGenTextures(1, &tex_2d[4]);
-			tex_2d[4] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Seed.bmp", 
+			tex_2d[4] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Seed.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[4] = 1;
 		}
@@ -780,7 +780,7 @@ public:
 		//Wheelers
 		if (i[5] == 0) {
 			glGenTextures(1, &tex_2d[5]);
-			tex_2d[5] = SOIL_load_OGL_texture ( "D:\\Private\\The Real 2D\\Code\\PolyCars\\Framework\\assets\\images\\Simple_Powers_Wheeler.bmp", 
+			tex_2d[5] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
 				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 			i[5] = 1;
 		}
