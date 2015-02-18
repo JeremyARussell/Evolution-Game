@@ -102,9 +102,9 @@ static void SimulationLoop() {
 	settings.hz = settingsHz;
 	settings.zoomLevel = viewZoom;
 	world->Step(&settings);
-	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)
+	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)//If size of window has changed
 	{
-		Resize(width, height);
+		Resize(width, height);//Runs the ortho rezise stuff;
 	}
 
 	//world->DrawTitle(5, 20, entry->name);//TODO - Decide if we will keep

@@ -5,10 +5,13 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#include "Build\PolyCars\PowerHUD.h"
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
 #include "Build\PolyCars\GrassSpawner.h"
+
 
 #include "SOIL\SOIL.h";
 
@@ -21,15 +24,6 @@ enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler 
     NON_INTERACTOR   =  0x0010,
     WALL             =  0x0020,
     GRASS_SENSOR	 =  0x0040,
-};
-
-enum _power {
-    GRAB,
-    SELECT,
-	DESTROY,
-	SPAWN_SEED,
-	SPAWN_WHEELER//,
-	//FEED
 };
 
 //Sensing
@@ -354,6 +348,9 @@ public:
 		i[6] = 0;
 		i[7] = 0;
 
+		int worldPowerInt = GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER;
+		powerHUD = PowerHUD(50, 50, (_power)worldPowerInt, activePower);
+
 		m_world->SetContactListener(&thisWheelerContactListener);
 		#pragma region World 
 		{
@@ -519,7 +516,13 @@ public:
 	GLfloat y;	  //Not using atm
 	GLfloat rsize;//Not using atm
 
+	PowerHUD powerHUD;
+
 	void RenderUI(Settings* settings) {
+		powerHUD.render();
+	}
+
+	void RenderUIold(Settings* settings) {
 
 		glEnable(GL_TEXTURE_2D);
 		glColor3f(10.0, 10.0, 10.0);
@@ -947,18 +950,23 @@ public:
 		switch (key) {
 		case '1':
 			activePower = GRAB;
+			powerHUD.setActivePower(activePower);
 			break;
 		case '2':
 			activePower = SELECT;
+			powerHUD.setActivePower(activePower);
 			break;
 		case '3':
 			activePower = DESTROY;
+			powerHUD.setActivePower(activePower);
 			break;
 		case '4':
 			activePower = SPAWN_SEED;
+			powerHUD.setActivePower(activePower);
 			break;
 		case '5':
 			activePower = SPAWN_WHEELER;
+			powerHUD.setActivePower(activePower);
 			break;
 		}
 	}

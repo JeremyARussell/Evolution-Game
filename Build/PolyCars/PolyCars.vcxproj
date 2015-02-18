@@ -130,6 +130,7 @@
     <ClCompile Include="..\..\PolyCars\Framework\GameWorlds.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="GrassSpawner.cpp" />
+    <ClCompile Include="PowerHUD.cpp" />
     <ClCompile Include="Seed.cpp" />
     <ClCompile Include="Wheeler.cpp" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />
+    <ClInclude Include="PowerHUD.h" />
     <ClInclude Include="Seed.h" />
     <ClInclude Include="Wheeler.h" />
   </ItemGroup>

@@ -25,6 +25,9 @@
     <ClCompile Include="GrassSpawner.cpp">
       <Filter>Game\Items</Filter>
     </ClCompile>
+    <ClCompile Include="PowerHUD.cpp">
+      <Filter>Game\Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h">
@@ -48,6 +51,9 @@
     <ClInclude Include="GrassSpawner.h">
       <Filter>Game\Items</Filter>
     </ClInclude>
+    <ClInclude Include="PowerHUD.h">
+      <Filter>Game\Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Framework">
@@ -64,6 +70,9 @@
     </Filter>
     <Filter Include="Game\Items">
       <UniqueIdentifier>{65a27752-fb3e-46f3-b058-3c8fd1f14875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Interface">
+      <UniqueIdentifier>{4b4c5667-d8f8-4dfa-9d15-9f739effcf9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
