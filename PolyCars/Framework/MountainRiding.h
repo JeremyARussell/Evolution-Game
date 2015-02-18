@@ -986,6 +986,18 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
 
+		if (true) {
+			m_textLine += 40;
+			m_debugDraw.DrawString(15, m_textLine, "======= World Stats =======");
+			m_textLine += 15;
+			int32 wheelerCount = wheelers.size();
+			m_debugDraw.DrawString(15, m_textLine, "Wheelers = %d", wheelerCount);
+			m_textLine += 15;
+			int32 grassCount = grasses.size();
+			m_debugDraw.DrawString(15, m_textLine, "Blades of Grass = %d", grassCount);
+			m_textLine += 15;
+		}
+
 		for (int i = 0; i < grassSpawners.size(); i ++) {
 			if (!settings->pause) { grassSpawners[i]->step(); }
 
