@@ -27,6 +27,7 @@ namespace {
 	int32 major = 0;
 	int32 minor = 1;
 	int32 revision = 5;
+	char  bugRevision = 'a';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -35,7 +36,7 @@ namespace {
 	World* world;
 	Settings settings;
 	int32 width = 1100;
-	int32 height = 700;
+	int32 height = 660;
 	int32 framePeriod = 16;
 	int32 mainWindow;
 	float settingsHz = 60.0;

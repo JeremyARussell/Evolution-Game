@@ -349,7 +349,7 @@ public:
 		i[7] = 0;
 
 		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER);
-		powerHUD = PowerHUD(50, 50, worldPowers, activePower);
+		powerHUD = PowerHUD(250, 50, worldPowers, activePower);
 
 		m_world->SetContactListener(&thisWheelerContactListener);
 		#pragma region World 
