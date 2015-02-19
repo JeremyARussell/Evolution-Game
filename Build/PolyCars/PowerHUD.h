@@ -1,12 +1,13 @@
 #pragma once
-
+#include "glui\glui.h"
+#include "SOIL\SOIL.h";
 
 enum _power {
-    GRAB = 0x0001,
-    SELECT = 0x0002,
-	DESTROY = 0x0004,
-	SPAWN_SEED = 0x0008,
-	SPAWN_WHEELER = 0x00016//,
+    GRAB = 1,
+    SELECT = 2,
+	DESTROY = 4,
+	SPAWN_SEED = 8,
+	SPAWN_WHEELER = 16//,
 	//FEED
 };
 
@@ -27,12 +28,19 @@ private:
 	_power worldPowers;
 	_power activePower;
 	int getPowerCount();
+	int pbTracker;
 
-	int i[8];//8 Texture for now, one for the background, 3 for powers, probably more.
-	float phX[8];
-	float phY[8];
-	float phWidth[8];
-	float phHeight[8];
+	GLuint hudTex, hilTex, powerTexs[8];
+
+	//texture initialization tracking bools
+	bool hudBt, hilBt,//HUD and hilighter 
+		 bt[8];//powers
+
+	//UI positions, widths and heights
+	float hudPhX, hudPhY, hilPhX, hilPhY,
+		  phX[8], phY[8],
+		  hudPhWidth, hudPhHeight, hilPhWidth, hilPhHeight,
+		  phWidth[8], phHeight[8];
 
 };
 
