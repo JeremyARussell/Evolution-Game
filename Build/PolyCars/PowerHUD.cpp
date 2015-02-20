@@ -40,10 +40,10 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 	hilPhY = y;
 	hilPhHeight = 50.0f;
 	hilPhWidth = 50.0f;
-
-	phY[0] = 55.00f; phY[1] = 55.00f;
-	phY[2] = 55.00f; phY[3] = 55.00f;
-	phY[4] = 55.00f;
+	
+	phY[0] = y + 5.0f; phY[1] = y + 5.0f;
+	phY[2] = y + 5.0f; phY[3] = y + 5.0f;
+	phY[4] = y + 5.0f;
 	phHeight[0] = 40.0f; phHeight[1] = 40.0f;
 	phHeight[2] = 40.0f; phHeight[3] = 40.0f;
 	phHeight[4] = 40.0f;
