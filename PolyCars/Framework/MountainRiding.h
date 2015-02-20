@@ -346,8 +346,10 @@ public:
 		i[6] = 0;
 		i[7] = 0;
 
+
+		hudX = 250, hudY = 50;
 		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER);
-		powerHUD = PowerHUD(250, 50, worldPowers, activePower);
+		powerHUD = PowerHUD(hudX, hudY, worldPowers, activePower);
 
 		m_world->SetContactListener(&thisWheelerContactListener);
 		#pragma region World 
@@ -515,7 +517,7 @@ public:
 	GLfloat rsize;//Not using atm
 
 	void RenderUI(Settings* settings) {
-		powerHUD.render();
+		//powerHUD.render();
 	}
 
 	void RenderUIold(Settings* settings) {
@@ -843,51 +845,6 @@ public:
 		QueryCallback callback(p);
 		m_world->QueryAABB(&callback, aabb);
 
-		//Mouse clicking on HUD stuff
-		if (p.x > phX[1] * clickZoomLevel + clickViewCenter.x &&				//Left Side
-			p.x < (phX[1] + phWidth[1]) * clickZoomLevel + clickViewCenter.x && //Right Side
-			p.y < phY[1] * clickZoomLevel + clickViewCenter.y &&				//Top Side
-			p.y > (phY[1] - phHeight[1]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
-		{
-			activePower = GRAB;
-			return;
-		}
-
-		if (p.x > phX[2] * clickZoomLevel + clickViewCenter.x &&				//Left Side
-			p.x < (phX[2] + phWidth[2]) * clickZoomLevel + clickViewCenter.x && //Right Side
-			p.y < phY[2] * clickZoomLevel + clickViewCenter.y &&				//Top Side
-			p.y > (phY[2] - phHeight[2]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
-		{
-			activePower = SELECT;
-			return;
-		}
-
-		if (p.x > phX[3] * clickZoomLevel + clickViewCenter.x &&				//Left Side
-			p.x < (phX[3] + phWidth[3]) * clickZoomLevel + clickViewCenter.x && //Right Side
-			p.y < phY[3] * clickZoomLevel + clickViewCenter.y &&				//Top Side
-			p.y > (phY[3] - phHeight[3]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
-		{
-			activePower = DESTROY;
-			return;
-		}
-
-		if (p.x > phX[4] * clickZoomLevel + clickViewCenter.x &&				//Left Side
-			p.x < (phX[4] + phWidth[4]) * clickZoomLevel + clickViewCenter.x && //Right Side
-			p.y < phY[4] * clickZoomLevel + clickViewCenter.y &&				//Top Side
-			p.y > (phY[4] - phHeight[4]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
-		{
-			activePower = SPAWN_SEED;
-			return;
-		}
-
-		if (p.x > phX[5] * clickZoomLevel + clickViewCenter.x &&				//Left Side
-			p.x < (phX[5] + phWidth[5]) * clickZoomLevel + clickViewCenter.x && //Right Side
-			p.y < phY[5] * clickZoomLevel + clickViewCenter.y &&				//Top Side
-			p.y > (phY[5] - phHeight[5]) * clickZoomLevel + clickViewCenter.y)  //Bottom Side
-		{
-			activePower = SPAWN_WHEELER;
-			return;
-		}
 
 		//Power implementation code
 		if (activePower == SPAWN_SEED) {
@@ -972,7 +929,7 @@ public:
 		if (clickZoomLevel != settings->zoomLevel) clickZoomLevel = settings->zoomLevel ;
 		if (clickViewCenter.x != settings->viewCenter.x &&
 			clickViewCenter.y != settings->viewCenter.y) clickViewCenter = settings->viewCenter ;
-
+		if (powerHUD.getActivePower() != activePower) activePower = powerHUD.getActivePower();
 
 		//For knowing if our settings file has the following flag triggered
 		if (settings->followCreature == true) {

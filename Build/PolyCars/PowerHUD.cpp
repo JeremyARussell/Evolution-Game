@@ -30,6 +30,13 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 	hudPhHeight = 50.0f;
 	hudPhWidth = 50.0f * getPowerCount();
 
+	/*Left*/	//left = w - hudPhWidth - hudPhX;
+	/*Bottom*/	//bottom = hudPhY + hudPhHeight;	
+	/*Right*/	//right = w - hudPhX;
+	/*Top*/		//top = hudPhY;
+
+
+
 	hilPhY = y;
 	hilPhHeight = 50.0f;
 	hilPhWidth = 50.0f;
@@ -44,39 +51,40 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 	phWidth[2] = 40.0f; phWidth[3] = 40.0f;
 	phWidth[4] = 40.0f;
 
-	//TODO - MOVE all the positions up here
-	
+
+
+
 	//TODO - Will probably need to make a reposition powers function if I want to activate powers halfway through
 	//		 a level or what not. Like in story mode, unlocking, etc. I could also destroy the hud instance and 
 	//		 rebuild it in the world that powers can become "unlocked" in.
 
 	if (worldPowers & GRAB) {
+		phX[0] = (pbTracker * 50) + 5;
 		pbTracker++;
-		phX[0] = x + (pbTracker * -50) + hudPhWidth + 5;
 		//phY[0] = y;
 	}
 
 	if (worldPowers & SELECT) {
+		phX[1] = (pbTracker * 50) + 5;
 		pbTracker++;
-		phX[1] = x + (pbTracker * -50) + hudPhWidth + 5;
 		//phY[1] = y;
 	}
 
 	if (worldPowers & DESTROY) {
+		phX[2] = (pbTracker * 50) + 5;
 		pbTracker++;
-		phX[2] = x + (pbTracker * -50) + hudPhWidth + 5;
 		//phY[2] = y;
 	}
 
 	if (worldPowers & SPAWN_SEED) {
+		phX[3] = (pbTracker * 50) + 5;
 		pbTracker++;
-		phX[3] = x + (pbTracker * -50) + hudPhWidth + 5;
 		//phY[3] = y;
 	}
 
 	if (worldPowers & SPAWN_WHEELER) {
+		phX[4] = (pbTracker * 50) + 5;
 		pbTracker++;
-		phX[4] = x + (pbTracker * -50) + hudPhWidth + 5;
 		//phY[4] = y;
 	}
 
@@ -102,8 +110,30 @@ PowerHUD::~PowerHUD(void)
 
 void PowerHUD::setActivePower(_power _activePower) {
 	activePower = _activePower;
+	//if not a world power set the old power as the active power
+	//if it is allowed go ahead and make it the active power
 }
 
+float PowerHUD::getHudX() {
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	return w - hudPhWidth - hudPhX;
+}
+
+float PowerHUD::getHudY() {
+	return hudPhY;
+}
+
+float PowerHUD::getHudWidth() {
+	return hudPhWidth;
+}
+
+float PowerHUD::getHudHeight() {
+	return hudPhHeight;
+}
+
+_power PowerHUD::getActivePower() {
+	return activePower;
+}
 
 int PowerHUD::getPowerCount()
 	{
@@ -173,31 +203,31 @@ void PowerHUD::render() {
 
 	switch (activePower) {
 	case GRAB:
-		hilPhX = phX[0] - 5;
+		hilPhX = phX[0];
 		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
 		sprintf_s(buf, "Grab - Throw those Wheelers around, they don't mind.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
 	case SELECT:
-		hilPhX = phX[1] - 5;
+		hilPhX = phX[1];
 		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
 		sprintf_s(buf, "Select - When you want to pick a favorite.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
 	case DESTROY:
-		hilPhX = phX[2] - 5;
+		hilPhX = phX[2];
 		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
 		sprintf_s(buf, "Destroy - When you have a least favorite.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
 	case SPAWN_SEED:
-		hilPhX = phX[3] - 5;
+		hilPhX = phX[3];
 		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
 		sprintf_s(buf, "Spawn a Seed - Pull food from the ether.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
 	case SPAWN_WHEELER:
-		hilPhX = phX[4] - 5;
+		hilPhX = phX[4];
 		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
 		sprintf_s(buf, "Spawn Wheeler - Spawn a random Wheeler, results may vary.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
@@ -205,11 +235,17 @@ void PowerHUD::render() {
 	}
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - hilPhX - hilPhWidth, hilPhY + hilPhHeight);		
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hilPhX, hilPhY + hilPhHeight);		
-	glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - hilPhX, hilPhY);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - hilPhX - hilPhWidth, hilPhY);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - hilPhWidth + hilPhX + 45, hilPhY + hilPhHeight );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + hilPhX + 45, hilPhY + hilPhHeight);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + hilPhX + 45, hilPhY);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - hilPhWidth + hilPhX + 45, hilPhY);
 	glEnd();								
+
+
+	//glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - hilPhX - hilPhWidth, hilPhY + hilPhHeight);		
+	//glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hilPhX, hilPhY + hilPhHeight);		
+	//glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - hilPhX, hilPhY);
+	//glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - hilPhX - hilPhWidth, hilPhY);
 	///
 
 
@@ -226,10 +262,10 @@ void PowerHUD::render() {
 
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - phWidth[0] - phX[0], phY[0] + phHeight[0] );
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - phX[0], phY[0] + phHeight[0]);		
-	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - phX[0], phY[0]);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - phWidth[0] - phX[0], phY[0]);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[0] + phX[0] + 40, phY[0] + phHeight[0] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[0] + 40, phY[0] + phHeight[0]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[0] + 40, phY[0]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[0] + phX[0] + 40, phY[0]);
 	glEnd();								
 
 	///Select
@@ -244,10 +280,10 @@ void PowerHUD::render() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - phWidth[1] - phX[1], phY[1] + phHeight[1] );
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - phX[1], phY[1] + phHeight[1]);		
-	glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - phX[1], phY[1]);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - phWidth[1] - phX[1], phY[1]);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[1] + phX[1] + 40, phY[1] + phHeight[1] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[1] + 40, phY[1] + phHeight[1]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[1] + 40, phY[1]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[1] + phX[1] + 40, phY[1]);
 	glEnd();								 
 
 	//Destroy
@@ -262,10 +298,10 @@ void PowerHUD::render() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - phWidth[2] - phX[2], phY[2] + phHeight[2] );
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/	glVertex2f(w - phX[2], phY[2] + phHeight[2]);		
-	glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - phX[2], phY[2]);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - phWidth[2] - phX[2], phY[2]);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[2] + phX[2] + 40, phY[2] + phHeight[2] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[2] + 40, phY[2] + phHeight[2]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[2] + 40, phY[2]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[2] + phX[2] + 40, phY[2]);
 	glEnd();								
 
 	//Seeds
@@ -280,10 +316,10 @@ void PowerHUD::render() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - phWidth[3] - phX[3], phY[3] + phHeight[3] );
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - phX[3], phY[3] + phHeight[3]);		
-	glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - phX[3], phY[3]);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - phWidth[3] - phX[3], phY[3]);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[3] + phX[3] + 40, phY[3] + phHeight[3] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[3] + 40, phY[3] + phHeight[3]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[3] + 40, phY[3]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[3] + phX[3] + 40, phY[3]);
 	glEnd();								 
 
 	//Wheelers
@@ -298,10 +334,10 @@ void PowerHUD::render() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0); /*Left Bottom*/		glVertex2f(w - phWidth[4] - phX[4], phY[4] + phHeight[4] );
-	glTexCoord2f(1.0, 1.0); /*Right Bottom*/	glVertex2f(w - phX[4], phY[4] + phHeight[4]);		
-	glTexCoord2f(1.0, 0.0); /*Right Top*/		glVertex2f(w - phX[4], phY[4]);
-	glTexCoord2f(0.0, 0.0); /*Left Top*/		glVertex2f(w - phWidth[4] - phX[4], phY[4]);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[4] + phX[4] + 40, phY[4] + phHeight[4] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[4] + 40, phY[4] + phHeight[4]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[4] + 40, phY[4]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[4] + phX[4] + 40, phY[4]);
 	glEnd();								 
 
 
@@ -311,4 +347,57 @@ void PowerHUD::render() {
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void PowerHUD::click(b2Vec2 rp) {
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	
+	float disFromLeft = w - hudPhWidth - hudPhX;
+	float disFromTop = hudPhY;
+
+	b2Vec2 hudP = b2Vec2(rp.x - disFromLeft, 
+		rp.y - disFromTop + 13);
+
+
+/////
+
+	//Mouse clicking on HUD stuff
+	if (hudP.x > phX[0] &&				//Left Side
+		hudP.x < phX[0] + phWidth[0])  //Right Side
+	{
+		activePower = GRAB;
+		return;
+	}
+
+	if (hudP.x > phX[1] &&				//Left Side
+		hudP.x < phX[1] + phWidth[1])  //Right Side
+	{
+		activePower = SELECT;
+		return;
+	}
+
+	if (hudP.x > phX[2] &&				//Left Side
+		hudP.x < phX[2] + phWidth[2])  //Right Side
+	{
+		activePower = DESTROY;
+		return;
+	}
+
+	if (hudP.x > phX[3] &&				//Left Side
+		hudP.x < phX[3] + phWidth[3])  //Right Side
+	{
+		activePower = SPAWN_SEED;
+		return;
+	}
+
+	if (hudP.x > phX[4] &&				//Left Side
+		hudP.x < phX[4] + phWidth[4])  //Right Side
+	{
+		activePower = SPAWN_WHEELER;
+		return;
+	}
+
+/////
+
+	int dbint = 9999;
 }

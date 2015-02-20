@@ -1,6 +1,7 @@
 #pragma once
+#include "Box2D\Box2D.h"
 #include "glui\glui.h"
-#include "SOIL\SOIL.h";
+#include "SOIL\SOIL.h"
 
 enum _power {
     GRAB = 1,
@@ -9,6 +10,9 @@ enum _power {
 	SPAWN_SEED = 8,
 	SPAWN_WHEELER = 16//,
 	//FEED
+	//Control
+	//Raise Land - Can't wait to start this.
+	//
 };
 
 
@@ -23,6 +27,15 @@ public:
 
 	void setActivePower(_power _activePower);
 	//void getActivePower(_power _activePower);
+
+	//Position and dimension variables
+	float getHudX();
+	float getHudY();
+	float getHudWidth();
+	float getHudHeight();
+	_power getActivePower();
+
+	void click(b2Vec2 rp);
 
 private:
 	_power worldPowers;

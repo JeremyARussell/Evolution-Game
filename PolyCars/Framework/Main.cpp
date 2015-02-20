@@ -203,6 +203,17 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y) {
 		b2Vec2 p = ConvertScreenToWorld(x, y);
 		if (state == GLUT_DOWN) {
 			b2Vec2 p = ConvertScreenToWorld(x, y);
+			b2Vec2 rp = b2Vec2(x, y);
+
+			if (rp.x > world->powerHUD.getHudX() &&			//Left Side
+				rp.x < world->powerHUD.getHudX() + world->powerHUD.getHudWidth() &&	//Right Side
+				rp.y > world->powerHUD.getHudY() - 15 &&				//Top Side
+				rp.y < world->powerHUD.getHudY() + world->powerHUD.getHudHeight() - 18)	//Bottom side
+			{
+				world->powerHUD.click(rp);
+				return;
+			}
+
 			if (mod == GLUT_ACTIVE_SHIFT) {
 				world->ShiftMouseDown(p);
 			} else {

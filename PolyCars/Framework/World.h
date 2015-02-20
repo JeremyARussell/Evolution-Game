@@ -143,9 +143,12 @@ public:
 	virtual void exportCreature() = 0;
 	virtual void importCreature() = 0;
 
+	//Powers and HUD stuff
 	_power activePower;
 	PowerHUD powerHUD;
 	virtual void RenderUI(Settings*) = 0;
+	int hudX;
+	int hudY;
 
 	Wheeler* activeWheeler;
 
