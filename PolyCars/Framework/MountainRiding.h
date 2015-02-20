@@ -346,6 +346,11 @@ public:
 		i[6] = 0;
 		i[7] = 0;
 
+		top = 68;
+		left = -223;
+		bottom = 0;
+		right = 223;
+
 
 		hudX = 250, hudY = 50;
 		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER);

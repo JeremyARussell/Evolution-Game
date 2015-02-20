@@ -150,6 +150,9 @@ public:
 	int hudX;
 	int hudY;
 
+	int top, left, bottom, right;
+
+
 	Wheeler* activeWheeler;
 
 	World();

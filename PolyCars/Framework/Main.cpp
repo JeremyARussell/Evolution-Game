@@ -214,6 +214,14 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y) {
 				return;
 			}
 
+			if (p.x < world->left	|
+				p.x > world->right	|
+				p.y < world->bottom |
+				p.y > world->top ) 
+			{
+				return;//If the player clicks outside the worlds bounds, than the click is ignored.
+			}
+
 			if (mod == GLUT_ACTIVE_SHIFT) {
 				world->ShiftMouseDown(p);
 			} else {
