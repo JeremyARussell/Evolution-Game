@@ -110,7 +110,8 @@ static void SimulationLoop() {
 
 	//world->DrawTitle(5, 20, entry->name);//TODO - Decide if we will keep
 
-	world->RenderUI(&settings);
+	//world->RenderUI(&settings);
+	world->powerHUD.render();
 
 	glutSwapBuffers();
 
@@ -196,7 +197,7 @@ static void KeyboardUp(unsigned char key, int x, int y) {
 }
 
 static void Mouse(int32 button, int32 state, int32 x, int32 y) {
-	// Use the mouse to move things around.
+	// Use the mouse to activate world powers.
 	if (button == GLUT_LEFT_BUTTON) {
 		int mod = glutGetModifiers();
 		b2Vec2 p = ConvertScreenToWorld(x, y);

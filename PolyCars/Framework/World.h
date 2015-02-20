@@ -22,6 +22,8 @@
 #include <Box2D/Box2D.h>
 #include "Render.h"
 #include "Build\PolyCars\Wheeler.h"
+#include "Build\PolyCars\PowerHUD.h"
+
 
 #include <cstdlib>
 
@@ -141,6 +143,8 @@ public:
 	virtual void exportCreature() = 0;
 	virtual void importCreature() = 0;
 
+	_power activePower;
+	PowerHUD powerHUD;
 	virtual void RenderUI(Settings*) = 0;
 
 	Wheeler* activeWheeler;

@@ -6,7 +6,6 @@
 #include <iostream>
 #include <string>
 
-#include "Build\PolyCars\PowerHUD.h"
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
@@ -108,7 +107,6 @@ public:
 class MountainRiding : public World {
 public:
 
-	_power activePower;
 
 	void nextWheeler() {
 		if (wheelers.size() == 0) return;
@@ -515,8 +513,6 @@ public:
 	GLfloat x;	  //Not using atm
 	GLfloat y;	  //Not using atm
 	GLfloat rsize;//Not using atm
-
-	PowerHUD powerHUD;
 
 	void RenderUI(Settings* settings) {
 		powerHUD.render();
