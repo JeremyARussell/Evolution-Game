@@ -27,7 +27,7 @@ namespace {
 	int32 major = 0;
 	int32 minor = 1;
 	int32 revision = 5;
-	char  bugRevision = 'a';
+	char  bugRevision = 'd';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -333,8 +333,11 @@ int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(width, height);
+    glutInitWindowPosition(100, 0);
 	char title[32];
 	sprintf_s(title, "Evolution Ver. %d.%d.%d", major, minor, revision);
+	title[20] = bugRevision;
+	title[21] = NULL;
 	mainWindow = glutCreateWindow(title);
 
 	glutDisplayFunc(SimulationLoop);
