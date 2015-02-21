@@ -26,8 +26,8 @@ using namespace std;
 namespace {
 	int32 major = 0;
 	int32 minor = 1;
-	int32 revision = 5;
-	char  bugRevision = 'd';
+	int32 revision = 6;
+	char  bugRevision = ' ';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -345,6 +345,8 @@ int main(int argc, char** argv) {
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
 	GLUI_Master.set_glutMouseFunc(Mouse);
+	//0-191-255
+	glClearColor(0.0f, 0.04f, 0.24f, 0.5f);
 #ifdef FREEGLUT
 	glutMouseWheelFunc(MouseWheel);
 #endif
