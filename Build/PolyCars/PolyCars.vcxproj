@@ -128,8 +128,11 @@
     <ClCompile Include="..\..\PolyCars\Framework\Render.cpp" />
     <ClCompile Include="..\..\PolyCars\Framework\World.cpp" />
     <ClCompile Include="..\..\PolyCars\Framework\GameWorlds.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="GrassSpawner.cpp" />
+    <ClCompile Include="LiveGame.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="PowerHUD.cpp" />
     <ClCompile Include="Seed.cpp" />
     <ClCompile Include="Wheeler.cpp" />
@@ -138,8 +141,11 @@
     <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
     <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />
+    <ClInclude Include="LiveGame.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="PowerHUD.h" />
     <ClInclude Include="Seed.h" />
     <ClInclude Include="Wheeler.h" />

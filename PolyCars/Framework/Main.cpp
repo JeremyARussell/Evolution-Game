@@ -23,6 +23,11 @@
 #include <cstdio>
 using namespace std;
 
+enum State {
+	MainMenu = 1,
+	LiveGame = 2
+};
+
 namespace {
 	int32 major = 0;
 	int32 minor = 1;
@@ -45,6 +50,9 @@ namespace {
 	int tx, ty, tw, th;
 	bool rMouseDown;
 	b2Vec2 lastp;
+
+	//Game State stuff
+	State state;
 }
 
 static void Resize(int32 w, int32 h) {
@@ -92,37 +100,107 @@ static void Timer(int) {
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
+//State Stuff
+//
+//Main Menu
+static void MainMenuLoop() {
+	char buffer[128];
+
+	const char *string = "Main Menu - Basic Testing, etc - Click to Continue";
+	va_list arg;
+	va_start(arg, string);
+	vsprintf_s(buffer, string, arg);
+	va_end(arg);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	int h = glutGet(GLUT_WINDOW_HEIGHT);
+	gluOrtho2D(0, w, h, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glColor3f(0.9f, 0.6f, 0.6f);
+	int x = (w / 2) - 150;
+	int y = h / 2;
+	glRasterPos2i(x, y);
+	int32 length = (int32)strlen(buffer);
+	for (int32 i = 0; i < length; ++i) {
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, buffer[i]);
+	}
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
+static void MainMenuMouse(int32 button, int32 stateM, int32 x, int32 y) {
+	if(button == GLUT_LEFT_BUTTON) {
+		state = LiveGame;
+	}
+}
+////
+
 static void SimulationLoop() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	world->SetTextLine(30);
-	b2Vec2 oldCenter = settings.viewCenter;
-	settings.hz = settingsHz;
-	settings.zoomLevel = viewZoom;
-	world->Step(&settings);
-	if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)//If size of window has changed
-	{
-		Resize(width, height);//Runs the ortho rezise stuff;
+
+	if (state == LiveGame) {	
+		b2Vec2 oldCenter = settings.viewCenter;
+
+		world->SetTextLine(30);
+		settings.hz = settingsHz;
+
+		//if (settings.pause) {
+		//Need stasis for interactions, no keyboard, no mouse. etc - Will have to put these checks inside the control code...
+		/// Mouse and Keyboard
+		//settings.viewCenter = oldCenter; -- Checkout the right click move stuff
+		//Zoom goes in other side
+		//some stuff you only do when paused...Hmm
+		////world->Step(&settings);
+		////world->powerHUD.render();
+		///TODO////Overlay translucent menu options and pause screen.
+		//} else {
+		//Allow us to zoom and interact
+		//settings.zoomLevel = viewZoom; -- Disable scroll when paused in mouse area. - Can still zoom after latest changes
+		world->Step(&settings);
+		world->powerHUD.render();
+		//}
+		//TODO - Test comment this below part out to see if main menu will resize still
+		if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)//If size of window has changed
+		{
+			Resize(width, height);//Runs the ortho rezise stuff;
+		}
+
 	}
 
 	//world->DrawTitle(5, 20, entry->name);//TODO - Decide if we will keep
 
-	//world->RenderUI(&settings);
-	world->powerHUD.render();
+	//Main Menu Stuff
+	if(state == MainMenu) {
+		MainMenuLoop();
+	}
+
+
 
 	glutSwapBuffers();
 
-	if (worldSelection != worldIndex) {
-		worldIndex = worldSelection;
-		delete world;
-		entry = g_worldEntries + worldIndex;
-		world = entry->createFcn();
-		viewZoom = 1.0f;
-		settings.viewCenter.Set(0.0f, 20.0f);
-		Resize(width, height);
+	if (state == LiveGame) {
+		if (worldSelection != worldIndex) {
+			worldIndex = worldSelection;
+			delete world;
+			entry = g_worldEntries + worldIndex;
+			world = entry->createFcn();
+			viewZoom = 1.0f;
+			settings.viewCenter.Set(0.0f, 20.0f);
+			Resize(width, height);
+		}
 	}
 }
 
@@ -196,12 +274,21 @@ static void KeyboardUp(unsigned char key, int x, int y) {
 	}
 }
 
-static void Mouse(int32 button, int32 state, int32 x, int32 y) {
+static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
+	//Cheating and putting mouse stealing function for the Main menu here, then returning, instead of wrapping the 
+	//below stuff in extra functions or classes for a live game state.
+	if (state == MainMenu) {
+		MainMenuMouse(button, stateM, x, y);
+		return;
+	}
+	
+	//TODO - Might need to cheat for the pause screen real quick to.
+
 	// Use the mouse to activate world powers.
 	if (button == GLUT_LEFT_BUTTON) {
 		int mod = glutGetModifiers();
 		b2Vec2 p = ConvertScreenToWorld(x, y);
-		if (state == GLUT_DOWN) {
+		if (stateM == GLUT_DOWN) {
 			b2Vec2 p = ConvertScreenToWorld(x, y);
 			b2Vec2 rp = b2Vec2(x, y);
 
@@ -213,7 +300,7 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y) {
 				world->powerHUD.click(rp);
 				return;
 			}
-
+			//Bounds limiter
 			if (p.x < world->left	|
 				p.x > world->right	|
 				p.y < world->bottom |
@@ -229,22 +316,25 @@ static void Mouse(int32 button, int32 state, int32 x, int32 y) {
 			}
 		}
 		
-		if (state == GLUT_UP) {
+		if (stateM == GLUT_UP) {
 			world->MouseUp(p);
 		}
 	} else if (button == GLUT_RIGHT_BUTTON) {
-		if (state == GLUT_DOWN) {	
+		if (stateM == GLUT_DOWN) {	
 			lastp = ConvertScreenToWorld(x, y);
 			rMouseDown = true;
 		}
 
-		if (state == GLUT_UP) {
+		if (stateM == GLUT_UP) {
 			rMouseDown = false;
 		}
 	}
 }
 
 static void MouseMotion(int32 x, int32 y) {
+
+	//TODO - MainMenu MouseMotion interception to allow for hovering over button animations.
+
 	b2Vec2 p = ConvertScreenToWorld(x, y);
 	world->MouseMove(p);
 	
@@ -324,6 +414,8 @@ int main(int argc, char** argv) {
 	worldCount = 0;
 	//while (g_worldEntries[worldCount].createFcn != NULL) { ++worldCount; }//Keep for later
 
+	state = MainMenu;
+
 	worldIndex = b2Clamp(worldIndex, 0, worldCount - 1);
 	worldSelection = worldIndex;
 
@@ -345,7 +437,7 @@ int main(int argc, char** argv) {
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
 	GLUI_Master.set_glutMouseFunc(Mouse);
-	//0-191-255
+	//Change background color
 	glClearColor(0.0f, 0.054f, 0.124f, 0.5f);
 #ifdef FREEGLUT
 	glutMouseWheelFunc(MouseWheel);

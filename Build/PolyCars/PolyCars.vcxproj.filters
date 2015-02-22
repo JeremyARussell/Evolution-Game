@@ -28,6 +28,15 @@
     <ClCompile Include="PowerHUD.cpp">
       <Filter>Game\Interface</Filter>
     </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Game\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Game\GameStates</Filter>
+    </ClCompile>
+    <ClCompile Include="LiveGame.cpp">
+      <Filter>Game\GameStates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h">
@@ -54,6 +63,15 @@
     <ClInclude Include="PowerHUD.h">
       <Filter>Game\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Game\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenu.h">
+      <Filter>Game\GameStates</Filter>
+    </ClInclude>
+    <ClInclude Include="LiveGame.h">
+      <Filter>Game\GameStates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Framework">
@@ -73,6 +91,9 @@
     </Filter>
     <Filter Include="Game\Interface">
       <UniqueIdentifier>{4b4c5667-d8f8-4dfa-9d15-9f739effcf9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameStates">
+      <UniqueIdentifier>{44ee35e2-4d08-4831-ad30-41227b862773}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
