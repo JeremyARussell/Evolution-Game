@@ -18,14 +18,16 @@
 
 #include "Render.h"
 #include "World.h"
+#include "Build\PolyCars\MainMenu.h"
+#include "Build\PolyCars\LiveGame.h"
 #include "glui/glui.h"
 
 #include <cstdio>
 using namespace std;
 
 enum State {
-	MainMenu = 1,
-	LiveGame = 2
+	MainMenuS = 1,
+	LiveGameS = 2
 };
 
 namespace {
@@ -53,6 +55,9 @@ namespace {
 
 	//Game State stuff
 	State state;
+
+	MainMenu mainMenu;
+
 }
 
 static void Resize(int32 w, int32 h) {
@@ -139,7 +144,7 @@ static void MainMenuLoop() {
 
 static void MainMenuMouse(int32 button, int32 stateM, int32 x, int32 y) {
 	if(button == GLUT_LEFT_BUTTON) {
-		state = LiveGame;
+		state = LiveGameS;
 	}
 }
 ////
@@ -150,8 +155,13 @@ static void SimulationLoop() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	//Main Menu Stuff
+	if(state == MainMenuS) {
+		MainMenuLoop();
+	}
 
-	if (state == LiveGame) {	
+	//Live Game stuff
+	if (state == LiveGameS) {	
 		b2Vec2 oldCenter = settings.viewCenter;
 
 		world->SetTextLine(30);
@@ -182,16 +192,9 @@ static void SimulationLoop() {
 
 	//world->DrawTitle(5, 20, entry->name);//TODO - Decide if we will keep
 
-	//Main Menu Stuff
-	if(state == MainMenu) {
-		MainMenuLoop();
-	}
-
-
-
 	glutSwapBuffers();
 
-	if (state == LiveGame) {
+	if (state == LiveGameS) {
 		if (worldSelection != worldIndex) {
 			worldIndex = worldSelection;
 			delete world;
@@ -277,7 +280,7 @@ static void KeyboardUp(unsigned char key, int x, int y) {
 static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 	//Cheating and putting mouse stealing function for the Main menu here, then returning, instead of wrapping the 
 	//below stuff in extra functions or classes for a live game state.
-	if (state == MainMenu) {
+	if (state == MainMenuS) {
 		MainMenuMouse(button, stateM, x, y);
 		return;
 	}
@@ -351,6 +354,7 @@ static void MouseWheel(int wheel, int direction, int x, int y) {
 	B2_NOT_USED(wheel);
 	B2_NOT_USED(x);
 	B2_NOT_USED(y);
+	if(state == MainMenuS) return;//don't process the mouse wheel if things are at the main menu.
 	if (direction > 0) {
 		viewZoom /= 1.1f;
 	} else {
@@ -414,7 +418,7 @@ int main(int argc, char** argv) {
 	worldCount = 0;
 	//while (g_worldEntries[worldCount].createFcn != NULL) { ++worldCount; }//Keep for later
 
-	state = MainMenu;
+	state = MainMenuS;
 
 	worldIndex = b2Clamp(worldIndex, 0, worldCount - 1);
 	worldSelection = worldIndex;

@@ -6,5 +6,9 @@ public:
 	~LiveGame(void);
 
 	void render();
+
+
+private:
+
 };
 
