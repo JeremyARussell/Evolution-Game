@@ -25,16 +25,11 @@
 #include <cstdio>
 using namespace std;
 
-enum State {
-	MainMenuS = 1,
-	LiveGameS = 2
-};
-
 namespace {
 	int32 major = 0;
 	int32 minor = 1;
-	int32 revision = 6;
-	char  bugRevision = 'a';
+	int32 revision = 7;
+	char  bugRevision = ' ';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -48,6 +43,7 @@ namespace {
 	int32 mainWindow;
 	float settingsHz = 60.0;
 	GLUI *glui;
+	bool gluiHidden;
 	float32 viewZoom = 3.5f;
 	int tx, ty, tw, th;
 	bool rMouseDown;
@@ -57,7 +53,7 @@ namespace {
 	State state;
 
 	MainMenu mainMenu;
-
+	LiveGame liveGame;
 }
 
 static void Resize(int32 w, int32 h) {
@@ -105,50 +101,6 @@ static void Timer(int) {
 	glutTimerFunc(framePeriod, Timer, 0);
 }
 
-//State Stuff
-//
-//Main Menu
-static void MainMenuLoop() {
-	char buffer[128];
-
-	const char *string = "Main Menu - Basic Testing, etc - Click to Continue";
-	va_list arg;
-	va_start(arg, string);
-	vsprintf_s(buffer, string, arg);
-	va_end(arg);
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	int w = glutGet(GLUT_WINDOW_WIDTH);
-	int h = glutGet(GLUT_WINDOW_HEIGHT);
-	gluOrtho2D(0, w, h, 0);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glColor3f(0.9f, 0.6f, 0.6f);
-	int x = (w / 2) - 150;
-	int y = h / 2;
-	glRasterPos2i(x, y);
-	int32 length = (int32)strlen(buffer);
-	for (int32 i = 0; i < length; ++i) {
-		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, buffer[i]);
-	}
-
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-}
-
-static void MainMenuMouse(int32 button, int32 stateM, int32 x, int32 y) {
-	if(button == GLUT_LEFT_BUTTON) {
-		state = LiveGameS;
-	}
-}
-////
-
 static void SimulationLoop() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -157,11 +109,19 @@ static void SimulationLoop() {
 
 	//Main Menu Stuff
 	if(state == MainMenuS) {
-		MainMenuLoop();
+		if (!gluiHidden) {
+			glui->hide();
+			gluiHidden = true;
+		}
+		mainMenu.render();
 	}
 
 	//Live Game stuff
 	if (state == LiveGameS) {	
+		if (gluiHidden) {
+			glui->show();
+			gluiHidden = false;
+		}
 		b2Vec2 oldCenter = settings.viewCenter;
 
 		world->SetTextLine(30);
@@ -281,7 +241,7 @@ static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 	//Cheating and putting mouse stealing function for the Main menu here, then returning, instead of wrapping the 
 	//below stuff in extra functions or classes for a live game state.
 	if (state == MainMenuS) {
-		MainMenuMouse(button, stateM, x, y);
+		mainMenu.MouseDown(button, stateM, x, y, state);
 		return;
 	}
 	
@@ -334,9 +294,16 @@ static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 	}
 }
 
+static void MousePassiveMotion(int32 x, int32 y) {
+	//TODO - MainMenu MouseMotion interception to allow for hovering over button animations.
+	if (state == MainMenuS) {
+		mainMenu.MouseMotion(x, y);
+		return;
+	}
+}
+
 static void MouseMotion(int32 x, int32 y) {
 
-	//TODO - MainMenu MouseMotion interception to allow for hovering over button animations.
 
 	b2Vec2 p = ConvertScreenToWorld(x, y);
 	world->MouseMove(p);
@@ -447,6 +414,7 @@ int main(int argc, char** argv) {
 	glutMouseWheelFunc(MouseWheel);
 #endif
 	glutMotionFunc(MouseMotion);
+	glutPassiveMotionFunc(MousePassiveMotion);
 
 	glutKeyboardUpFunc(KeyboardUp);
 

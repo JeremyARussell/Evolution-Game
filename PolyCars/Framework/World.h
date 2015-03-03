@@ -131,6 +131,11 @@ struct ContactPoint {
 	b2PointState state;
 };
 
+enum State {
+	MainMenuS = 1,
+	LiveGameS = 2
+};
+
 class World : public b2ContactListener {
 public:
 
