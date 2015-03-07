@@ -173,8 +173,11 @@ void World::Step(Settings* settings) {
 			timeStep = 0.0f;
 		}
 
-		m_debugDraw.DrawString(5, m_textLine, "****PAUSED****");
-		m_textLine += 15;
+		int h = glutGet(GLUT_WINDOW_HEIGHT);
+		int w = glutGet(GLUT_WINDOW_WIDTH);
+										 //The - 60 is to compensate for half the length of the string being printed "****PAUSED****"
+		m_debugDraw.DrawString((w / 2) - 60, h / 2, "****PAUSED****");
+		//m_textLine += 15;
 	}
 
 	uint32 flags = 0;

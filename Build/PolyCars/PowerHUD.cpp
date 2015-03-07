@@ -187,18 +187,7 @@ void PowerHUD::render() {
 	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - hudPhWidth - hudPhX, hudPhY);
 	glEnd();								
 
-
-	//Hilighter
-	if (hilBt == false) {
-		glGenTextures(1, &hilTex);
-		hilTex = SOIL_load_OGL_texture ( "images\\Simple_Powers_Hilighter.tex", 
-			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-		hilBt = true;
-	}
-
-	glBindTexture(GL_TEXTURE_2D, hilTex);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
+	glDisable(GL_TEXTURE_2D);
 	char buf[256];
 
 	switch (activePower) {
@@ -234,6 +223,19 @@ void PowerHUD::render() {
 		break;
 	}
 
+	glEnable(GL_TEXTURE_2D);
+
+	//Hilighter
+	if (hilBt == false) {
+		glGenTextures(1, &hilTex);
+		hilTex = SOIL_load_OGL_texture ( "images\\Simple_Powers_Hilighter.tex", 
+			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+		hilBt = true;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, hilTex);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
 	glBegin(GL_POLYGON);
 	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - hilPhWidth + hilPhX + 45, hilPhY + hilPhHeight );
 	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + hilPhX + 45, hilPhY + hilPhHeight);		
@@ -241,13 +243,11 @@ void PowerHUD::render() {
 	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - hilPhWidth + hilPhX + 45, hilPhY);
 	glEnd();								
 
-
+	//Not sure what this is for anymore :/ - 03/07/15.
 	//glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(w - hilPhX - hilPhWidth, hilPhY + hilPhHeight);		
 	//glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hilPhX, hilPhY + hilPhHeight);		
 	//glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(w - hilPhX, hilPhY);
 	//glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(w - hilPhX - hilPhWidth, hilPhY);
-	///
-
 
 	///Grab
 	if (bt[0] == false) {

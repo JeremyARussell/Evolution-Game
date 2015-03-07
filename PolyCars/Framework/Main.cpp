@@ -172,15 +172,14 @@ static void Keyboard(unsigned char key, int x, int y) {
 	B2_NOT_USED(y);
 
 	switch (key) {
-	case 27:
-#ifndef __APPLE__
-		// freeglut specific function
-		glutLeaveMainLoop();
-#endif
-		exit(0);
-		break;
 	case ' ':
 		break;
+	case 27://ESC key pauses
+//#ifndef __APPLE__
+//		// freeglut specific function
+//		glutLeaveMainLoop();
+//#endif
+//		exit(0);
 	case 'p':
 		settings.pause = !settings.pause;
 		break;
