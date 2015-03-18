@@ -42,9 +42,6 @@
     <ClInclude Include="..\..\PolyCars\Framework\Render.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h">
-      <Filter>Game\Worlds</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\PolyCars\Framework\World.h">
       <Filter>Framework</Filter>
     </ClInclude>
@@ -71,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="LiveGame.h">
       <Filter>Game\GameStates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h">
+      <Filter>Game\Worlds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

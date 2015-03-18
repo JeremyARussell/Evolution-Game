@@ -1,5 +1,5 @@
-#ifndef MTN_RIDING_H
-#define MTN_RIDING_H
+#ifndef SANDBOX_H
+#define SANDBOX_H
 #pragma once
 
 #include <fstream>
@@ -104,7 +104,7 @@ public:
 	b2Fixture* m_fixture;
 };
 
-class MountainRiding : public World {
+class SandboxWorld : public World {
 public:
 
 
@@ -135,7 +135,7 @@ public:
 	}
 
 	void saveWorld() {
-		ofstream saveFile("MountainRidingWorld.sav");
+		ofstream saveFile("SandboxWorld.sav");
 
 		//For each grass - Save the grass position
 		for (int i = 0; i < grasses.size(); i ++) {
@@ -179,7 +179,7 @@ public:
 		saveFile.close();
 	}
 	void loadWorld() {
-		ifstream loadFile("MountainRidingWorld.sav");
+		ifstream loadFile("SandboxWorld.sav");
 
 		string loadType = "";
 		float32 var1;
@@ -327,7 +327,7 @@ public:
 	}
 
 	//Level building, and default creature placement go here.
-    MountainRiding() {
+    SandboxWorld() {
 		cW = 0;
 		activeWheeler = NULL;
 		grassSpawnCounter = 0;
@@ -831,7 +831,7 @@ public:
 	float32 clickZoomLevel;
 	b2Vec2  clickViewCenter;
 
-	void MountainRiding::MouseDown(const b2Vec2& p) {
+	void SandboxWorld::MouseDown(const b2Vec2& p) {
 										
 		m_mouseWorld = p;
 	
@@ -1106,7 +1106,7 @@ public:
 	}
 
 	static World* Create() {
-		return new MountainRiding;
+		return new SandboxWorld;
 	}
 
 private:

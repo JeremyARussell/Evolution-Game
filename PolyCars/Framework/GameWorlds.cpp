@@ -28,10 +28,10 @@
 #include <cstring>
 using namespace std;
 
-#include "MountainRiding.h"
+#include "SandboxWorld.h"
 
 WorldEntry g_worldEntries[] =
 {	
-	{"Mountain Riding", MountainRiding::Create },
+	{"Sandbox World", SandboxWorld::Create },
 	{NULL, NULL}
 };

@@ -140,7 +140,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\MountainRiding.h" />
+    <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />

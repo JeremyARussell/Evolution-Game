@@ -29,7 +29,7 @@ namespace {
 	int32 major = 0;
 	int32 minor = 1;
 	int32 revision = 7;
-	char  bugRevision = ' ';
+	char  bugRevision = 'a';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
