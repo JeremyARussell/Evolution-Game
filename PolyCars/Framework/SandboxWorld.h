@@ -952,16 +952,42 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
 
-		if (true) {
-			m_textLine += 40;
-			m_debugDraw.DrawString(15, m_textLine, "======= World Stats =======");
-			m_textLine += 15;
+		if (settings->pause) {
+
+			m_debugDraw.DrawString(240, 85, "======= World Stats =======");
+
 			int32 wheelerCount = wheelers.size();
-			m_debugDraw.DrawString(15, m_textLine, "Wheelers = %d", wheelerCount);
-			m_textLine += 15;
+			m_debugDraw.DrawString(240, 100, "Wheelers = %d", wheelerCount);
+
 			int32 grassCount = grasses.size();
-			m_debugDraw.DrawString(15, m_textLine, "Blades of Grass = %d", grassCount);
-			m_textLine += 15;
+			m_debugDraw.DrawString(240, 115, "Blades of Grass = %d", grassCount);
+
+		}
+
+		int trackwsp = 85;
+
+		if (settings->followCreature == true && activeWheeler != NULL) {
+			m_debugDraw.DrawString(15, trackwsp, "======= Wheeler Stats ======");
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= Spoke - Length  / Angle  =");
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #1    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[0], activeWheeler->spokeAngles[0]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #2    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[1], activeWheeler->spokeAngles[1]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #3    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[2], activeWheeler->spokeAngles[2]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #4    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[3], activeWheeler->spokeAngles[3]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #5    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[4], activeWheeler->spokeAngles[4]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #6    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[5], activeWheeler->spokeAngles[5]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #7    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[6], activeWheeler->spokeAngles[6]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #8    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[7], activeWheeler->spokeAngles[7]);
+			trackwsp += 15;
+
 		}
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {
