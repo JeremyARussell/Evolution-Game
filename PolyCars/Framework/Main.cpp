@@ -433,6 +433,8 @@ int main(int argc, char** argv) {
 		
 	glui->add_column(true);
 	glui->add_checkbox("Follow Creature", &settings.followCreature);
+	glui->add_checkbox("Draw Genes", &settings.drawGenes);
+	////////glui->add_checkbox("Follow Creature", &settings.followCreature);
 	glui->add_button("Next", 0, nextWheeler);
 	glui->add_button("Previous", 0, previusWheeler);
 

@@ -59,7 +59,7 @@ struct Settings {
 		grassSpawnRate(5),
 		velocityIterations(8),
 		positionIterations(3),
-		drawShapes(1),
+		drawShapes(1),//blah blah
 		drawJoints(0),
 		drawAABBs(0),
 		drawPairs(0),
@@ -75,7 +75,8 @@ struct Settings {
 		enableSubStepping(0),
 		pause(0),
 		singleStep(0),
-		followCreature(0)
+		followCreature(0),//mine
+		drawGenes(0)
 		{}
 
 	b2Vec2 viewCenter;
@@ -101,6 +102,7 @@ struct Settings {
 	int32 pause;
 	int32 singleStep;
 	int32 followCreature;
+	int32 drawGenes;
 };
 
 struct WorldEntry {

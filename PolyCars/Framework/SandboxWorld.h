@@ -376,26 +376,10 @@ public:
 			b2FixtureDef fdGround1;
 			fdGround1.shape = &polyGround1;
 			fdGround1.density = 0.0f;
-			fdGround1.filter.categoryBits = WALL;
+			fdGround1.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
 
 			world->CreateFixture(&fdGround1);
-			//Ground #2
-			//b2Vec2 vsGround2[4];
-			//vsGround2[0].Set(-225.0f, 1.0f);
-			//vsGround2[1].Set(-200.0f, -1.0f);
-			//vsGround2[2].Set(225.0f, -1.0f);
-			//vsGround2[3].Set(225.0f, 1.0f);
 
-			//b2PolygonShape polyGround2;
-			//polyGround2.Set(vsGround2, 4);
-
-			//b2FixtureDef fdGround2;
-			//fdGround2.shape = &polyGround2;
-			//fdGround2.density = 0.0f;
-			//fdGround2.filter.categoryBits = WALL;
-
-			//world->CreateFixture(&fdGround2);
-			//Left Wall
 			b2Vec2 vsLeftWall[4];
 			vsLeftWall[0].Set(-225.0f, 68.0f);
 			vsLeftWall[1].Set(-225.0f, 1.0f);
@@ -428,9 +412,9 @@ public:
 
 			world->CreateFixture(&fdCeiling);	
 			//Right Wall
-			b2Vec2 vsRightWall[4];
-			vsRightWall[0].Set(223.0f, 68.0f);
-			vsRightWall[1].Set(223.0f, 1.0f);
+			b2Vec2 vsRightWall[4];//<--- TODO - Take all these bits of reuseable variables and make them generic...
+			vsRightWall[0].Set(223.0f, 68.0f);//...then just change the values and go through a bunch of tuples...
+			vsRightWall[1].Set(223.0f, 1.0f);//...or something... 
 			vsRightWall[2].Set(225.0f, 1.0f);
 			vsRightWall[3].Set(225.0f, 68.0f);
 
@@ -525,7 +509,7 @@ public:
 		//powerHUD.render();
 	}
 
-	void RenderUIold(Settings* settings) {
+	void RenderUIold(Settings* settings) {//Can delete entirely.
 
 		glEnable(GL_TEXTURE_2D);
 		glColor3f(10.0, 10.0, 10.0);
@@ -966,7 +950,7 @@ public:
 
 		int trackwsp = 85;
 
-		if (settings->followCreature == true && activeWheeler != NULL) {
+		if (/*settings->followCreature == true && */activeWheeler != NULL && settings->drawGenes) {
 			m_debugDraw.DrawString(15, trackwsp, "======= Wheeler Stats ======");
 			trackwsp += 15;
 			m_debugDraw.DrawString(15, trackwsp, "= Spoke - Length  / Angle  =");
@@ -986,6 +970,27 @@ public:
 			m_debugDraw.DrawString(15, trackwsp, "= #7    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[6], activeWheeler->spokeAngles[6]);
 			trackwsp += 15;
 			m_debugDraw.DrawString(15, trackwsp, "= #8    - %06.3f  / %06.3f =", activeWheeler->spokeLengths[7], activeWheeler->spokeAngles[7]);
+			trackwsp += 15;
+
+			m_debugDraw.DrawString(15, trackwsp, "========== Wheels ==========");
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= Spoke - Length  / Angle  =");
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #1    - %06.3f  / %06.3f =", activeWheeler->hasWheel[0], activeWheeler->wheelRadius[0]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #2    - %06.3f  / %06.3f =", activeWheeler->hasWheel[1], activeWheeler->wheelRadius[1]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #3    - %06.3f  / %06.3f =", activeWheeler->hasWheel[2], activeWheeler->wheelRadius[2]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #4    - %06.3f  / %06.3f =", activeWheeler->hasWheel[3], activeWheeler->wheelRadius[3]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #5    - %06.3f  / %06.3f =", activeWheeler->hasWheel[4], activeWheeler->wheelRadius[4]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #6    - %06.3f  / %06.3f =", activeWheeler->hasWheel[5], activeWheeler->wheelRadius[5]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #7    - %06.3f  / %06.3f =", activeWheeler->hasWheel[6], activeWheeler->wheelRadius[6]);
+			trackwsp += 15;
+			m_debugDraw.DrawString(15, trackwsp, "= #8    - %06.3f  / %06.3f =", activeWheeler->hasWheel[7], activeWheeler->wheelRadius[7]);
 			trackwsp += 15;
 
 		}
