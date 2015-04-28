@@ -326,6 +326,58 @@ public:
 		loadFile.close();
 	}
 
+	void buildGroundPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
+
+		b2Vec2 vsGround1[4];
+
+		float32 slope = (pb.y - pa.y) / (pb.x - pa.x);
+
+		//float32 gHeight = abs(ps.y - pe.y);
+		//float32 gWidth = abs(ps.x - pe.x);
+
+		if(slope >= 1 | slope < 0) {//Mostly vertical
+			//A is lower than B
+			if (pa.y < pb.y)
+			{
+				vsGround1[0].Set(pb.x - 2.5f, pb.y);
+				vsGround1[1].Set(pa.x - 2.5f, pa.y);
+				vsGround1[2].Set(pa.x + 2.5f, pa.y); 
+				vsGround1[3].Set(pb.x + 2.5f, pb.y);   
+			} else {
+				vsGround1[0].Set(pa.x - 2.5f, pa.y);
+				vsGround1[1].Set(pb.x - 2.5f, pb.y);
+				vsGround1[2].Set(pb.x + 2.5f, pb.y); 
+				vsGround1[3].Set(pa.x + 2.5f, pa.y);   
+			}
+
+		} else {//Mostly horizontal
+			//A is to the left of B
+			if (pa.x < pb.x)
+			{
+				vsGround1[0].Set(pa.x, pa.y + 2.5f); /// top left
+				vsGround1[1].Set(pa.x, pa.y - 2.5f);/// bottom left
+				vsGround1[2].Set(pb.x, pb.y - 2.5f); /// bottom right
+				vsGround1[3].Set(pb.x, pb.y + 2.5f);  /// top right 
+			} else {//B is to the left of A
+				vsGround1[0].Set(pb.x, pb.y + 2.5f); /// top left
+				vsGround1[1].Set(pb.x, pb.y - 2.5f);/// bottom left
+				vsGround1[2].Set(pa.x, pa.y - 2.5f); /// bottom right
+				vsGround1[3].Set(pa.x, pa.y + 2.5f);  /// top right 
+			}
+		}
+
+		b2PolygonShape sGround;
+		sGround.Set(vsGround1, 4);
+
+		b2FixtureDef fdGround;
+		fdGround.shape = &sGround;
+		fdGround.density = 0.0f;
+		fdGround.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
+
+		world->CreateFixture(&fdGround);
+
+	}
+
 	//Level building, and default creature placement go here.
     SandboxWorld() {
 		cW = 0;
@@ -364,7 +416,19 @@ public:
 			b2Body* world = m_world->CreateBody(&bd);
 			
 			//Ground
-			b2Vec2 vsGround1[4];
+
+			buildGroundPiece(b2Vec2( 225.0f, -1.5f), 
+							 b2Vec2(-225.0f, -1.5f), world);
+
+
+			buildGroundPiece(b2Vec2(-125.0f, 10.5f), 
+							 b2Vec2(-25.0f, 10.5f), world);
+
+
+			buildGroundPiece(b2Vec2(-55.0f, 30.5f), 
+							 b2Vec2(-55.0f, 20.5f), world);
+
+/*			b2Vec2 vsGround1[4];
 			vsGround1[0].Set(-225.0f, 1.0f);
 			vsGround1[1].Set(-225.0f, -4.0f);
 			vsGround1[2].Set(225.0f, -4.0f);
@@ -378,7 +442,7 @@ public:
 			fdGround1.density = 0.0f;
 			fdGround1.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
 
-			world->CreateFixture(&fdGround1);
+			world->CreateFixture(&fdGround1);      */
 
 			b2Vec2 vsLeftWall[4];
 			vsLeftWall[0].Set(-225.0f, 68.0f);
@@ -414,7 +478,7 @@ public:
 			//Right Wall
 			b2Vec2 vsRightWall[4];//<--- TODO - Take all these bits of reuseable variables and make them generic...
 			vsRightWall[0].Set(223.0f, 68.0f);//...then just change the values and go through a bunch of tuples...
-			vsRightWall[1].Set(223.0f, 1.0f);//...or something... 
+			vsRightWall[1].Set(223.0f, 1.0f);//...or something... gonna make a function to build stuff.
 			vsRightWall[2].Set(225.0f, 1.0f);
 			vsRightWall[3].Set(225.0f, 68.0f);
 
