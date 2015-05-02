@@ -43,13 +43,16 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 	
 	phY[0] = y + 5.0f; phY[1] = y + 5.0f;
 	phY[2] = y + 5.0f; phY[3] = y + 5.0f;
-	phY[4] = y + 5.0f;
+	phY[4] = y + 5.0f; phY[5] = y + 5.0f;
+	phY[6] = y + 5.0f;
 	phHeight[0] = 40.0f; phHeight[1] = 40.0f;
 	phHeight[2] = 40.0f; phHeight[3] = 40.0f;
-	phHeight[4] = 40.0f;
+	phHeight[4] = 40.0f; phHeight[5] = 40.0f;
+	phHeight[6] = 40.0f;
 	phWidth[0] = 40.0f; phWidth[1] = 40.0f;
 	phWidth[2] = 40.0f; phWidth[3] = 40.0f;
-	phWidth[4] = 40.0f;
+	phWidth[4] = 40.0f; phWidth[5] = 40.0f;
+	phWidth[6] = 40.0f;
 
 
 
@@ -84,6 +87,18 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 
 	if (worldPowers & SPAWN_WHEELER) {
 		phX[4] = (pbTracker * 50) + 5;
+		pbTracker++;
+		//phY[4] = y;
+	}
+
+	if (worldPowers & CREATE_GROUND) {
+		phX[5] = (pbTracker * 50) + 5;
+		pbTracker++;
+		//phY[4] = y;
+	}
+
+	if (worldPowers & CREATE_WALL) {
+		phX[6] = (pbTracker * 50) + 5;
 		pbTracker++;
 		//phY[4] = y;
 	}
@@ -221,6 +236,18 @@ void PowerHUD::render() {
 		sprintf_s(buf, "Spawn Wheeler - Spawn a random Wheeler, results may vary.");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
+	case CREATE_GROUND:
+		hilPhX = phX[5];
+		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
+		sprintf_s(buf, "Create Ground");
+		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
+		break;
+	case CREATE_WALL:
+		hilPhX = phX[6];
+		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
+		sprintf_s(buf, "Create Wall");
+		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
+		break;
 	}
 
 	glEnable(GL_TEXTURE_2D);
@@ -340,6 +367,42 @@ void PowerHUD::render() {
 	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[4] + phX[4] + 40, phY[4]);
 	glEnd();								 
 
+	//Ground
+	if (bt[5] == false) {
+		glGenTextures(1, &powerTexs[5]);
+		powerTexs[5] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
+			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+		bt[5] = true;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, powerTexs[5]);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[5] + phX[5] + 40, phY[5] + phHeight[5] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[5] + 40, phY[5] + phHeight[5]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[5] + 40, phY[5]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[5] + phX[5] + 40, phY[5]);
+	glEnd();								 
+
+	//Wall
+	if (bt[6] == false) {
+		glGenTextures(1, &powerTexs[6]);
+		powerTexs[6] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
+			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+		bt[6] = true;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, powerTexs[6]);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[6] + phX[6] + 40, phY[6] + phHeight[6] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[6] + 40, phY[6] + phHeight[6]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[6] + 40, phY[6]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[6] + phX[6] + 40, phY[6]);
+	glEnd();								 
+
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -394,6 +457,18 @@ void PowerHUD::click(b2Vec2 rp) {
 		hudP.x < phX[4] + phWidth[4])  //Right Side
 	{
 		activePower = SPAWN_WHEELER;
+		return;
+	}
+	if (hudP.x > phX[5] &&				//Left Side
+		hudP.x < phX[5] + phWidth[4])  //Right Side
+	{
+		activePower = CREATE_GROUND;
+		return;
+	}
+	if (hudP.x > phX[6] &&				//Left Side
+		hudP.x < phX[6] + phWidth[4])  //Right Side
+	{
+		activePower = CREATE_WALL;
 		return;
 	}
 

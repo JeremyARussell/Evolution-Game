@@ -378,6 +378,61 @@ public:
 
 	}
 
+
+	void buildWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
+
+		b2Vec2 vsGround1[4];
+
+		float32 slope = (pb.y - pa.y) / (pb.x - pa.x);
+
+		//float32 gHeight = abs(ps.y - pe.y);
+		//float32 gWidth = abs(ps.x - pe.x);
+
+		if(slope >= 1 | slope < 0) {//Mostly vertical
+			//A is lower than B
+			if (pa.y < pb.y)
+			{
+				vsGround1[0].Set(pb.x - 2.5f, pb.y);
+				vsGround1[1].Set(pa.x - 2.5f, pa.y);
+				vsGround1[2].Set(pa.x + 2.5f, pa.y); 
+				vsGround1[3].Set(pb.x + 2.5f, pb.y);   
+			} else {
+				vsGround1[0].Set(pa.x - 2.5f, pa.y);
+				vsGround1[1].Set(pb.x - 2.5f, pb.y);
+				vsGround1[2].Set(pb.x + 2.5f, pb.y); 
+				vsGround1[3].Set(pa.x + 2.5f, pa.y);   
+			}
+
+		} else {//Mostly horizontal
+			//A is to the left of B
+			if (pa.x < pb.x)
+			{
+				vsGround1[0].Set(pa.x, pa.y + 2.5f); /// top left
+				vsGround1[1].Set(pa.x, pa.y - 2.5f);/// bottom left
+				vsGround1[2].Set(pb.x, pb.y - 2.5f); /// bottom right
+				vsGround1[3].Set(pb.x, pb.y + 2.5f);  /// top right 
+			} else {//B is to the left of A
+				vsGround1[0].Set(pb.x, pb.y + 2.5f); /// top left
+				vsGround1[1].Set(pb.x, pb.y - 2.5f);/// bottom left
+				vsGround1[2].Set(pa.x, pa.y - 2.5f); /// bottom right
+				vsGround1[3].Set(pa.x, pa.y + 2.5f);  /// top right 
+			}
+		}
+
+		b2PolygonShape sGround;
+		sGround.Set(vsGround1, 4);
+
+		b2FixtureDef fdGround;
+		fdGround.shape = &sGround;
+		fdGround.density = 0.0f;
+		fdGround.filter.categoryBits = NON_INTERACTOR;//TODO - WALL here should really be GROUND
+
+		world->CreateFixture(&fdGround);
+
+	}
+
+	b2Body* world;
+
 	//Level building, and default creature placement go here.
     SandboxWorld() {
 		cW = 0;
@@ -385,6 +440,8 @@ public:
 		grassSpawnCounter = 0;
 		following = false;
 		activePower = GRAB;
+
+		ma.x = 0.0f; ma.y = 0.0f;
 
 		x = 0.0f;
 		y = 0.0f;
@@ -405,7 +462,8 @@ public:
 
 
 		hudX = 250, hudY = 50;
-		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER);
+		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER 
+									  | CREATE_GROUND | CREATE_WALL);
 		powerHUD = PowerHUD(hudX, hudY, worldPowers, activePower);
 
 		m_world->SetContactListener(&thisWheelerContactListener);
@@ -413,7 +471,7 @@ public:
 		{
 			//The World's boundaries
 			b2BodyDef bd;
-			b2Body* world = m_world->CreateBody(&bd);
+			world = m_world->CreateBody(&bd);
 			
 			//Ground
 
@@ -421,13 +479,16 @@ public:
 							 b2Vec2(-225.0f, -1.5f), world);
 
 
-			buildGroundPiece(b2Vec2(-125.0f, 10.5f), 
-							 b2Vec2(-25.0f, 10.5f), world);
+			/*buildGroundPiece(b2Vec2(-155.0f, 10.5f), 
+							 b2Vec2(-55.0f, 10.5f), world);
 
 
-			buildGroundPiece(b2Vec2(-55.0f, 30.5f), 
-							 b2Vec2(-55.0f, 20.5f), world);
+			buildWallPiece(b2Vec2(-160.0f, 30.5f), 
+							 b2Vec2(-152.0f, 12.5f), world);
 
+			buildWallPiece(b2Vec2(-45.0f, 30.5f), 
+							 b2Vec2(-55.0f, 12.5f), world);
+			*/
 /*			b2Vec2 vsGround1[4];
 			vsGround1[0].Set(-225.0f, 1.0f);
 			vsGround1[1].Set(-225.0f, -4.0f);
@@ -879,6 +940,8 @@ public:
 	float32 clickZoomLevel;
 	b2Vec2  clickViewCenter;
 
+	b2Vec2 ma, mb;
+
 	void SandboxWorld::MouseDown(const b2Vec2& p) {
 										
 		m_mouseWorld = p;
@@ -913,6 +976,12 @@ public:
 				cW = 0;
 				wheelers.push_back(new Wheeler(m_world,  callback.m_point.x, callback.m_point.y));
 			}			
+		}
+
+		if (activePower == CREATE_GROUND | activePower == CREATE_WALL) {
+			ma = b2Vec2(p.x, p.y);
+
+
 		}
 
 		if (callback.m_fixture) {
@@ -950,6 +1019,29 @@ public:
 				testWheeler = NULL;
 			}
 		}
+	}
+
+	void SandboxWorld::MouseUp(const b2Vec2& p) {
+		if (activePower == CREATE_GROUND |activePower == CREATE_WALL) {
+			if (ma.x != 0.0f && ma.y != 0.0f) {
+				mb = b2Vec2(p.x, p.y);
+
+				float32 dist = sqrt((mb.x - ma.x)*(mb.x - ma.x) + (mb.y - ma.y)*(mb.y - ma.y));
+
+				if (dist > 1.0f)
+				{
+					if(activePower == CREATE_GROUND) {
+						buildGroundPiece(ma, mb, world);
+					} else {
+						buildWallPiece(ma, mb, world);
+					} 
+				}
+
+				ma.x = 0.0f;
+				ma.y = 0.0f;
+			}
+		}
+		World::MouseUp(p);
 	}
 
 	void Keyboard(unsigned char key) {
