@@ -335,7 +335,7 @@ public:
 		//float32 gHeight = abs(ps.y - pe.y);
 		//float32 gWidth = abs(ps.x - pe.x);
 
-		if(slope >= 1 | slope < 0) {//Mostly vertical
+		if(slope >= 1 | slope < -1.0) {//Mostly vertical
 			//A is lower than B
 			if (pa.y < pb.y)
 			{
@@ -388,7 +388,7 @@ public:
 		//float32 gHeight = abs(ps.y - pe.y);
 		//float32 gWidth = abs(ps.x - pe.x);
 
-		if(slope >= 1 | slope < 0) {//Mostly vertical
+		if(slope >= 1 | slope < -1.0) {//Mostly vertical
 			//A is lower than B
 			if (pa.y < pb.y)
 			{
