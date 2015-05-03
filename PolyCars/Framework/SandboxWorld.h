@@ -90,7 +90,7 @@ public:
 
 	bool ReportFixture(b2Fixture* fixture) {
 		b2Body* body = fixture->GetBody();
-		if (body->GetType() == b2_dynamicBody) {
+		if (body->GetType() == b2_dynamicBody | body->GetType() == b2_staticBody) {
 			bool inside = fixture->TestPoint(m_point);
 			if (inside) {
 				m_fixture = fixture;
@@ -1005,14 +1005,23 @@ public:
 				b2Body* body = callback.m_fixture->GetBody();
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					//callback.m_fixture->GetFilterData().categoryBits == GRASS | - Grass doesn't trigger a callback thingy anyways
-					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
-				
-				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
-				wheelersToDelete.push_back(*testWheeler);
-				wheelers.erase( std::find(wheelers.begin(), wheelers.end(), testWheeler ) );
-				activeWheeler = NULL;
-				testWheeler = NULL;
+					callback.m_fixture->GetFilterData().categoryBits == GRASS) return;
+
+				if (callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR)
+				{
+					GrassSpawner *spawner = (GrassSpawner *)body->GetUserData();
+					//wheelersToDelete.push_back(*spawner);
+					grassSpawners.erase( std::find(grassSpawners.begin(), grassSpawners.end(), spawner ) );
+				}
+
+				if (callback.m_fixture->GetFilterData().categoryBits == WHEELER)
+				{
+					Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+					wheelersToDelete.push_back(*testWheeler);
+					wheelers.erase( std::find(wheelers.begin(), wheelers.end(), testWheeler ) );
+					activeWheeler = NULL;
+					testWheeler = NULL; 
+				}
 			}
 		}
 	}
