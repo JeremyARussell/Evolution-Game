@@ -328,106 +328,98 @@ public:
 
 	void buildGroundPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
 
-		b2Vec2 vsGround1[4];
+		b2Vec2 _bgpTva[4];
+		float32 _bgpTslope = (pb.y - pa.y) / (pb.x - pa.x);
 
-		float32 slope = (pb.y - pa.y) / (pb.x - pa.x);
-
-		//float32 gHeight = abs(ps.y - pe.y);
-		//float32 gWidth = abs(ps.x - pe.x);
-
-		if(slope >= 1 | slope < -1.0) {//Mostly vertical
+		if(_bgpTslope >= 1 | _bgpTslope < -1.0) {//Mostly vertical
 			//A is lower than B
 			if (pa.y < pb.y)
 			{
-				vsGround1[0].Set(pb.x - 2.5f, pb.y);
-				vsGround1[1].Set(pa.x - 2.5f, pa.y);
-				vsGround1[2].Set(pa.x + 2.5f, pa.y); 
-				vsGround1[3].Set(pb.x + 2.5f, pb.y);   
+				_bgpTva[0].Set(pb.x - 2.5f, pb.y);
+				_bgpTva[1].Set(pa.x - 2.5f, pa.y);
+				_bgpTva[2].Set(pa.x + 2.5f, pa.y); 
+				_bgpTva[3].Set(pb.x + 2.5f, pb.y);   
 			} else {
-				vsGround1[0].Set(pa.x - 2.5f, pa.y);
-				vsGround1[1].Set(pb.x - 2.5f, pb.y);
-				vsGround1[2].Set(pb.x + 2.5f, pb.y); 
-				vsGround1[3].Set(pa.x + 2.5f, pa.y);   
+				_bgpTva[0].Set(pa.x - 2.5f, pa.y);
+				_bgpTva[1].Set(pb.x - 2.5f, pb.y);
+				_bgpTva[2].Set(pb.x + 2.5f, pb.y); 
+				_bgpTva[3].Set(pa.x + 2.5f, pa.y);   
 			}
 
 		} else {//Mostly horizontal
 			//A is to the left of B
 			if (pa.x < pb.x)
 			{
-				vsGround1[0].Set(pa.x, pa.y + 2.5f); /// top left
-				vsGround1[1].Set(pa.x, pa.y - 2.5f);/// bottom left
-				vsGround1[2].Set(pb.x, pb.y - 2.5f); /// bottom right
-				vsGround1[3].Set(pb.x, pb.y + 2.5f);  /// top right 
+				_bgpTva[0].Set(pa.x, pa.y + 2.5f); /// top left
+				_bgpTva[1].Set(pa.x, pa.y - 2.5f);/// bottom left
+				_bgpTva[2].Set(pb.x, pb.y - 2.5f); /// bottom right
+				_bgpTva[3].Set(pb.x, pb.y + 2.5f);  /// top right 
 			} else {//B is to the left of A
-				vsGround1[0].Set(pb.x, pb.y + 2.5f); /// top left
-				vsGround1[1].Set(pb.x, pb.y - 2.5f);/// bottom left
-				vsGround1[2].Set(pa.x, pa.y - 2.5f); /// bottom right
-				vsGround1[3].Set(pa.x, pa.y + 2.5f);  /// top right 
+				_bgpTva[0].Set(pb.x, pb.y + 2.5f); /// top left
+				_bgpTva[1].Set(pb.x, pb.y - 2.5f);/// bottom left
+				_bgpTva[2].Set(pa.x, pa.y - 2.5f); /// bottom right
+				_bgpTva[3].Set(pa.x, pa.y + 2.5f);  /// top right 
 			}
 		}
 
-		b2PolygonShape sGround;
-		sGround.Set(vsGround1, 4);
+		b2PolygonShape _bgpTps;
+		_bgpTps.Set(_bgpTva, 4);
 
-		b2FixtureDef fdGround;
-		fdGround.shape = &sGround;
-		fdGround.density = 0.0f;
-		fdGround.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
+		b2FixtureDef _bgpTfd;
+		_bgpTfd.shape = &_bgpTps;
+		_bgpTfd.density = 0.0f;
+		_bgpTfd.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
 
-		world->CreateFixture(&fdGround);
+		world->CreateFixture(&_bgpTfd);
 
 	}
 
 
 	void buildWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
 
-		b2Vec2 vsGround1[4];
+		b2Vec2 _bwpTva[4];
+		float32 _bwpTslope = (pb.y - pa.y) / (pb.x - pa.x);
 
-		float32 slope = (pb.y - pa.y) / (pb.x - pa.x);
-
-		//float32 gHeight = abs(ps.y - pe.y);
-		//float32 gWidth = abs(ps.x - pe.x);
-
-		if(slope >= 1 | slope < -1.0) {//Mostly vertical
+		if(_bwpTslope >= 1 | _bwpTslope < -1.0) {//Mostly vertical
 			//A is lower than B
 			if (pa.y < pb.y)
 			{
-				vsGround1[0].Set(pb.x - 2.5f, pb.y);
-				vsGround1[1].Set(pa.x - 2.5f, pa.y);
-				vsGround1[2].Set(pa.x + 2.5f, pa.y); 
-				vsGround1[3].Set(pb.x + 2.5f, pb.y);   
+				_bwpTva[0].Set(pb.x - 2.5f, pb.y);
+				_bwpTva[1].Set(pa.x - 2.5f, pa.y);
+				_bwpTva[2].Set(pa.x + 2.5f, pa.y); 
+				_bwpTva[3].Set(pb.x + 2.5f, pb.y);   
 			} else {
-				vsGround1[0].Set(pa.x - 2.5f, pa.y);
-				vsGround1[1].Set(pb.x - 2.5f, pb.y);
-				vsGround1[2].Set(pb.x + 2.5f, pb.y); 
-				vsGround1[3].Set(pa.x + 2.5f, pa.y);   
+				_bwpTva[0].Set(pa.x - 2.5f, pa.y);
+				_bwpTva[1].Set(pb.x - 2.5f, pb.y);
+				_bwpTva[2].Set(pb.x + 2.5f, pb.y); 
+				_bwpTva[3].Set(pa.x + 2.5f, pa.y);   
 			}
 
 		} else {//Mostly horizontal
 			//A is to the left of B
 			if (pa.x < pb.x)
 			{
-				vsGround1[0].Set(pa.x, pa.y + 2.5f); /// top left
-				vsGround1[1].Set(pa.x, pa.y - 2.5f);/// bottom left
-				vsGround1[2].Set(pb.x, pb.y - 2.5f); /// bottom right
-				vsGround1[3].Set(pb.x, pb.y + 2.5f);  /// top right 
+				_bwpTva[0].Set(pa.x, pa.y + 2.5f);
+				_bwpTva[1].Set(pa.x, pa.y - 2.5f);
+				_bwpTva[2].Set(pb.x, pb.y - 2.5f);
+				_bwpTva[3].Set(pb.x, pb.y + 2.5f);
 			} else {//B is to the left of A
-				vsGround1[0].Set(pb.x, pb.y + 2.5f); /// top left
-				vsGround1[1].Set(pb.x, pb.y - 2.5f);/// bottom left
-				vsGround1[2].Set(pa.x, pa.y - 2.5f); /// bottom right
-				vsGround1[3].Set(pa.x, pa.y + 2.5f);  /// top right 
+				_bwpTva[0].Set(pb.x, pb.y + 2.5f);
+				_bwpTva[1].Set(pb.x, pb.y - 2.5f);
+				_bwpTva[2].Set(pa.x, pa.y - 2.5f);
+				_bwpTva[3].Set(pa.x, pa.y + 2.5f);
 			}
 		}
 
-		b2PolygonShape sGround;
-		sGround.Set(vsGround1, 4);
+		b2PolygonShape _bwpTps;
+		_bwpTps.Set(_bwpTva, 4);
 
-		b2FixtureDef fdGround;
-		fdGround.shape = &sGround;
-		fdGround.density = 0.0f;
-		fdGround.filter.categoryBits = NON_INTERACTOR;//TODO - WALL here should really be GROUND
+		b2FixtureDef _bwpTfd;
+		_bwpTfd.shape = &_bwpTps;
+		_bwpTfd.density = 0.0f;
+		_bwpTfd.filter.categoryBits = NON_INTERACTOR;//TODO - NON_INTERACTOR here should really be WALL
 
-		world->CreateFixture(&fdGround);
+		world->CreateFixture(&_bwpTfd);
 
 	}
 
