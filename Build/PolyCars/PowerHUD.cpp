@@ -44,15 +44,15 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 	phY[0] = y + 5.0f; phY[1] = y + 5.0f;
 	phY[2] = y + 5.0f; phY[3] = y + 5.0f;
 	phY[4] = y + 5.0f; phY[5] = y + 5.0f;
-	phY[6] = y + 5.0f;
+	phY[6] = y + 5.0f; phY[7] = y + 5.0f;
 	phHeight[0] = 40.0f; phHeight[1] = 40.0f;
 	phHeight[2] = 40.0f; phHeight[3] = 40.0f;
 	phHeight[4] = 40.0f; phHeight[5] = 40.0f;
-	phHeight[6] = 40.0f;
+	phHeight[6] = 40.0f; phHeight[7] = 40.0f;
 	phWidth[0] = 40.0f; phWidth[1] = 40.0f;
 	phWidth[2] = 40.0f; phWidth[3] = 40.0f;
 	phWidth[4] = 40.0f; phWidth[5] = 40.0f;
-	phWidth[6] = 40.0f;
+	phWidth[6] = 40.0f; phWidth[7] = 40.0f;
 
 
 
@@ -103,6 +103,12 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 		//phY[4] = y;
 	}
 
+	if (worldPowers & GRASS_SPAWNER) {
+		phX[7] = (pbTracker * 50) + 5;
+		pbTracker++;
+		//phY[4] = y;
+	}
+
 	//Some logic for incrementing and what not the positions, etc.
 	/*
 	phX[5] = x;
@@ -121,7 +127,6 @@ PowerHUD::PowerHUD(float x, float y, _power _worldPowers, _power _activePower)
 PowerHUD::~PowerHUD(void)
 {
 }
-
 
 void PowerHUD::setActivePower(_power _activePower) {
 	activePower = _activePower;
@@ -248,6 +253,13 @@ void PowerHUD::render() {
 		sprintf_s(buf, "Create Wall");
 		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 		break;
+	case GRASS_SPAWNER:
+		hilPhX = phX[7];
+		glRasterPos2f(w - hudPhX - hudPhWidth, hudPhY + hudPhHeight + 10);
+		sprintf_s(buf, "Create Grass Spawner");
+		glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
+		break;
+
 	}
 
 	glEnable(GL_TEXTURE_2D);
@@ -370,7 +382,7 @@ void PowerHUD::render() {
 	//Ground
 	if (bt[5] == false) {
 		glGenTextures(1, &powerTexs[5]);
-		powerTexs[5] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
+		powerTexs[5] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Ground.tex", 
 			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 		bt[5] = true;
 	}
@@ -388,7 +400,7 @@ void PowerHUD::render() {
 	//Wall
 	if (bt[6] == false) {
 		glGenTextures(1, &powerTexs[6]);
-		powerTexs[6] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
+		powerTexs[6] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wall.tex", 
 			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
 		bt[6] = true;
 	}
@@ -401,6 +413,24 @@ void PowerHUD::render() {
 	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[6] + 40, phY[6] + phHeight[6]);		
 	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[6] + 40, phY[6]);
 	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[6] + phX[6] + 40, phY[6]);
+	glEnd();								 
+
+	//Grass Spawner
+	if (bt[7] == false) {
+		glGenTextures(1, &powerTexs[7]);
+		powerTexs[7] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Grass_Spawner.tex", 
+			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
+		bt[7] = true;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, powerTexs[7]);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.0, 1.0);/*Left Bottom*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[7] + phX[7] + 40, phY[7] + phHeight[7] );
+	glTexCoord2f(1.0, 1.0);/*Right Bottom*/ glVertex2f(w - hudPhWidth - hudPhX + phX[7] + 40, phY[7] + phHeight[7]);		
+	glTexCoord2f(1.0, 0.0);/*Right Top*/ glVertex2f(w - hudPhWidth - hudPhX + phX[7] + 40, phY[7]);
+	glTexCoord2f(0.0, 0.0);/*Left Top*/ glVertex2f(w - hudPhWidth - hudPhX - phWidth[7] + phX[7] + 40, phY[7]);
 	glEnd();								 
 
 
@@ -460,15 +490,21 @@ void PowerHUD::click(b2Vec2 rp) {
 		return;
 	}
 	if (hudP.x > phX[5] &&				//Left Side
-		hudP.x < phX[5] + phWidth[4])  //Right Side
+		hudP.x < phX[5] + phWidth[5])  //Right Side
 	{
 		activePower = CREATE_GROUND;
 		return;
 	}
 	if (hudP.x > phX[6] &&				//Left Side
-		hudP.x < phX[6] + phWidth[4])  //Right Side
+		hudP.x < phX[6] + phWidth[6])  //Right Side
 	{
 		activePower = CREATE_WALL;
+		return;
+	}
+	if (hudP.x > phX[7] &&				//Left Side
+		hudP.x < phX[7] + phWidth[7])  //Right Side
+	{
+		activePower = GRASS_SPAWNER;
 		return;
 	}
 

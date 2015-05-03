@@ -10,7 +10,8 @@ enum _power {
 	SPAWN_SEED = 8,
 	SPAWN_WHEELER = 16,
 	CREATE_GROUND = 32,
-	CREATE_WALL = 64
+	CREATE_WALL = 64,
+	GRASS_SPAWNER = 128
 	//Control
 	//Raise Land - Can't wait to start this.
 	//

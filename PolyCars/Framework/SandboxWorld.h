@@ -455,7 +455,7 @@ public:
 
 		hudX = 250, hudY = 50;
 		_power worldPowers = (_power)(GRAB | SELECT | DESTROY | SPAWN_SEED | SPAWN_WHEELER 
-									  | CREATE_GROUND | CREATE_WALL);
+									| CREATE_GROUND | CREATE_WALL | GRASS_SPAWNER);
 		powerHUD = PowerHUD(hudX, hudY, worldPowers, activePower);
 
 		m_world->SetContactListener(&thisWheelerContactListener);
@@ -968,6 +968,10 @@ public:
 				cW = 0;
 				wheelers.push_back(new Wheeler(m_world,  callback.m_point.x, callback.m_point.y));
 			}			
+		}
+
+		if (activePower == GRASS_SPAWNER) {
+			grassSpawners.push_back(new GrassSpawner(m_world, p.x, p.y));
 		}
 
 		if (activePower == CREATE_GROUND | activePower == CREATE_WALL) {
