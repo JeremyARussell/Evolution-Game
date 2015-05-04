@@ -523,6 +523,14 @@ public:
 			if (activePower == DESTROY) {
 				b2Body* body = callback.m_fixture->GetBody();
 
+
+				if (callback.m_fixture->GetFilterData().categoryBits == WALL
+					| callback.m_fixture->GetFilterData().categoryBits == NON_INTERACTOR) {
+					callback.m_fixture->GetBody()->DestroyFixture(callback.m_fixture); 
+					return;//Very very very hackish way to pull off destroying more stuff, don't think I like it much... :(
+				}
+				
+
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
 					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
 				

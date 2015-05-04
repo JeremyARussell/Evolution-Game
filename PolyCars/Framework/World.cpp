@@ -95,7 +95,7 @@ public:
 
 	bool ReportFixture(b2Fixture* fixture) {
 		b2Body* body = fixture->GetBody();
-		if (body->GetType() == b2_dynamicBody) {
+		if (body->GetType() == b2_dynamicBody | body->GetType() == b2_staticBody) {
 			bool inside = fixture->TestPoint(m_point);
 			if (inside) {
 				m_fixture = fixture;
