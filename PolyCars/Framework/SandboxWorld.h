@@ -1,20 +1,19 @@
 #ifndef SANDBOX_H
 #define SANDBOX_H
 #pragma once
-
+//Includes for file stream and standard classes.
 #include <fstream>
 #include <iostream>
 #include <string>
-
+//Includes needed for game specific classes
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
 #include "Build\PolyCars\GrassSpawner.h"
-
-
+//Includes for third party engine stuff (not including the box2d engine stuff)
 #include "SOIL\SOIL.h";
 
-
+//An enum I need to fix and move to it's own header...
 enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
     SEED		     =  0x0001,
     GRASS            =  0x0002,
@@ -26,22 +25,13 @@ enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler 
 };
 
 //Sensing
-class WheelerContactListener : public b2ContactListener { 
+class WheelerContactListener : public b2ContactListener {
 	void BeginContact(b2Contact* contact) {
+
 		b2Fixture* fixtureA = contact->GetFixtureA();
 		b2Fixture* fixtureB = contact->GetFixtureB();
 
-		//Wheeler colliding with grass
-//		if (fixtureA->GetFilterData().categoryBits == WHEELER && 
-//			fixtureB->GetFilterData().categoryBits == GRASS) {
-//			Grass* activeGrass = (Grass *)fixtureB->GetBody()->GetUserData();
-//			Wheeler* activeWheeler = (Wheeler *)fixtureA->GetBody()->GetUserData();
-//			if (activeWheeler->health < 30) {
-//				activeGrass->beingEaten = true;
-//				activeWheeler->needsToReproduce = true;
-//				activeWheeler->health = 50;
-//			}
-//		}
+		//When a wheeler's sensor collides with a piece of grass.
 		if (fixtureB->GetFilterData().categoryBits == WHEELER && 
 			fixtureA->GetFilterData().categoryBits == GRASS) {
 			Grass* activeGrass = (Grass *)fixtureA->GetBody()->GetUserData();
@@ -54,14 +44,13 @@ class WheelerContactListener : public b2ContactListener {
 				activeWheeler->health = 50;
 			}
 		}		
+		//When a seed touches a pieces of WALL(Really Ground, I need to change that)
 		if (fixtureA->GetFilterData().categoryBits == WALL && 
 			fixtureB->GetFilterData().categoryBits == SEED) {
 				Seed* seedTest = (Seed *)fixtureB->GetBody()->GetUserData(); 
-				//fixtureB->GetBody()->GetPosition();
 				seedTest->timetoSeed = true;
-				//Make grass here
-				//grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
 		}
+		//When a root is touching another root.
 		if (fixtureA->GetFilterData().categoryBits == GRASS_SENSOR && 
 			fixtureB->GetFilterData().categoryBits == GRASS_SENSOR) {
 				Grass* seedTest = (Grass *)fixtureB->GetBody()->GetUserData(); 
@@ -69,19 +58,16 @@ class WheelerContactListener : public b2ContactListener {
 				seedTest->crowded = true;
 				seedTest2->crowded = true;
 		}
-//		if (fixtureB->GetFilterData().categoryBits == NON_INTERACTOR && 
-//			fixtureA->GetFilterData().categoryBits == SEED) {
-//		}
 	}
   
     void EndContact(b2Contact* contact) {
-
+		//Nothing happens when contacting ends... Not sure how it would be useful right now yet.
     }
 };
 
 WheelerContactListener thisWheelerContactListener;
 
-class QueryCallback : public b2QueryCallback {
+class QueryCallback : public b2QueryCallback {//This may or may not be needed, it exists in the World class.
 public:
 	QueryCallback(const b2Vec2& point) {
 		m_point = point;
@@ -107,7 +93,7 @@ public:
 class SandboxWorld : public World {
 public:
 
-
+	//These functions are tied to the GLUI GUI
 	void nextWheeler() {
 		if (wheelers.size() == 0) return;
 		cW++;
@@ -374,7 +360,6 @@ public:
 
 	}
 
-
 	void buildWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
 
 		b2Vec2 _bwpTva[4];
@@ -435,18 +420,6 @@ public:
 
 		ma.x = 0.0f; ma.y = 0.0f;
 
-		x = 0.0f;
-		y = 0.0f;
-		rsize = 8;
-		i[0] = 0;
-		i[1] = 0;
-		i[2] = 0;
-		i[3] = 0;
-		i[4] = 0;
-		i[5] = 0;
-		i[6] = 0;
-		i[7] = 0;
-
 		top = 68;
 		left = -223;
 		bottom = 0;
@@ -459,6 +432,7 @@ public:
 		powerHUD = PowerHUD(hudX, hudY, worldPowers, activePower);
 
 		m_world->SetContactListener(&thisWheelerContactListener);
+
 		#pragma region World 
 		{
 			//The World's boundaries
@@ -466,473 +440,21 @@ public:
 			world = m_world->CreateBody(&bd);
 			
 			//Ground
+			buildGroundPiece(b2Vec2( 225.0f, -1.5f), b2Vec2(-225.0f, -1.5f), world);
 
-			buildGroundPiece(b2Vec2( 225.0f, -1.5f), 
-							 b2Vec2(-225.0f, -1.5f), world);
-
-
-			/*buildGroundPiece(b2Vec2(-155.0f, 10.5f), 
-							 b2Vec2(-55.0f, 10.5f), world);
-
-
-			buildWallPiece(b2Vec2(-160.0f, 30.5f), 
-							 b2Vec2(-152.0f, 12.5f), world);
-
-			buildWallPiece(b2Vec2(-45.0f, 30.5f), 
-							 b2Vec2(-55.0f, 12.5f), world);
-			*/
-/*			b2Vec2 vsGround1[4];
-			vsGround1[0].Set(-225.0f, 1.0f);
-			vsGround1[1].Set(-225.0f, -4.0f);
-			vsGround1[2].Set(225.0f, -4.0f);
-			vsGround1[3].Set(225.0f, 1.0f);
-
-			b2PolygonShape polyGround1;
-			polyGround1.Set(vsGround1, 4);
-
-			b2FixtureDef fdGround1;
-			fdGround1.shape = &polyGround1;
-			fdGround1.density = 0.0f;
-			fdGround1.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
-
-			world->CreateFixture(&fdGround1);      */
-
-			b2Vec2 vsLeftWall[4];
-			vsLeftWall[0].Set(-225.0f, 68.0f);
-			vsLeftWall[1].Set(-225.0f, 1.0f);
-			vsLeftWall[2].Set(-223.0f, 1.0f);
-			vsLeftWall[3].Set(-223.0f, 68.0f);
-
-			b2PolygonShape polyLeftWall;
-			polyLeftWall.Set(vsLeftWall, 4);
-
-			b2FixtureDef fdLeftWall;
-			fdLeftWall.shape = &polyLeftWall;
-			fdLeftWall.density = 0.0f;
-			fdLeftWall.filter.categoryBits = NON_INTERACTOR;
-
-			world->CreateFixture(&fdLeftWall);
-			//Ceiling
-			b2Vec2 vsCeiling[4];
-			vsCeiling[0].Set(-225.0f, 70.0f);
-			vsCeiling[1].Set(-225.0f, 68.0f);
-			vsCeiling[2].Set(225.0f, 68.0f);
-			vsCeiling[3].Set(225.0f, 70.0f);
-
-			b2PolygonShape polyCeiling;
-			polyCeiling.Set(vsCeiling, 4);
-
-			b2FixtureDef fdCeiling;
-			fdCeiling.shape = &polyCeiling;
-			fdCeiling.density = 0.0f;
-			fdCeiling.filter.categoryBits = NON_INTERACTOR;
-
-			world->CreateFixture(&fdCeiling);	
-			//Right Wall
-			b2Vec2 vsRightWall[4];//<--- TODO - Take all these bits of reuseable variables and make them generic...
-			vsRightWall[0].Set(223.0f, 68.0f);//...then just change the values and go through a bunch of tuples...
-			vsRightWall[1].Set(223.0f, 1.0f);//...or something... gonna make a function to build stuff.
-			vsRightWall[2].Set(225.0f, 1.0f);
-			vsRightWall[3].Set(225.0f, 68.0f);
-
-			b2PolygonShape polyRightWall;
-			polyRightWall.Set(vsRightWall, 4);
-
-			b2FixtureDef fdRightWall;
-			fdRightWall.shape = &polyRightWall;
-			fdRightWall.density = 0.0f;
-			fdRightWall.filter.categoryBits = NON_INTERACTOR;
-
-			world->CreateFixture(&fdRightWall);
+			//Wall
+			buildWallPiece(b2Vec2( -222.5f, 0.0f ), b2Vec2( -222.5f, 70.0f ), world);//Left Wall
+			buildWallPiece(b2Vec2( -222.5f, 70.0f), b2Vec2( 222.5f, 70.0f), world);//Ceiling
+			buildWallPiece(b2Vec2( 222.5f, 0.0f ), b2Vec2( 222.5f, 70.0f ), world);//Right Wall
 
 		}
 		#pragma endregion Ground and Walls
-
-		/*{
-			//Building the Hexagon for throwing away unwanted Wheelers
-			b2BodyDef bd;
-			b2Body* hex = m_world->CreateBody(&bd);
-			
-			b2Vec2 vs[12];
-
-			float32 wallLength = 15.0f;
-			b2Vec2 S;
-			S.Set(-wallLength / 2, 40.0f);
-
-			float32 A = wallLength;//Wall length, and Center to vertice
-			float32 B = A / 2;
-			float32 C = A * 0.866;//The 0.866 is sin(60)
-			
-			//Outside Hex
-			vs[0].Set( -B + S.x		  ,  C + S.y);
-			vs[1].Set( -A + S.x		  ,      S.y);
-			vs[2].Set( -B + S.x		  , -C + S.y);
-			vs[3].Set(  B + S.x		  , -C + S.y);
-			vs[4].Set(  A + S.x		  ,      S.y);
-			vs[5].Set(  B + S.x		  ,  C + S.y);
-			//Inside hex - to create a hole in the top - Zoom in to see what I mean
-			vs[6].Set(  B + S.x - 0.2 ,  C + S.y);
-			vs[7].Set(  A + S.x - 0.2 ,      S.y);
-			vs[8].Set(  B + S.x - 0.2 , -C + S.y + 0.2);
-			vs[9].Set( -B + S.x + 0.2 , -C + S.y + 0.2);
-			vs[10].Set(-A + S.x + 0.2 ,      S.y);
-			vs[11].Set(-B + S.x + 0.2 ,  C + S.y);
-
-			b2ChainShape loop;
-			loop.CreateLoop(vs, 12);
-			b2FixtureDef fd;
-			fd.shape = &loop;
-			fd.density = 0.0f;
-			fd.filter.categoryBits = WALL;
-
-			hex->CreateFixture(&fd);
-		}*/
-
-
-		#pragma region Spawners 
-		{
-			float32 spx; float32 spy;
-			spx = -50.0f; spy = 40.0f;
-			grassSpawners.push_back(new GrassSpawner(m_world, spx, spy));
-
-			spx = -40.0f; spy = 45.0f;
-			grassSpawners.push_back(new GrassSpawner(m_world, spx, spy));
-			
-			spx = -30.0f; spy = 40.0f;
-			grassSpawners.push_back(new GrassSpawner(m_world, spx, spy));
-			
-			spx = 15.0f; spy = 43.0f;
-			grassSpawners.push_back(new GrassSpawner(m_world, spx, spy));
-			
-			spx = 20; spy = 40.0f;
-			grassSpawners.push_back(new GrassSpawner(m_world, spx, spy));
-		}
-		#pragma endregion Units for spawning
 	}
 	
-	GLuint tex_2d[8];
-
-	int i[8];//8 Texture for now, one for the background, 3 for powers, probably more.
-	float32 phX[8];
-	float32 phY[8];
-	float32 phWidth[8];
-	float32 phHeight[8];
-
-	GLfloat x;	  //Not using atm
-	GLfloat y;	  //Not using atm
-	GLfloat rsize;//Not using atm
-
-	void RenderUI(Settings* settings) {
-		//powerHUD.render();
-	}
-
-	void RenderUIold(Settings* settings) {//Can delete entirely.
-
-		glEnable(GL_TEXTURE_2D);
-		glColor3f(10.0, 10.0, 10.0);
-		
-		if (i[0] == 0) {
-			glGenTextures(1, &tex_2d[0]);
-
-			tex_2d[0] = SOIL_load_OGL_texture("images\\Simple_PowersHUD.tex",
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[0] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[0]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		phX[0] = -9.25f;
-		phY[0] = 20.75f;
-		phHeight[0] = 3.5f;
-		phWidth[0] = 15.5f;
-
-		//The main HUD background
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[0]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[0] - phHeight[0] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[0] + phWidth[0]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[0] - phHeight[0] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[0] + phWidth[0]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[0]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[0]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[0]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top
-		/////
-
-		//Hilighter
-		if (i[7] == 0) {
-			glGenTextures(1, &tex_2d[7]);
-			tex_2d[7] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Hilighter.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[7] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[7]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		char buf[256];
-
-		switch (activePower) {
-		case GRAB:
-			phX[7] = -9.0f;
-			phY[7] = 20.5f;
-			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
-						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
-			sprintf_s(buf, "Grab - Throw those Wheelers around, they don't mind.");
-			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
-			break;
-		case SELECT:
-			phX[7] = -6.0f;
-			phY[7] = 20.5f;
-			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
-						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
-			sprintf_s(buf, "Select - When you want to pick a favorite.");
-			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
-			break;
-		case DESTROY:
-			phX[7] = -3.0f;
-			phY[7] = 20.5f;
-			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
-						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
-			sprintf_s(buf, "Destroy - When you have a least favorite.");
-			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
-			break;
-		case SPAWN_SEED:
-			phX[7] = 0.0f;
-			phY[7] = 20.5f;
-			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
-						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
-			sprintf_s(buf, "Spawn a Seed - Pull food from the ether.");
-			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
-			break;
-		case SPAWN_WHEELER:
-			phX[7] = 3.0f;
-			phY[7] = 20.5f;
-			glRasterPos2f( phX[0]						* settings->zoomLevel + settings->viewCenter.x
-						,( phY[0] - phHeight[0] - 1.0f) * settings->zoomLevel + settings->viewCenter.y);
-			sprintf_s(buf, "Spawn Wheeler - Spawn a random Wheeler, results may vary.");
-			glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
-			break;
-		}
-
-		//phX[7] = -9.0f;
-		//phY[7] = 20.5f;
-		phHeight[7] = 3.0f;
-		phWidth[7] = 3.0f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[7]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[7] - phHeight[7] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[7] + phWidth[7]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[7] - phHeight[7] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[7] + phWidth[7]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[7]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[7]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[7]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-		///
-		/////
-
-		///Grab
-		if (i[1] == 0) {
-			glGenTextures(1, &tex_2d[1]);
-			tex_2d[1] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Grab.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[1] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[1]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		phX[1] = -8.75f;
-		phY[1] = 20.25f;
-		phHeight[1] = 2.5f;
-		phWidth[1] = 2.5f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[1]				 ) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[1] - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[1] + phWidth[1]	 ) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[1] - phHeight[1] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[1] + phWidth[1]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[1]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[1]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[1]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-
-		///Select
-		if (i[2] == 0) {
-			glGenTextures(1, &tex_2d[2]);
-			tex_2d[2] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Select.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[2] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[2]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		phX[2] = -5.75f;
-		phY[2] = 20.25f;
-		phHeight[2] = 2.5f;
-		phWidth[2] = 2.5f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[2]				 ) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[2] - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[2] + phWidth[2]	 ) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[2] - phHeight[2] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[2] + phWidth[2]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[2]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[2]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[2]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-
-		//Destroy
-		if (i[3] == 0) {
-			glGenTextures(1, &tex_2d[3]);
-			tex_2d[3] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Destroy.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[3] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[3]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		phX[3] = -2.75f;
-		phY[3] = 20.25f;
-		phHeight[3] = 2.5f;
-		phWidth[3] = 2.5f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[3]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[3] - phHeight[3] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[3] + phWidth[3]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[3] - phHeight[3] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[3] + phWidth[3]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[3]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[3]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[3]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-
-		//Seeds
-		if (i[4] == 0) {
-			glGenTextures(1, &tex_2d[4]);
-			tex_2d[4] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Seed.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[4] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[4]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		phX[4] = 0.25f;
-		phY[4] = 20.25f;
-		phHeight[4] = 2.5f;
-		phWidth[4] = 2.5f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[4]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[4] - phHeight[4] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[4] + phWidth[4]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[4] - phHeight[4] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[4] + phWidth[4]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[4]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[4]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[4]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-
-		//Wheelers
-		if (i[5] == 0) {
-			glGenTextures(1, &tex_2d[5]);
-			tex_2d[5] = SOIL_load_OGL_texture ( "images\\Simple_Powers_Wheeler.tex", 
-				SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
-			i[5] = 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, tex_2d[5]);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		//float32 padWheeler = 0;
-		//if (activePower == SPAWN_WHEELER) {
-		//	padWheeler = 0.25f;
-		//} else {
-		//	padWheeler = 0;
-		//}
-
-		phX[5] = 3.25f;
-		phY[5] = 20.25f;
-		phHeight[5] = 2.5f;
-		phWidth[5] = 2.5f;
-
-		glBegin(GL_POLYGON);				   // Size + position							|--Aplying zoom			|--Adding the new center
-											   // from center + pad adjust					v--to retain size		v--to maintain position
-		glTexCoord2f(0.0, 1.0); glVertex2f((   (( phX[5]				) * settings->zoomLevel)  + settings->viewCenter.x ),    
-											   (( phY[5] - phHeight[5] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Left Bottom 
-
-		glTexCoord2f(1.0, 1.0); glVertex2f((   (( phX[5] + phWidth[5]	) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[5] - phHeight[5] ) * settings->zoomLevel)  + settings->viewCenter.y );		
-												//Right Bottom 
-
-		glTexCoord2f(1.0, 0.0); glVertex2f((   (( phX[5] + phWidth[5]	) * settings->zoomLevel)  + settings->viewCenter.x ),
-											   (( phY[5]				) * settings->zoomLevel)  + settings->viewCenter.y );
-												//Right Top
-
-		glTexCoord2f(0.0, 0.0); glVertex2f((   (( phX[5]				) * settings->zoomLevel)  + settings->viewCenter.x ),	
-											   (( phY[5]				) * settings->zoomLevel)  + settings->viewCenter.y );
-		glEnd();								//Left Top 
-		
-
-		glDisable(GL_TEXTURE_2D);
-	}
-
 	float32 clickZoomLevel;
 	b2Vec2  clickViewCenter;
 
-	b2Vec2 ma, mb;
+	b2Vec2 ma, mb;//used for the new ground and wall powers.
 
 	void SandboxWorld::MouseDown(const b2Vec2& p) {
 										
@@ -953,12 +475,10 @@ public:
 		QueryCallback callback(p);
 		m_world->QueryAABB(&callback, aabb);
 
-
 		//Power implementation code
 		if (activePower == SPAWN_SEED) {
 			float32 xt = randomNumber(-3.0f, 3.0f);
-			float32 yt = randomNumber(1.0f, 3.0f);
-			//new Seed(m_world, b2Vec2(xt, yt);//<-- Maybe do an option to have them randomly fly off or not?
+			float32 yt = randomNumber(1.0f, 3.0f);//<-- Maybe do an option to have them randomly fly off or not?
 			seeds.push_back(new Seed(m_world, callback.m_point, b2Vec2(xt, yt)));
 			
 		}
@@ -976,8 +496,6 @@ public:
 
 		if (activePower == CREATE_GROUND | activePower == CREATE_WALL) {
 			ma = b2Vec2(p.x, p.y);
-
-
 		}
 
 		if (callback.m_fixture) {
@@ -991,21 +509,21 @@ public:
 				m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&md);
 				body->SetAwake(true);
 			}
+
 			if (activePower == SELECT) {
 				b2Body* body = callback.m_fixture->GetBody();
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					//callback.m_fixture->GetFilterData().categoryBits == GRASS |
 					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
 
 				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
 				activeWheeler = testWheeler;
 			}
+
 			if (activePower == DESTROY) {
 				b2Body* body = callback.m_fixture->GetBody();
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					//callback.m_fixture->GetFilterData().categoryBits == GRASS | - Grass doesn't trigger a callback thingy anyways
 					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
 				
 				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
@@ -1018,11 +536,11 @@ public:
 	}
 
 	void SandboxWorld::MouseUp(const b2Vec2& p) {
-		if (activePower == CREATE_GROUND |activePower == CREATE_WALL) {
+		if (activePower == CREATE_GROUND | activePower == CREATE_WALL) {
 			if (ma.x != 0.0f && ma.y != 0.0f) {
 				mb = b2Vec2(p.x, p.y);
 
-				float32 dist = sqrt((mb.x - ma.x)*(mb.x - ma.x) + (mb.y - ma.y)*(mb.y - ma.y));
+				float32 dist = sqrt((mb.x - ma.x) * (mb.x - ma.x) + (mb.y - ma.y) * (mb.y - ma.y));
 
 				if (dist > 1.0f)
 				{
@@ -1037,6 +555,7 @@ public:
 				ma.y = 0.0f;
 			}
 		}
+
 		World::MouseUp(p);
 	}
 
@@ -1061,15 +580,15 @@ public:
 		case '5':
 			activePower = SPAWN_WHEELER;
 			powerHUD.setActivePower(activePower);
-			break;
+			break;//TODO - Add the rest of the powers later
 		}
 	}
 
 	void Step(Settings* settings) {
 
-		if (clickZoomLevel != settings->zoomLevel) clickZoomLevel = settings->zoomLevel ;
+		if (clickZoomLevel != settings->zoomLevel) clickZoomLevel = settings->zoomLevel;
 		if (clickViewCenter.x != settings->viewCenter.x &&
-			clickViewCenter.y != settings->viewCenter.y) clickViewCenter = settings->viewCenter ;
+			clickViewCenter.y != settings->viewCenter.y) clickViewCenter = settings->viewCenter;
 		if (powerHUD.getActivePower() != activePower) activePower = powerHUD.getActivePower();
 
 		//For knowing if our settings file has the following flag triggered
@@ -1088,7 +607,7 @@ public:
 		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
 		m_textLine += 15;
 
-		if (settings->pause) {
+		if (settings->pause) {//TODO - Make a checkbox for this guy to not need to be paused.
 
 			m_debugDraw.DrawString(240, 85, "======= World Stats =======");
 
@@ -1097,12 +616,11 @@ public:
 
 			int32 grassCount = grasses.size();
 			m_debugDraw.DrawString(240, 115, "Blades of Grass = %d", grassCount);
-
 		}
 
 		int trackwsp = 85;
 
-		if (/*settings->followCreature == true && */activeWheeler != NULL && settings->drawGenes) {
+		if (activeWheeler != NULL && settings->drawGenes) {
 			m_debugDraw.DrawString(15, trackwsp, "======= Wheeler Stats ======");
 			trackwsp += 15;
 			m_debugDraw.DrawString(15, trackwsp, "= Spoke - Length  / Angle  =");
@@ -1203,13 +721,6 @@ public:
 			}
 		}
 
-		//Timer and code for the spawning of grass
-		//if (!settings->pause) { grassSpawnCounter++; }
-		//if (grassSpawnCounter > settings->grassSpawnRate * 60) {
-		//	grassSpawnCounter = 0;
-		//	grasses.push_back(new Grass(m_world, randomNumber(-125.0f, 125.0f),  0.0f));
-		//}
-
 		//Wheeler Step code
 		for (int i = 0; i < wheelers.size(); i ++) {
 			//Call to render
@@ -1268,6 +779,7 @@ public:
 
 		World::Step(settings);
 
+		//Taking care of all the dying.
 		for (int i = 0; i < wheelersToDelete.size(); i ++) {
 			if (cW >= wheelers.size()) {
 				cW = 0;

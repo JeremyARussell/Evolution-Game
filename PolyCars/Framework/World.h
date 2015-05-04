@@ -153,7 +153,7 @@ public:
 	//Powers and HUD stuff
 	_power activePower;
 	PowerHUD powerHUD;
-	virtual void RenderUI(Settings*) = 0;
+	//virtual void RenderUI(Settings*) = 0;
 	int hudX;
 	int hudY;
 
