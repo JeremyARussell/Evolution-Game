@@ -15,7 +15,7 @@ Seed::Seed(b2World* world, b2Vec2 pos, b2Vec2 impulse) {
 	seedShape.m_radius = 0.2f;
 
 	seedFixDef.filter.categoryBits = SEED;
-	seedFixDef.filter.maskBits = WALL | NON_INTERACTOR;
+	seedFixDef.filter.maskBits = GROUND | NON_INTERACTOR;
     seedFixDef.shape = &seedShape;
     seedFixDef.density = 2.0f;
     seedFixDef.friction = 10.0f;

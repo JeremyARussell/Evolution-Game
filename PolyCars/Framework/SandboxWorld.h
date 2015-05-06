@@ -34,15 +34,15 @@ class WheelerContactListener : public b2ContactListener {
 				activeWheeler->health = 50;
 			}
 		}		
-		//When a seed touches a pieces of WALL(Really Ground, I need to change that)
-		if (fixtureA->GetFilterData().categoryBits == WALL && 
+		//When a SEED touches the GROUND
+		if (fixtureA->GetFilterData().categoryBits == GROUND && 
 			fixtureB->GetFilterData().categoryBits == SEED) {
 				Seed* seedTest = (Seed *)fixtureB->GetBody()->GetUserData(); 
 				seedTest->timetoSeed = true;
 		}
 		//When a root is touching another root.
-		if (fixtureA->GetFilterData().categoryBits == GRASS_SENSOR && 
-			fixtureB->GetFilterData().categoryBits == GRASS_SENSOR) {
+		if (fixtureA->GetFilterData().categoryBits == ROOT && 
+			fixtureB->GetFilterData().categoryBits == ROOT) {
 				Grass* seedTest = (Grass *)fixtureB->GetBody()->GetUserData(); 
 				Grass* seedTest2 = (Grass *)fixtureA->GetBody()->GetUserData(); 
 				seedTest->crowded = true;
@@ -344,7 +344,7 @@ public:
 		b2FixtureDef _bgpTfd;
 		_bgpTfd.shape = &_bgpTps;
 		_bgpTfd.density = 0.0f;
-		_bgpTfd.filter.categoryBits = WALL;//TODO - WALL here should really be GROUND
+		_bgpTfd.filter.categoryBits = GROUND;
 
 		world->CreateFixture(&_bgpTfd);
 
@@ -504,7 +504,7 @@ public:
 				b2Body* body = callback.m_fixture->GetBody();
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
+					callback.m_fixture->GetFilterData().categoryBits == ROOT) return;
 
 				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
 				activeWheeler = testWheeler;
@@ -514,7 +514,7 @@ public:
 				b2Body* body = callback.m_fixture->GetBody();
 
 
-				if (callback.m_fixture->GetFilterData().categoryBits == WALL
+				if (callback.m_fixture->GetFilterData().categoryBits == GROUND
 					| callback.m_fixture->GetFilterData().categoryBits == NON_INTERACTOR) {
 					callback.m_fixture->GetBody()->DestroyFixture(callback.m_fixture); 
 					return;//Very very very hackish way to pull off destroying more stuff, don't think I like it much... :(
@@ -522,7 +522,7 @@ public:
 				
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					callback.m_fixture->GetFilterData().categoryBits == GRASS_SENSOR) return;
+					callback.m_fixture->GetFilterData().categoryBits == ROOT) return;
 				
 				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
 				wheelersToDelete.push_back(*testWheeler);

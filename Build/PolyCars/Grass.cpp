@@ -38,8 +38,8 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 	stalkSensorShape.SetAsBox(0.4f, 0.2f);//0.2 per hp
 
-	stalkSensorFixture.filter.categoryBits = GRASS_SENSOR;
-	stalkSensorFixture.filter.maskBits = GRASS_SENSOR;//This dynamic dude is a sensor for roots - I'll probably call it a root later to.
+	stalkSensorFixture.filter.categoryBits = ROOT;
+	stalkSensorFixture.filter.maskBits = ROOT;
 	stalkSensorFixture.isSensor = true;
     stalkSensorFixture.shape = &stalkShape;
     stalkSensorFixture.density = 2.0f;
