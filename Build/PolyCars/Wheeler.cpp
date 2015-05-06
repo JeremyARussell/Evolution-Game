@@ -147,8 +147,8 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 				  //were only on later spokes --- UPDATE: It needs to run at 8 to prevent an
 				  //uninitialized pointer problem.
 
-	cart_piece_fixture.filter.categoryBits = NON_INTERACTOR;
-    wheel_fixture.filter.categoryBits = NON_INTERACTOR;//TODO - change to something Wheeler specific, like Wheeler_Body or something.
+	cart_piece_fixture.filter.categoryBits = WHEELER_BODY;
+    wheel_fixture.filter.categoryBits = WHEELER_BODY;//TODO - change to something Wheeler specific, like Wheeler_Body or something.
 
 	healthDownCounter = 120;
 
@@ -348,8 +348,8 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	
 	cart->SetUserData( this );
 
-	cart_piece_fixture.filter.categoryBits = NON_INTERACTOR;
-    wheel_fixture.filter.categoryBits = NON_INTERACTOR;
+	cart_piece_fixture.filter.categoryBits = WHEELER_BODY;
+    wheel_fixture.filter.categoryBits = WHEELER_BODY;
 
 	healthDownCounter = 120;
 

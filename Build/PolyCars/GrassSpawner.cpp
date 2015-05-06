@@ -21,7 +21,7 @@ GrassSpawner::GrassSpawner(b2World *m_world, float32 x,float32 y) : Grass(m_worl
 	b2FixtureDef fdS1;//This is the triangular base of the spawner...
 	fdS1.shape = &loopS1;
 	fdS1.density = 0.0f;
-	fdS1.filter.categoryBits = NON_INTERACTOR;//Need to make a grass_spawner_base enum
+	fdS1.filter.categoryBits = GRASS_SPAWNER_BASE;
 
 	spawnerS1->CreateFixture(&fdS1);
 }

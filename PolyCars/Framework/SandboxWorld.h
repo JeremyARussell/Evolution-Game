@@ -392,7 +392,7 @@ public:
 		b2FixtureDef _bwpTfd;
 		_bwpTfd.shape = &_bwpTps;
 		_bwpTfd.density = 0.0f;
-		_bwpTfd.filter.categoryBits = NON_INTERACTOR;//TODO - NON_INTERACTOR here should really be WALL
+		_bwpTfd.filter.categoryBits = WALL;
 
 		world->CreateFixture(&_bwpTfd);
 
@@ -515,7 +515,7 @@ public:
 
 
 				if (callback.m_fixture->GetFilterData().categoryBits == GROUND
-					| callback.m_fixture->GetFilterData().categoryBits == NON_INTERACTOR) {
+					| callback.m_fixture->GetFilterData().categoryBits == WALL) {
 					callback.m_fixture->GetBody()->DestroyFixture(callback.m_fixture); 
 					return;//Very very very hackish way to pull off destroying more stuff, don't think I like it much... :(
 				}
