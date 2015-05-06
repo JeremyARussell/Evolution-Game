@@ -10,30 +10,27 @@ Step 3b - Split Non interactor ----------------------------------------A
 Step 4 - Map out what category is using what throughout the creature classes, etc. -- kind of did this during the whole thing anyways.
 Step 5 - Reorganize the order of the enums, environment -> Things -> Creatures.
 
-
-
-
 */
 
 
 enum _entityCategory {
-    SEED		     =  1, //0x0001
-    GRASS            =  2, //0x0002
-    WHEELER		     =  4, //0x0004
-    WALL			 =  8, //0x0008
-    WHEELER_BODY	 =  16,//0x0010
-    GROUND           =  32,//0x0020
-    ROOT			 =  64,//0x0040
-    GRASS_SPAWNER_BASE		 =  128
+    GROUND				=  1,
+    WALL				=  2,
+    GRASS_SPAWNER_BASE	=  4,
+    SEED				=  8,
+    GRASS				=  16,
+    ROOT				=  32,
+    WHEELER_BODY		=  64,
+    WHEELER				=  128	 
 
-//    GRASS_SENSOR	 =  256,
-//    GRASS_SENSOR	 =  512,
-//    GRASS_SENSOR	 =  1024,
-//    GRASS_SENSOR	 =  2048,
-//    GRASS_SENSOR	 =  4096,
-//    GRASS_SENSOR	 =  8192,
-//    GRASS_SENSOR	 =  16384,
-//    GRASS_SENSOR	 =  32768,
+//    xxxx	 =  256,
+//    xxxx	 =  512,
+//    xxxx	 =  1024,
+//    xxxx	 =  2048,
+//    xxxx	 =  4096,
+//    xxxx	 =  8192,
+//    xxxx	 =  16384,
+//    xxxx	 =  32768,
 
 };
 
