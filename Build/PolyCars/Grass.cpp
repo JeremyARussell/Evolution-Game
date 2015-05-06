@@ -1,4 +1,5 @@
 #include "Grass.h"
+#include "Build\PolyCars\collision_enums.h"
 
 //Use collision of seeds to find the ground anchor point to grow the new grass.
 
@@ -16,8 +17,8 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 	stalkShape.SetAsBox(0.4f, 0.2f);//0.2 per hp
 
-	stalkFixture.filter.categoryBits = 0x0002;
-	stalkFixture.filter.maskBits = 0x0002 | 0x0004;
+	stalkFixture.filter.categoryBits = GRASS;
+	stalkFixture.filter.maskBits = GRASS | WHEELER;//Wheeler is really just the sensor, the parts are non_int
 	//stalkFixture.isSensor = true;
     stalkFixture.shape = &stalkShape;
     stalkFixture.density = 2.0f;
@@ -37,8 +38,8 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 	stalkSensorShape.SetAsBox(0.4f, 0.2f);//0.2 per hp
 
-	stalkSensorFixture.filter.categoryBits = 0x0040;
-	stalkSensorFixture.filter.maskBits = 0x0040;
+	stalkSensorFixture.filter.categoryBits = GRASS_SENSOR;
+	stalkSensorFixture.filter.maskBits = GRASS_SENSOR;//This dynamic dude is a sensor for roots - I'll probably call it a root later to.
 	stalkSensorFixture.isSensor = true;
     stalkSensorFixture.shape = &stalkShape;
     stalkSensorFixture.density = 2.0f;

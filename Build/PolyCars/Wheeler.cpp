@@ -1,4 +1,6 @@
 #include "Wheeler.h"
+#include "Build\PolyCars\collision_enums.h"
+
 #include <stdio.h>
 using namespace std;
  
@@ -145,8 +147,8 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 				  //were only on later spokes --- UPDATE: It needs to run at 8 to prevent an
 				  //uninitialized pointer problem.
 
-	cart_piece_fixture.filter.categoryBits = 0x0010;
-    wheel_fixture.filter.categoryBits = 0x0010;
+	cart_piece_fixture.filter.categoryBits = NON_INTERACTOR;
+    wheel_fixture.filter.categoryBits = NON_INTERACTOR;//TODO - change to something Wheeler specific, like Wheeler_Body or something.
 
 	healthDownCounter = 120;
 
@@ -279,8 +281,8 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	fd.shape = &sensorCircle;
 	fd.density = 0.0f;
 	fd.isSensor = true;
-	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0002/*GRASS*/;
+	fd.filter.categoryBits = WHEELER;//Wheeler_Sensor, or something like that...
+	fd.filter.maskBits = GRASS;
 			
 	cart->CreateFixture(&fd);
 
@@ -346,8 +348,8 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	
 	cart->SetUserData( this );
 
-	cart_piece_fixture.filter.categoryBits = 0x0010;
-    wheel_fixture.filter.categoryBits = 0x0010;
+	cart_piece_fixture.filter.categoryBits = NON_INTERACTOR;
+    wheel_fixture.filter.categoryBits = NON_INTERACTOR;
 
 	healthDownCounter = 120;
 
@@ -482,8 +484,8 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	fd.shape = &sensorCircle;
 	fd.density = 0.0f;
 	fd.isSensor = true;
-	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0002/*GRASS*/;
+	fd.filter.categoryBits = WHEELER;
+	fd.filter.maskBits = GRASS;
 			
 	cart->CreateFixture(&fd);
 
