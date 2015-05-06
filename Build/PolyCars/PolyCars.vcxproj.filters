@@ -72,6 +72,9 @@
     <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h">
       <Filter>Game\Worlds</Filter>
     </ClInclude>
+    <ClInclude Include="collision_enums.h">
+      <Filter>Game\Creatures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Framework">

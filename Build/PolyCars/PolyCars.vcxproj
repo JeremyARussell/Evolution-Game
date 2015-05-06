@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
     <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="collision_enums.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />
     <ClInclude Include="LiveGame.h" />

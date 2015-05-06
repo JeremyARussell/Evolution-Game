@@ -10,19 +10,9 @@
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
 #include "Build\PolyCars\GrassSpawner.h"
+#include "Build\PolyCars\collision_enums.h"
 //Includes for third party engine stuff (not including the box2d engine stuff)
 #include "SOIL\SOIL.h";
-
-//An enum I need to fix and move to it's own header...
-enum _entityCategory {///HACKY - Just use the bitwise values inside the wheeler class, etc.
-    SEED		     =  0x0001,
-    GRASS            =  0x0002,
-    WHEELER		     =  0x0004,
-    //CARNIVORE	     =  0x0008,
-    NON_INTERACTOR   =  0x0010,
-    WALL             =  0x0020,
-    GRASS_SENSOR	 =  0x0040,
-};
 
 //Sensing
 class WheelerContactListener : public b2ContactListener {
