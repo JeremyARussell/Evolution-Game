@@ -14,17 +14,16 @@ Step 5 - Reorganize the order of the enums, environment -> Things -> Creatures.
 
 
 enum _entityCategory {
-    GROUND				=  1,
-    WALL				=  2,
-    GRASS_SPAWNER_BASE	=  4,
-    SEED				=  8,
-    GRASS				=  16,
-    ROOT				=  32,
-    WHEELER_BODY		=  64,
-    WHEELER				=  128	 
-
-//    xxxx	 =  256,
-//    xxxx	 =  512,
+    PERM_GROUND			=  1,
+    GROUND				=  2,
+    PERM_WALL			=  4,
+    WALL				=  8,
+    GRASS_SPAWNER_BASE	=  16,
+    SEED				=  32,
+    GRASS				=  64,
+    ROOT				=  128,
+    WHEELER_BODY		=  256,
+    WHEELER				=  512	 
 //    xxxx	 =  1024,
 //    xxxx	 =  2048,
 //    xxxx	 =  4096,

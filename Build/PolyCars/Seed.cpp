@@ -15,7 +15,7 @@ Seed::Seed(b2World* world, b2Vec2 pos, b2Vec2 impulse) {
 	seedShape.m_radius = 0.2f;
 
 	seedFixDef.filter.categoryBits = SEED;
-	seedFixDef.filter.maskBits = GROUND | WALL | WHEELER_BODY | GRASS_SPAWNER_BASE;
+	seedFixDef.filter.maskBits = GROUND | WALL | PERM_GROUND | PERM_WALL | WHEELER_BODY | GRASS_SPAWNER_BASE;
     seedFixDef.shape = &seedShape;
     seedFixDef.density = 2.0f;
     seedFixDef.friction = 10.0f;

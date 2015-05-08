@@ -35,7 +35,7 @@ class WheelerContactListener : public b2ContactListener {
 			}
 		}		
 		//When a SEED touches the GROUND
-		if (fixtureA->GetFilterData().categoryBits == GROUND && 
+		if ((fixtureA->GetFilterData().categoryBits == GROUND | fixtureA->GetFilterData().categoryBits == PERM_GROUND) && 
 			fixtureB->GetFilterData().categoryBits == SEED) {
 				Seed* seedTest = (Seed *)fixtureB->GetBody()->GetUserData(); 
 				seedTest->timetoSeed = true;
@@ -350,6 +350,55 @@ public:
 
 	}
 
+	void buildPermGroundPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
+
+		b2Vec2 _bgpTva[4];
+		float32 _bgpTslope = (pb.y - pa.y) / (pb.x - pa.x);
+
+		if(_bgpTslope >= 1 | _bgpTslope < -1.0) {//Mostly vertical
+			//A is lower than B
+			if (pa.y < pb.y)
+			{
+				_bgpTva[0].Set(pb.x - 2.5f, pb.y);
+				_bgpTva[1].Set(pa.x - 2.5f, pa.y);
+				_bgpTva[2].Set(pa.x + 2.5f, pa.y); 
+				_bgpTva[3].Set(pb.x + 2.5f, pb.y);   
+			} else {
+				_bgpTva[0].Set(pa.x - 2.5f, pa.y);
+				_bgpTva[1].Set(pb.x - 2.5f, pb.y);
+				_bgpTva[2].Set(pb.x + 2.5f, pb.y); 
+				_bgpTva[3].Set(pa.x + 2.5f, pa.y);   
+			}
+
+		} else {//Mostly horizontal
+			//A is to the left of B
+			if (pa.x < pb.x)
+			{
+				_bgpTva[0].Set(pa.x, pa.y + 2.5f); /// top left
+				_bgpTva[1].Set(pa.x, pa.y - 2.5f);/// bottom left
+				_bgpTva[2].Set(pb.x, pb.y - 2.5f); /// bottom right
+				_bgpTva[3].Set(pb.x, pb.y + 2.5f);  /// top right 
+			} else {//B is to the left of A
+				_bgpTva[0].Set(pb.x, pb.y + 2.5f); /// top left
+				_bgpTva[1].Set(pb.x, pb.y - 2.5f);/// bottom left
+				_bgpTva[2].Set(pa.x, pa.y - 2.5f); /// bottom right
+				_bgpTva[3].Set(pa.x, pa.y + 2.5f);  /// top right 
+			}
+		}
+
+		b2PolygonShape _bgpTps;
+		_bgpTps.Set(_bgpTva, 4);
+
+		b2FixtureDef _bgpTfd;
+		_bgpTfd.shape = &_bgpTps;
+		_bgpTfd.density = 0.0f;
+		_bgpTfd.filter.categoryBits = PERM_GROUND;
+
+		world->CreateFixture(&_bgpTfd);
+
+	}
+
+
 	void buildWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
 
 		b2Vec2 _bwpTva[4];
@@ -398,6 +447,55 @@ public:
 
 	}
 
+	void buildPermWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
+
+		b2Vec2 _bwpTva[4];
+		float32 _bwpTslope = (pb.y - pa.y) / (pb.x - pa.x);
+
+		if(_bwpTslope >= 1 | _bwpTslope < -1.0) {//Mostly vertical
+			//A is lower than B
+			if (pa.y < pb.y)
+			{
+				_bwpTva[0].Set(pb.x - 2.5f, pb.y);
+				_bwpTva[1].Set(pa.x - 2.5f, pa.y);
+				_bwpTva[2].Set(pa.x + 2.5f, pa.y); 
+				_bwpTva[3].Set(pb.x + 2.5f, pb.y);   
+			} else {
+				_bwpTva[0].Set(pa.x - 2.5f, pa.y);
+				_bwpTva[1].Set(pb.x - 2.5f, pb.y);
+				_bwpTva[2].Set(pb.x + 2.5f, pb.y); 
+				_bwpTva[3].Set(pa.x + 2.5f, pa.y);   
+			}
+
+		} else {//Mostly horizontal
+			//A is to the left of B
+			if (pa.x < pb.x)
+			{
+				_bwpTva[0].Set(pa.x, pa.y + 2.5f);
+				_bwpTva[1].Set(pa.x, pa.y - 2.5f);
+				_bwpTva[2].Set(pb.x, pb.y - 2.5f);
+				_bwpTva[3].Set(pb.x, pb.y + 2.5f);
+			} else {//B is to the left of A
+				_bwpTva[0].Set(pb.x, pb.y + 2.5f);
+				_bwpTva[1].Set(pb.x, pb.y - 2.5f);
+				_bwpTva[2].Set(pa.x, pa.y - 2.5f);
+				_bwpTva[3].Set(pa.x, pa.y + 2.5f);
+			}
+		}
+
+		b2PolygonShape _bwpTps;
+		_bwpTps.Set(_bwpTva, 4);
+
+		b2FixtureDef _bwpTfd;
+		_bwpTfd.shape = &_bwpTps;
+		_bwpTfd.density = 0.0f;
+		_bwpTfd.filter.categoryBits = PERM_WALL;
+
+		world->CreateFixture(&_bwpTfd);
+
+	}
+
+
 	b2Body* world;
 
 	//Level building, and default creature placement go here.
@@ -430,12 +528,12 @@ public:
 			world = m_world->CreateBody(&bd);
 			
 			//Ground
-			buildGroundPiece(b2Vec2( 225.0f, -1.5f), b2Vec2(-225.0f, -1.5f), world);
+			buildPermGroundPiece(b2Vec2( 225.0f, -1.5f), b2Vec2(-225.0f, -1.5f), world);
 
 			//Wall
-			buildWallPiece(b2Vec2( -222.5f, 0.0f ), b2Vec2( -222.5f, 70.0f ), world);//Left Wall
-			buildWallPiece(b2Vec2( -222.5f, 70.0f), b2Vec2( 222.5f, 70.0f), world);//Ceiling
-			buildWallPiece(b2Vec2( 222.5f, 0.0f ), b2Vec2( 222.5f, 70.0f ), world);//Right Wall
+			buildPermWallPiece(b2Vec2( -222.5f, 0.0f ), b2Vec2( -222.5f, 70.0f ), world);//Left Wall
+			buildPermWallPiece(b2Vec2( -222.5f, 70.0f), b2Vec2( 222.5f, 70.0f), world);//Ceiling
+			buildPermWallPiece(b2Vec2( 222.5f, 0.0f ), b2Vec2( 222.5f, 70.0f ), world);//Right Wall
 
 		}
 		#pragma endregion Ground and Walls
@@ -520,15 +618,28 @@ public:
 					return;//Very very very hackish way to pull off destroying more stuff, don't think I like it much... :(
 				}
 				
+				if (callback.m_fixture->GetFilterData().categoryBits == GRASS_SPAWNER_BASE) {
+
+				}
+
+				if (callback.m_fixture->GetFilterData().categoryBits == GRASS) {
+
+				}
+
+				if (callback.m_fixture->GetFilterData().categoryBits == WHEELER |
+					callback.m_fixture->GetFilterData().categoryBits == WHEELER_BODY) {
+					Wheeler *testWheeler = (Wheeler *)body->GetUserData();
+					wheelersToDelete.push_back(*testWheeler);
+					wheelers.erase( std::find(wheelers.begin(), wheelers.end(), testWheeler ) );
+					activeWheeler = NULL;
+					testWheeler = NULL;
+				}
 
 				if (callback.m_fixture->GetFilterData().categoryBits == SEED |
-					callback.m_fixture->GetFilterData().categoryBits == ROOT) return;
+					callback.m_fixture->GetFilterData().categoryBits == ROOT |
+					callback.m_fixture->GetFilterData().categoryBits == PERM_GROUND |
+					callback.m_fixture->GetFilterData().categoryBits == PERM_WALL) return;
 				
-				Wheeler *testWheeler = (Wheeler *)body->GetUserData();
-				wheelersToDelete.push_back(*testWheeler);
-				wheelers.erase( std::find(wheelers.begin(), wheelers.end(), testWheeler ) );
-				activeWheeler = NULL;
-				testWheeler = NULL;
 			}
 		}
 	}
