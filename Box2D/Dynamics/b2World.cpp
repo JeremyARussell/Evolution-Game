@@ -1092,7 +1092,26 @@ void b2World::DrawShape(b2Fixture* fixture, const b2Transform& xf, const b2Color
 				vertices[i] = b2Mul(xf, poly->m_vertices[i]);
 			}
 
-			m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
+			if(fixture->m_filter.categoryBits == 1 | fixture->m_filter.categoryBits == 2) {//Ground
+				//205-133-63
+				b2Color newColor = b2Color(0.8f, 0.4f, 0.2f);
+
+				m_debugDraw->DrawSolidPolygon(vertices, vertexCount, newColor);
+				break;
+			} else if (fixture->m_filter.categoryBits == 4 | fixture->m_filter.categoryBits == 8) {//Wall
+				//
+				b2Color newColor = b2Color(205.0f, 133.0f, 63.0f);
+
+				m_debugDraw->DrawSolidPolygon(vertices, vertexCount, newColor);
+				break;
+			} else {
+				m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
+				break;
+			}
+
+
+
+			//m_debugDraw->DrawSolidPolygon(vertices, vertexCount, color);
 		}
 		break;
             
