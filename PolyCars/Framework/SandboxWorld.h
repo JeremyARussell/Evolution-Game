@@ -9,6 +9,8 @@
 #include "Build\PolyCars\Wheeler.h"
 #include "Build\PolyCars\Seed.h"
 #include "Build\PolyCars\Grass.h"
+#include "Build\PolyCars\Wall.h"
+#include "Build\PolyCars\Ground.h"
 #include "Build\PolyCars\GrassSpawner.h"
 #include "Build\PolyCars\collision_enums.h"
 //Includes for third party engine stuff (not including the box2d engine stuff)
@@ -113,6 +115,22 @@ public:
 	void saveWorld() {
 		ofstream saveFile("SandboxWorld.sav");
 
+		//For our walls and ground later.
+		for (int i = 0; i < walls.size(); i ++) {
+			saveFile << "wallPosA" << ' ' << walls[i]->posA.x << ' ' << walls[i]->posA.y << endl;
+			saveFile << "wallPosB" << ' ' << walls[i]->posB.x << ' ' << walls[i]->posB.y << endl;
+		}
+
+		for (int i = 0; i < ground.size(); i ++) {
+			saveFile << "groundPosA" << ' ' << ground[i]->posA.x << ' ' << ground[i]->posA.y << endl;
+			saveFile << "groundPosB" << ' ' << ground[i]->posB.x << ' ' << ground[i]->posB.y << endl;
+		}
+
+		//For each GrassSpawner - Save the grassSpawner position
+		for (int i = 0; i < grassSpawners.size(); i ++) {
+			saveFile << "grassSpawnerPos" << ' ' << grassSpawners[i]->spx << ' ' << grassSpawners[i]->spy << endl;
+		}
+
 		//For each grass - Save the grass position
 		for (int i = 0; i < grasses.size(); i ++) {
 			b2Vec2 grassPosition = grasses[i]->stalk->GetPosition();
@@ -152,6 +170,7 @@ public:
 			saveFile << "wheelRadius3" << ' ' << wheelers[i]->wheelRadius[4] << ' ' << wheelers[i]->wheelRadius[5] << endl;
 			saveFile << "wheelRadius4" << ' ' << wheelers[i]->wheelRadius[6] << ' ' << wheelers[i]->wheelRadius[7] << endl;
 		}
+
 		saveFile.close();
 	}
 	void loadWorld() {
@@ -161,10 +180,53 @@ public:
 		float32 var1;
 		float32 var2;
 
+		//Wall and Ground load stuff
+		b2Vec2 endA;
+		b2Vec2 endB;
+		bool readyToBuild = false;
+
+		//Wheeler load stuff
 		vector<float32> genes;
 		bool readyToWheel = false;
 
 		while (loadFile >> loadType >> var1 >> var2 ) {
+			//Load the Walls
+			if (loadType == "wallPosA") { 
+				endA = b2Vec2(var1, var2);
+			}
+			if (loadType == "wallPosB") { 
+				endB = b2Vec2(var1, var2);
+				readyToBuild = true;
+			}
+			if (readyToBuild) {
+				walls.push_back(new Wall(m_world, endA, endB));
+
+				endA, endB = b2Vec2(0.0f, 0.0f);
+
+				readyToBuild = false;
+			}
+
+			//Load the Ground
+			if (loadType == "groundPosA") { 
+				endA = b2Vec2(var1, var2);
+			}
+			if (loadType == "groundPosB") { 
+				endB = b2Vec2(var1, var2);
+				readyToBuild = true;
+			}
+			if (readyToBuild) {
+				ground.push_back(new Ground(m_world, endA, endB));
+
+				endA, endB = b2Vec2(0.0f, 0.0f);
+
+				readyToBuild = false;
+			}
+
+			//Load the GrassSpawner
+			if (loadType == "grassSpawnerPos") {
+				grassSpawners.push_back(new GrassSpawner(m_world, var1, var2 ));
+			}
+
 			//Load the grass
 			if (loadType == "grassPos") {
 				grasses.push_back(new Grass(m_world, var1, var2 ));
@@ -303,51 +365,7 @@ public:
 	}
 
 	void buildGroundPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
-
-		b2Vec2 _bgpTva[4];
-		float32 _bgpTslope = (pb.y - pa.y) / (pb.x - pa.x);
-
-		if(_bgpTslope >= 1 | _bgpTslope < -1.0) {//Mostly vertical
-			//A is lower than B
-			if (pa.y < pb.y)
-			{
-				_bgpTva[0].Set(pb.x - 2.5f, pb.y);
-				_bgpTva[1].Set(pa.x - 2.5f, pa.y);
-				_bgpTva[2].Set(pa.x + 2.5f, pa.y); 
-				_bgpTva[3].Set(pb.x + 2.5f, pb.y);   
-			} else {
-				_bgpTva[0].Set(pa.x - 2.5f, pa.y);
-				_bgpTva[1].Set(pb.x - 2.5f, pb.y);
-				_bgpTva[2].Set(pb.x + 2.5f, pb.y); 
-				_bgpTva[3].Set(pa.x + 2.5f, pa.y);   
-			}
-
-		} else {//Mostly horizontal
-			//A is to the left of B
-			if (pa.x < pb.x)
-			{
-				_bgpTva[0].Set(pa.x, pa.y + 2.5f); /// top left
-				_bgpTva[1].Set(pa.x, pa.y - 2.5f);/// bottom left
-				_bgpTva[2].Set(pb.x, pb.y - 2.5f); /// bottom right
-				_bgpTva[3].Set(pb.x, pb.y + 2.5f);  /// top right 
-			} else {//B is to the left of A
-				_bgpTva[0].Set(pb.x, pb.y + 2.5f); /// top left
-				_bgpTva[1].Set(pb.x, pb.y - 2.5f);/// bottom left
-				_bgpTva[2].Set(pa.x, pa.y - 2.5f); /// bottom right
-				_bgpTva[3].Set(pa.x, pa.y + 2.5f);  /// top right 
-			}
-		}
-
-		b2PolygonShape _bgpTps;
-		_bgpTps.Set(_bgpTva, 4);
-
-		b2FixtureDef _bgpTfd;
-		_bgpTfd.shape = &_bgpTps;
-		_bgpTfd.density = 0.0f;
-		_bgpTfd.filter.categoryBits = GROUND;
-
-		world->CreateFixture(&_bgpTfd);
-
+		ground.push_back(new Ground(m_world, pa, pb));
 	}
 
 	void buildPermGroundPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
@@ -400,51 +418,7 @@ public:
 
 
 	void buildWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
-
-		b2Vec2 _bwpTva[4];
-		float32 _bwpTslope = (pb.y - pa.y) / (pb.x - pa.x);
-
-		if(_bwpTslope >= 1 | _bwpTslope < -1.0) {//Mostly vertical
-			//A is lower than B
-			if (pa.y < pb.y)
-			{
-				_bwpTva[0].Set(pb.x - 2.5f, pb.y);
-				_bwpTva[1].Set(pa.x - 2.5f, pa.y);
-				_bwpTva[2].Set(pa.x + 2.5f, pa.y); 
-				_bwpTva[3].Set(pb.x + 2.5f, pb.y);   
-			} else {
-				_bwpTva[0].Set(pa.x - 2.5f, pa.y);
-				_bwpTva[1].Set(pb.x - 2.5f, pb.y);
-				_bwpTva[2].Set(pb.x + 2.5f, pb.y); 
-				_bwpTva[3].Set(pa.x + 2.5f, pa.y);   
-			}
-
-		} else {//Mostly horizontal
-			//A is to the left of B
-			if (pa.x < pb.x)
-			{
-				_bwpTva[0].Set(pa.x, pa.y + 2.5f);
-				_bwpTva[1].Set(pa.x, pa.y - 2.5f);
-				_bwpTva[2].Set(pb.x, pb.y - 2.5f);
-				_bwpTva[3].Set(pb.x, pb.y + 2.5f);
-			} else {//B is to the left of A
-				_bwpTva[0].Set(pb.x, pb.y + 2.5f);
-				_bwpTva[1].Set(pb.x, pb.y - 2.5f);
-				_bwpTva[2].Set(pa.x, pa.y - 2.5f);
-				_bwpTva[3].Set(pa.x, pa.y + 2.5f);
-			}
-		}
-
-		b2PolygonShape _bwpTps;
-		_bwpTps.Set(_bwpTva, 4);
-
-		b2FixtureDef _bwpTfd;
-		_bwpTfd.shape = &_bwpTps;
-		_bwpTfd.density = 0.0f;
-		_bwpTfd.filter.categoryBits = WALL;
-
-		world->CreateFixture(&_bwpTfd);
-
+		walls.push_back(new Wall(m_world, pa, pb));
 	}
 
 	void buildPermWallPiece(b2Vec2 pa, b2Vec2 pb, b2Body* world) {
@@ -612,14 +586,26 @@ public:
 				b2Body* body = callback.m_fixture->GetBody();
 
 
-				if (callback.m_fixture->GetFilterData().categoryBits == GROUND
-					| callback.m_fixture->GetFilterData().categoryBits == WALL) {
-					callback.m_fixture->GetBody()->DestroyFixture(callback.m_fixture); 
-					return;//Very very very hackish way to pull off destroying more stuff, don't think I like it much... :(
+				if (callback.m_fixture->GetFilterData().categoryBits == GROUND) {
+					Ground *groundD = (Ground *)body->GetUserData();
+					groundToDelete.push_back(*groundD);
+					ground.erase( std::find(ground.begin(), ground.end(), groundD));
+					return;
+				}
+
+				if (callback.m_fixture->GetFilterData().categoryBits == WALL) {
+
+					Wall *wall = (Wall *)body->GetUserData();
+					wallsToDelete.push_back(*wall);
+					walls.erase( std::find(walls.begin(), walls.end(), wall));
+
+					return;
 				}
 				
 				if (callback.m_fixture->GetFilterData().categoryBits == GRASS_SPAWNER_BASE) {
-
+					GrassSpawner *spawner = (GrassSpawner *)body->GetUserData();
+					grassSpawnersToDelete.push_back(*spawner);
+					grassSpawners.erase( std::find(grassSpawners.begin(), grassSpawners.end(), spawner));
 				}
 
 				if (callback.m_fixture->GetFilterData().categoryBits == GRASS) {
@@ -898,14 +884,26 @@ public:
 				activeWheeler = NULL;
 			}
 		}
+		for (int i = 0; i < wallsToDelete.size(); i ++) {
+			wallsToDelete[i].destroy();
+		}
+		for (int i = 0; i < groundToDelete.size(); i ++) {
+			groundToDelete[i].destroy();
+		}
 		for (int i = 0; i < grassToDelete.size(); i ++) {
 			grassToDelete[i].die();
+		}		
+		for (int i = 0; i < grassSpawnersToDelete.size(); i ++) {
+			grassSpawnersToDelete[i].destroy();
 		}
 		for (int i = 0; i < seedsToDelete.size(); i ++) {
 			seedsToDelete[i].destroy();
 		}
 		wheelersToDelete.clear();
+		wallsToDelete.clear();
+		groundToDelete.clear();
 		grassToDelete.clear();
+		grassSpawnersToDelete.clear();
 		seedsToDelete.clear();
 	}
 
@@ -922,14 +920,19 @@ private:
         return retNum;
     }
 
-	//Live creatures
+	//Live objects
 	vector<Wheeler*> wheelers;
 	vector<Grass*> grasses;
+	vector<Wall*> walls;
+	vector<Ground*> ground;
 	vector<GrassSpawner*> grassSpawners;
 	vector<Seed*> seeds;
-	//Dying creatures
+	//Dying objects
 	vector<Wheeler> wheelersToDelete;
 	vector<Grass> grassToDelete;
+	vector<Wall> wallsToDelete;
+	vector<Ground> groundToDelete;
+	vector<GrassSpawner> grassSpawnersToDelete;
 	vector<Seed> seedsToDelete;
 
 	//Used to place random generated Wheelers

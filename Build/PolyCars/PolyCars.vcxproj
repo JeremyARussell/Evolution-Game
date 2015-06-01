@@ -131,10 +131,12 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="GrassSpawner.cpp" />
+    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="LiveGame.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="PowerHUD.cpp" />
     <ClCompile Include="Seed.cpp" />
+    <ClCompile Include="Wall.cpp" />
     <ClCompile Include="Wheeler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -145,10 +147,12 @@
     <ClInclude Include="collision_enums.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />
+    <ClInclude Include="Ground.h" />
     <ClInclude Include="LiveGame.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="PowerHUD.h" />
     <ClInclude Include="Seed.h" />
+    <ClInclude Include="Wall.h" />
     <ClInclude Include="Wheeler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

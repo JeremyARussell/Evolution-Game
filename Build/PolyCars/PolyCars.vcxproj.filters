@@ -37,6 +37,12 @@
     <ClCompile Include="LiveGame.cpp">
       <Filter>Game\GameStates</Filter>
     </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>Game\Items</Filter>
+    </ClCompile>
+    <ClCompile Include="Ground.cpp">
+      <Filter>Game\Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h">
@@ -74,6 +80,12 @@
     </ClInclude>
     <ClInclude Include="collision_enums.h">
       <Filter>Game\Creatures</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>Game\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Ground.h">
+      <Filter>Game\Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

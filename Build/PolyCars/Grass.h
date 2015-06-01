@@ -19,7 +19,6 @@ public:
 	b2Body* stalk;
 	b2Body* stalkSensor;
 
-	b2World *myWorld;
 	bool beingEaten;
 
 	bool seeding;
@@ -55,6 +54,7 @@ protected:
 	float32 yp;
 
 	//Physics stuff
+	b2World *myWorld;
 	b2BodyDef m_stalkBody;
     b2PolygonShape stalkShape;
     b2FixtureDef stalkFixture;
