@@ -28,8 +28,8 @@ using namespace std;
 namespace {
 	int32 major = 0;
 	int32 minor = 1;
-	int32 revision = 7;
-	char  bugRevision = 'a';
+	int32 revision = 8;
+	char  bugRevision = ' ';
 
 	int32 worldIndex = 0;
 	int32 worldSelection = 0;
@@ -425,18 +425,27 @@ int main(int argc, char** argv) {
 	glui->add_button("Import", 0, importCreature);
 
 	glui->add_column(true);
-	glui->add_button("Pause", 0, Pause);
-	///*#if defined (_DEBUG)*/ glui->add_button("Single Step", 0, SingleStep);
-	///*#endif*/
-	glui->add_button("Restart", 0, Restart);
-	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
-		
+	glui->add_button("Export", 0, exportCreature);
+
 	glui->add_column(true);
+	glui->add_separator();
+	glui->add_separator();
+	glui->add_button("Previous", 0, previusWheeler);
+	glui->add_separator();
+	glui->add_separator();
+
+	glui->add_column(true);
+
 	glui->add_checkbox("Follow Creature", &settings.followCreature);
 	glui->add_checkbox("Draw Genes", &settings.drawGenes);
-	////////glui->add_checkbox("Follow Creature", &settings.followCreature);
+	glui->add_button("Destroy", 0, destroyCreature);
+
+	glui->add_column(true);
+	glui->add_separator();
+	glui->add_separator();
 	glui->add_button("Next", 0, nextWheeler);
-	glui->add_button("Previous", 0, previusWheeler);
+	glui->add_separator();
+	glui->add_separator();
 
 	//GLUI_Spinner* grassSpawnSpinner =
 	//	glui->add_spinner("Grass Rate", GLUI_SPINNER_INT, &settings.grassSpawnRate);
@@ -444,10 +453,13 @@ int main(int argc, char** argv) {
 	//grassSpawnSpinner->set_speed(0.1f);
 
 	glui->add_column(true);
-	glui->add_button("Destroy", 0, destroyCreature);
-
-	glui->add_column(true);
-	glui->add_button("Export", 0, exportCreature);
+	glui->add_button("Pause", 0, Pause);
+	///*#if defined (_DEBUG)*/ glui->add_button("Single Step", 0, SingleStep);
+	///*#endif*/
+	glui->add_button("Restart", 0, Restart);
+	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
+		
+	glui->add_separator();
 
 	glui->set_main_gfx_window( mainWindow );
 	
