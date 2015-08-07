@@ -135,6 +135,7 @@ public:
 		for (int i = 0; i < grasses.size(); i ++) {
 			b2Vec2 grassPosition = grasses[i]->stalk->GetPosition();
 			saveFile << "grassPos" << ' ' << grassPosition.x << ' ' << grassPosition.y << endl;
+			//TODO - BUG
 		}
 
 		//For each Wheeler ----- Save the wheeler stuff
