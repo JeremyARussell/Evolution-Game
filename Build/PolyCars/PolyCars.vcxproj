@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
+    <ClInclude Include="..\..\PolyCars\Framework\Universes\Abiogenesis_Universe.h" />
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
     <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h" />
     <ClInclude Include="Button.h" />

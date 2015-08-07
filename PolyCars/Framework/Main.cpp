@@ -381,12 +381,12 @@ static void importCreature(int) {
 
 int main(int argc, char** argv) {
 	srand (time(NULL));
-	worldCount = 0;
+	worldCount = 1;
 	//while (g_worldEntries[worldCount].createFcn != NULL) { ++worldCount; }//Keep for later
 
 	state = MainMenuS;
 
-	worldIndex = b2Clamp(worldIndex, 0, worldCount - 1);
+	worldIndex = 1;//b2Clamp(worldIndex, 0, worldCount - 1);
 	worldSelection = worldIndex;
 
 	entry = g_worldEntries + worldIndex;

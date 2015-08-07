@@ -87,6 +87,9 @@
     <ClInclude Include="Ground.h">
       <Filter>Game\Items</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\PolyCars\Framework\Universes\Abiogenesis_Universe.h">
+      <Filter>Game\Worlds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Framework">

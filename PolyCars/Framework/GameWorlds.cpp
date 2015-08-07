@@ -29,9 +29,11 @@
 using namespace std;
 
 #include "SandboxWorld.h"
+#include "Universes\Abiogenesis_Universe.h"
 
 WorldEntry g_worldEntries[] =
 {	
 	{"Sandbox World", SandboxWorld::Create },
+	{"Abiogenesis", Abiogenesis::Create },
 	{NULL, NULL}
 };
