@@ -13,3 +13,4 @@ Build/vs2010/_ReSharper.Evolution/
 *.sav
 *.unsuccessfulbuild
 *.lib
+Build/vs2010/Evolution.sdf
