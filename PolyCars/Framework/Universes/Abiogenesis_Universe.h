@@ -68,19 +68,110 @@ public:
     Abiogenesis() {
 
 		activePower = GRAB;
-
 		ma.x = 0.0f; ma.y = 0.0f;
-
 		m_world->SetContactListener(&athisWheelerContactListener);
 
 		#pragma region Boundaries
 		{
+
 			b2BodyDef bd;
 			world = m_world->CreateBody(&bd);
+
+			b2Vec2 _bgpTva[4];
+			b2PolygonShape _bgpTps;
+			b2FixtureDef _bgpTfd;
+
+			//Bottom Bar
+			_bgpTva[0].Set(-50, -48);
+			_bgpTva[1].Set(-50, -50);
+			_bgpTva[2].Set( 50, -50); 
+			_bgpTva[3].Set( 50, -48);   
+
+			_bgpTps.Set(_bgpTva, 4);
+
+			_bgpTfd.shape = &_bgpTps;
+			_bgpTfd.density = 0.0f;
+			_bgpTfd.filter.categoryBits = PERM_WALL;
+
+			world->CreateFixture(&_bgpTfd);
+
+			//Top Bar
+			_bgpTva[0].Set(-50, 50);
+			_bgpTva[1].Set(-50, 48);
+			_bgpTva[2].Set( 50, 48); 
+			_bgpTva[3].Set( 50, 50);   
+
+			_bgpTps.Set(_bgpTva, 4);
+
+			_bgpTfd.shape = &_bgpTps;
+			_bgpTfd.density = 0.0f;
+			_bgpTfd.filter.categoryBits = PERM_WALL;
+
+			world->CreateFixture(&_bgpTfd);
+
+			//Left Bar
+			_bgpTva[0].Set(-50,  50);
+			_bgpTva[1].Set(-50, -50);
+			_bgpTva[2].Set(-48, -50); 
+			_bgpTva[3].Set(-48,  50);   
+
+			_bgpTps.Set(_bgpTva, 4);
+
+			_bgpTfd.shape = &_bgpTps;
+			_bgpTfd.density = 0.0f;
+			_bgpTfd.filter.categoryBits = PERM_WALL;
+
+			world->CreateFixture(&_bgpTfd);
+
+			//Right Bar
+			_bgpTva[0].Set( 48,  50);
+			_bgpTva[1].Set( 48, -50);
+			_bgpTva[2].Set( 50, -50); 
+			_bgpTva[3].Set( 50,  50);   
+
+			_bgpTps.Set(_bgpTva, 4);
+
+			_bgpTfd.shape = &_bgpTps;
+			_bgpTfd.density = 0.0f;
+			_bgpTfd.filter.categoryBits = PERM_WALL;
+
+			world->CreateFixture(&_bgpTfd);
+
+			//Water
+
+			b2Vec2 waterPos;
+
+			//for 100
+				//for 50+
+
+			waterPos.Set(0, 0);
+
+			spawnWater(waterPos);
+
+
 		}
 		#pragma endregion
 	}
 	
+	void spawnWater(b2Vec2 pos) {
+
+		b2BodyDef myBodyDef;
+		myBodyDef.type = b2_dynamicBody; //this will be a dynamic body
+		myBodyDef.position.Set(pos.x, pos.y); //set the starting position
+		myBodyDef.angle = 0; //set the starting angle
+
+		b2Body* dynamicBody = m_world->CreateBody(&myBodyDef);
+
+		b2CircleShape circleShape;
+		circleShape.m_p.Set(0, 0); //position, relative to body position
+		circleShape.m_radius = 1; //radius
+
+		b2FixtureDef myFixtureDef;
+		myFixtureDef.shape = &circleShape; //this is a pointer to the shape above
+		dynamicBody->CreateFixture(&myFixtureDef); //add a fixture to the body
+
+	}
+
 	float32 clickZoomLevel;
 	b2Vec2  clickViewCenter;
 
