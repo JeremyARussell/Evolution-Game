@@ -2,20 +2,81 @@
 #define ABIOGENESIS_H
 #pragma once
 
+
+enum _AbioCategories {
+    AWALL			=  1,
+    WATER_CORE				=  2,
+    WATER_SHELL			=  4,
+    PHOBIC				=  8,
+    PHILLIC	=  16,
+//    SEED				=  32,
+//    GRASS				=  64,
+//    ROOT				=  128,
+//    WHEELER_BODY		=  256,
+//    WHEELER				=  512	 
+//    xxxx	 =  1024,
+//    xxxx	 =  2048,
+//    xxxx	 =  4096,
+//    xxxx	 =  8192,
+//    xxxx	 =  16384,
+//    xxxx	 =  32768,
+
+};
+
+
 class aWheelerContactListener : public b2ContactListener {
 	void BeginContact(b2Contact* contact) {
 
 		b2Fixture* fixtureA = contact->GetFixtureA();
 		b2Fixture* fixtureB = contact->GetFixtureB();
 
-		//When a root is touching another root. --- USE this to start later...
-		if (fixtureA->GetFilterData().categoryBits == ROOT && 
-			fixtureB->GetFilterData().categoryBits == ROOT) {
-				Grass* seedTest = (Grass *)fixtureB->GetBody()->GetUserData(); 
-				Grass* seedTest2 = (Grass *)fixtureA->GetBody()->GetUserData(); 
-				seedTest->crowded = true;
-				seedTest2->crowded = true;
+		if (fixtureA->GetFilterData().categoryBits == WATER_SHELL && 
+			fixtureB->GetFilterData().categoryBits == WATER_SHELL) {
+
+				b2Vec2 testPointA = fixtureA->GetBody()->GetPosition();
+				b2Vec2 testPointB = fixtureB->GetBody()->GetPosition();
+
+				fixtureA->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointA.x - testPointB.x) * 2, (testPointA.y - testPointB.y) * 2), 
+					fixtureA->GetBody()->GetWorldCenter() );
+
+				fixtureB->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointB.x - testPointA.x) * 2, (testPointB.y - testPointA.y) * 2), 
+					fixtureB->GetBody()->GetWorldCenter() );
 		}
+
+		if (fixtureA->GetFilterData().categoryBits == PHOBIC && 
+			 fixtureB->GetFilterData().categoryBits == WATER_SHELL) {
+
+				b2Vec2 testPointA = fixtureA->GetBody()->GetPosition();
+				b2Vec2 testPointB = fixtureB->GetBody()->GetPosition();
+
+				fixtureA->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointA.x - testPointB.x), (testPointA.y - testPointB.y)), 
+					fixtureA->GetBody()->GetWorldCenter() );
+
+				fixtureB->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointB.x - testPointA.x), (testPointB.y - testPointA.y)), 
+					fixtureB->GetBody()->GetWorldCenter() );
+		}
+
+		if (fixtureA->GetFilterData().categoryBits == WATER_SHELL && 
+			fixtureB->GetFilterData().categoryBits == PHILLIC) {
+
+				b2Vec2 testPointA = fixtureA->GetBody()->GetPosition();
+				b2Vec2 testPointB = fixtureB->GetBody()->GetPosition();
+
+				fixtureB->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointA.x - testPointB.x), (testPointA.y - testPointB.y)), 
+					fixtureB->GetBody()->GetWorldCenter() );
+
+				fixtureA->GetBody()->ApplyLinearImpulse( 
+					b2Vec2((testPointB.x - testPointA.x), (testPointB.y - testPointA.y)), 
+					fixtureA->GetBody()->GetWorldCenter() );
+		}
+
+
+
 	}
   
     void EndContact(b2Contact* contact) {
@@ -71,8 +132,15 @@ public:
 		ma.x = 0.0f; ma.y = 0.0f;
 		m_world->SetContactListener(&athisWheelerContactListener);
 
+		top = 48;
+		left = -48;
+		bottom = -48;
+		right = 48;
+
 		#pragma region Boundaries
 		{
+
+			m_world->SetGravity(b2Vec2(0, 0));
 
 			b2BodyDef bd;
 			world = m_world->CreateBody(&bd);
@@ -91,7 +159,8 @@ public:
 
 			_bgpTfd.shape = &_bgpTps;
 			_bgpTfd.density = 0.0f;
-			_bgpTfd.filter.categoryBits = PERM_WALL;
+			_bgpTfd.filter.categoryBits = AWALL;
+			_bgpTfd.filter.maskBits = WATER_CORE | PHOBIC | PHILLIC;
 
 			world->CreateFixture(&_bgpTfd);
 
@@ -105,7 +174,8 @@ public:
 
 			_bgpTfd.shape = &_bgpTps;
 			_bgpTfd.density = 0.0f;
-			_bgpTfd.filter.categoryBits = PERM_WALL;
+			_bgpTfd.filter.categoryBits = AWALL;
+			_bgpTfd.filter.maskBits = WATER_CORE | PHOBIC | PHILLIC;
 
 			world->CreateFixture(&_bgpTfd);
 
@@ -119,7 +189,8 @@ public:
 
 			_bgpTfd.shape = &_bgpTps;
 			_bgpTfd.density = 0.0f;
-			_bgpTfd.filter.categoryBits = PERM_WALL;
+			_bgpTfd.filter.categoryBits = AWALL;
+			_bgpTfd.filter.maskBits = WATER_CORE | PHOBIC | PHILLIC;
 
 			world->CreateFixture(&_bgpTfd);
 
@@ -133,42 +204,103 @@ public:
 
 			_bgpTfd.shape = &_bgpTps;
 			_bgpTfd.density = 0.0f;
-			_bgpTfd.filter.categoryBits = PERM_WALL;
+			_bgpTfd.filter.categoryBits = AWALL;
+			_bgpTfd.filter.maskBits = WATER_CORE | PHOBIC | PHILLIC;
 
 			world->CreateFixture(&_bgpTfd);
-
-			//Water
-
-			b2Vec2 waterPos;
-
-			//for 100
-				//for 50+
-
-			waterPos.Set(0, 0);
-
-			spawnWater(waterPos);
-
-
 		}
 		#pragma endregion
+
+		#pragma region Water
+
+		//Water
+
+		b2Vec2 waterPos;
+
+		//for 100
+			//for 50+
+
+		for (int ix = -47; ix < 48; ix++) {
+			for (int iy = -47; iy < 48; iy++) {
+				waterPos.Set(ix, iy);
+				spawnWater(waterPos);
+			}
+		}
+
+		#pragma endregion
+
+		for (int ix = - 15; ix < 15; ix++) {
+			for (int iy = -8; iy < 8; iy = iy + 3) {
+				spawnPhLipid(b2Vec2( ix, iy));
+			}
+		}
+
 	}
 	
 	void spawnWater(b2Vec2 pos) {
 
-		b2BodyDef myBodyDef;
-		myBodyDef.type = b2_dynamicBody; //this will be a dynamic body
-		myBodyDef.position.Set(pos.x, pos.y); //set the starting position
-		myBodyDef.angle = 0; //set the starting angle
+		b2BodyDef waterBodDef;
+		waterBodDef.type = b2_dynamicBody;
+		waterBodDef.position.Set(pos.x, pos.y);
+		waterBodDef.angle = 0;
 
-		b2Body* dynamicBody = m_world->CreateBody(&myBodyDef);
+		b2Body* waterBod = m_world->CreateBody(&waterBodDef);
 
 		b2CircleShape circleShape;
-		circleShape.m_p.Set(0, 0); //position, relative to body position
-		circleShape.m_radius = 1; //radius
+		b2FixtureDef waterFixtureDef;
 
-		b2FixtureDef myFixtureDef;
-		myFixtureDef.shape = &circleShape; //this is a pointer to the shape above
-		dynamicBody->CreateFixture(&myFixtureDef); //add a fixture to the body
+		//Water Core
+		circleShape.m_p.Set(0, 0);
+		circleShape.m_radius = 0.25;
+		waterFixtureDef.shape = &circleShape;
+		waterFixtureDef.filter.categoryBits = WATER_CORE;
+		waterFixtureDef.filter.maskBits = WATER_CORE | AWALL | PHOBIC | PHILLIC;
+
+		waterBod->CreateFixture(&waterFixtureDef);
+
+		//Water Shell
+		circleShape.m_p.Set(0, 0);
+		circleShape.m_radius = 0.4995;
+		waterFixtureDef.shape = &circleShape;
+		waterFixtureDef.isSensor = true;
+		waterFixtureDef.filter.categoryBits = WATER_SHELL;
+		waterFixtureDef.filter.maskBits = WATER_SHELL | WATER_CORE | AWALL | PHOBIC | PHILLIC;
+
+		waterBod->CreateFixture(&waterFixtureDef);
+	}
+
+	void spawnPhLipid(b2Vec2 pos) {
+
+		b2BodyDef waterBodDef;
+		waterBodDef.type = b2_dynamicBody;
+		waterBodDef.position.Set(pos.x, pos.y);
+		waterBodDef.angle = 0;
+
+		b2Body* waterBod = m_world->CreateBody(&waterBodDef);
+
+		b2CircleShape phobicShape;
+		b2PolygonShape phillicShape;
+		b2FixtureDef lipidFixDef;
+
+		lipidFixDef.density = 0.5;
+
+		//Phillic
+		phobicShape.m_p.Set(0, 0.5);
+		phobicShape.m_radius = 0.38;
+		lipidFixDef.shape = &phobicShape;
+		lipidFixDef.filter.categoryBits = PHILLIC;
+		lipidFixDef.filter.maskBits = WATER_SHELL | WATER_CORE | AWALL | PHOBIC | PHILLIC;
+
+		waterBod->CreateFixture(&lipidFixDef);
+
+		//Phobic
+		phillicShape.SetAsBox(0.25, 0.5, b2Vec2(0, -0.5), 0);
+		lipidFixDef.shape = &phillicShape;
+
+		lipidFixDef.filter.categoryBits = PHOBIC;
+		lipidFixDef.filter.maskBits = WATER_SHELL | WATER_CORE | AWALL | PHOBIC | PHILLIC;
+
+		waterBod->CreateFixture(&lipidFixDef);
 
 	}
 
