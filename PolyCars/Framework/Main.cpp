@@ -386,7 +386,7 @@ int main(int argc, char** argv) {
 
 	state = MainMenuS;
 
-	worldIndex = 1;//b2Clamp(worldIndex, 0, worldCount - 1);
+	worldIndex = 0;//b2Clamp(worldIndex, 0, worldCount - 1);
 	worldSelection = worldIndex;
 
 	entry = g_worldEntries + worldIndex;

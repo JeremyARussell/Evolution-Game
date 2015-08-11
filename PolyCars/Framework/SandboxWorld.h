@@ -700,10 +700,10 @@ public:
 		}
 
 		//Game text
-		m_debugDraw.DrawString(10, m_textLine, "Welcome to Evolution, a game/project to create worlds and creatures which compete and evolve");
+		m_debugDraw.DrawString(10, m_textLine, "Welcome the the Wheeler's Universe, a demonstration of Natural Selection.");
 		m_textLine += 15;
 
-		if (settings->pause) {//TODO - Make a checkbox for this guy to not need to be paused.
+		//if (settings->pause) {//TODO - Make a checkbox for this guy to not need to be paused.
 
 			m_debugDraw.DrawString(240, 85, "======= World Stats =======");
 
@@ -712,7 +712,7 @@ public:
 
 			int32 grassCount = grasses.size();
 			m_debugDraw.DrawString(240, 115, "Blades of Grass = %d", grassCount);
-		}
+		//}
 
 		int trackwsp = 85;
 
