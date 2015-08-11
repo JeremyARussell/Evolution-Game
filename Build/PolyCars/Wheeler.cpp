@@ -492,6 +492,12 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	cart->SetTransform(cart->GetPosition(), genes[2]);
 }
 
+
+void buildBody(vector<float32> genes, float32 x,float32 y, float32 angle, int age) {
+
+}
+
+
 //Function used to turn the Wheeler's wheel's rotation around
 void Wheeler::turnAround() {
 	int32 spoke_index = 0;
