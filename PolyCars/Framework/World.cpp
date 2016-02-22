@@ -95,7 +95,7 @@ public:
 
 	bool ReportFixture(b2Fixture* fixture) {
 		b2Body* body = fixture->GetBody();
-		if (body->GetType() == b2_dynamicBody) {
+		if (body->GetType() == b2_dynamicBody | body->GetType() == b2_staticBody) {
 			bool inside = fixture->TestPoint(m_point);
 			if (inside) {
 				m_fixture = fixture;
@@ -109,9 +109,8 @@ public:
 	b2Fixture* m_fixture;
 };
 
-void World::MouseDown(const b2Vec2& p) {//TODO - Take these functions and move them into the Main.cpp
-										// file, controls should be universal unless I need them
-										// to be different per world.
+void World::MouseDown(const b2Vec2& p) {
+										
 	m_mouseWorld = p;
 	
 	if (m_mouseJoint != NULL) {
@@ -174,12 +173,12 @@ void World::Step(Settings* settings) {
 			timeStep = 0.0f;
 		}
 
-		m_debugDraw.DrawString(5, m_textLine, "****PAUSED****");
-		m_textLine += 15;
+		int h = glutGet(GLUT_WINDOW_HEIGHT);
+		int w = glutGet(GLUT_WINDOW_WIDTH);
+										 //The - 60 is to compensate for half the length of the string being printed "****PAUSED****"
+		m_debugDraw.DrawString((w / 2) - 60, h / 2, "****PAUSED****");
+		//m_textLine += 15;
 	}
-
-	//m_debugDraw.DrawString(5, m_textLine, );
-	//m_textLine += 15;
 
 	uint32 flags = 0;
 	flags += settings->drawShapes			* b2Draw::e_shapeBit;

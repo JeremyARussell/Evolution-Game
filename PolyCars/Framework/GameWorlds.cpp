@@ -16,8 +16,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
-
 #include "World.h"
 #include "Render.h"
 
@@ -30,10 +28,12 @@
 #include <cstring>
 using namespace std;
 
-#include "MountainRiding.h"
+#include "SandboxWorld.h"
+#include "Universes\Abiogenesis_Universe.h"
 
 WorldEntry g_worldEntries[] =
 {	
-	{"Mountain Riding", MountainRiding::Create },
+	{"Sandbox World", SandboxWorld::Create },
+	{"Abiogenesis", Abiogenesis::Create },
 	{NULL, NULL}
 };

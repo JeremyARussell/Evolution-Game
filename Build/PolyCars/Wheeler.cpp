@@ -1,74 +1,34 @@
 #include "Wheeler.h"
+#include "Build\PolyCars\collision_enums.h"
+
 #include <stdio.h>
-#include <Box2D/Box2D.h>
 using namespace std;
-//#include "freeglut/freeglut.h"
  
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
 
-/*      -------------   NOTES   -------------
-Need to split the creation of the Wheeler into parts, so that I can modularize and swap out
-the way it's body is built, to create the turning around in a 2d world effect.
-
-	generateFreshChromosome()
-	 | generateChildChromosome()
-	 |   |
-	 --------buildWheeler() - for turning - buildWheelerBackwards()
-
-*/
-
+//Rendering for the Wheeler
 void Wheeler::render() {
 
     b2Vec2 pos = cart->GetPosition();
-    //float angle = cart->GetAngle();
   
-    //call normal render at different position/rotation
     glPushMatrix();
     glTranslatef( pos.x, pos.y, 0 );
-    //glRotatef( angle * RADTODEG, 0, 0, 1 );//OpenGL uses degrees here
  
 	glColor3f(1,1,1);//white
   
 	glRasterPos2i(2, 2);
-	glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-
 
 	char buf[256];
 	sprintf_s(buf, "%d", health);
 
 	glutBitmapString(GLUT_BITMAP_HELVETICA_10, (const unsigned char *)buf);
 
-	//nose and eyes
-	//glPointSize(4);
-	//glBegin(GL_POINTS);
-	//glVertex2f( 0, 0 );
-	//glVertex2f(-0.5, 0.5 );
-	//glVertex2f( 0.5, 0.5 );
-	//glEnd();
-      
-	//mouth
-	//glBegin(GL_LINES);
-	//glVertex2f(-0.5,  -0.5 );
-	//glVertex2f(-0.16, -0.6 );
-	//glVertex2f( 0.16, -0.6 );
-	//glVertex2f( 0.5,  -0.5 );
-	//glEnd();
-
-	//circle outline
-	//glBegin(GL_LINE_LOOP);
-	//for (float a = 0; a < 360 * DEGTORAD; a += 30 * DEGTORAD) 
-	//glVertex2f( sinf(a), cosf(a) );
-	//glEnd();
-
     glPopMatrix();
-
 }
 	
-
 //Constructor for a fresh randomly generated Wheeler
-Wheeler::Wheeler(b2World *m_world, float32 x,float32 y)
-{
+Wheeler::Wheeler(b2World *m_world, float32 x,float32 y) {
 	myWorld = m_world;
 
     totalAngleValue = 0;
@@ -76,14 +36,10 @@ Wheeler::Wheeler(b2World *m_world, float32 x,float32 y)
 	generateFreshChromosome();
 
 	buildWheeler(x, y);
-
-    return;
-    
 }
 
 //Constructor for a baby Wheeler
-Wheeler::Wheeler(Wheeler parent, b2World *m_world, float32 x,float32 y)
-{
+Wheeler::Wheeler(Wheeler parent, b2World *m_world, float32 x,float32 y) {
 	myWorld = m_world;
 
     totalAngleValue = 0;
@@ -94,8 +50,7 @@ Wheeler::Wheeler(Wheeler parent, b2World *m_world, float32 x,float32 y)
 }
 
 //Constructor for a loaded Wheeler
-Wheeler::Wheeler(b2World *m_world, vector<float32> genes)
-{
+Wheeler::Wheeler(b2World *m_world, vector<float32> genes) {
 	myWorld = m_world;
 
     totalAngleValue = 0;
@@ -103,8 +58,8 @@ Wheeler::Wheeler(b2World *m_world, vector<float32> genes)
 	loadWheeler(genes);
 }
 
+//Code to generate some random genes
 void Wheeler::generateFreshChromosome() {
-
 	spinDirection = -6 * b2_pi;//Probably should be called spinSpeed
 
 	MIN_WHEEL = 0.1f;//Wheel radius or diameter
@@ -128,6 +83,7 @@ void Wheeler::generateFreshChromosome() {
     }
 }
 
+//Code to generate genes based off of parent, with mutation
 void Wheeler::generateChildChromosome(Wheeler parent) {
 	health = 50;
 
@@ -136,13 +92,12 @@ void Wheeler::generateChildChromosome(Wheeler parent) {
     int spoke_index = 0;
     while (spoke_index < 8) {
 		
-
 		spokeAngles[spoke_index] = parent.spokeAngles[spoke_index];    //randomNumber(0.05f, 1.0f);
         totalAngleValue = totalAngleValue + spokeAngles[spoke_index];
 		
 		spokeLengths[spoke_index] = parent.spokeLengths[spoke_index] + randomNumber(-0.3f, 0.3f);
 		if (spokeLengths[spoke_index] < 0) {spokeLengths[spoke_index] = 0.3f;}
-		hasWheel[spoke_index] = parent.hasWheel[spoke_index];//randomNumber(0.01f, 1.0f) < m_wheelProb ? (randomNumberInt(0, (VECTOR_NUM - 1))) : (-1);
+		hasWheel[spoke_index] = parent.hasWheel[spoke_index];
 		axleAngle[spoke_index] = parent.axleAngle[spoke_index] + randomNumber(-1.0f, 1.0f * b2_pi);
 		wheelRadius[spoke_index] = parent.wheelRadius[spoke_index] + randomNumber(-0.2f, 0.2f);
 
@@ -150,11 +105,20 @@ void Wheeler::generateChildChromosome(Wheeler parent) {
     }
 }
 
+//Code to piece together a Wheeler
 void Wheeler::buildWheeler(float32 x,float32 y) {
-
 	needsToReproduce = false;
 	reproductionCounter = 0;
 	minutesToLive = 28800;//8 minutes of life in a 1/60 timestep
+
+	//Initializing vars
+	oldShortPos = b2Vec2(0.0f, 0.0f);
+	newShortPos = b2Vec2(0.0f, 0.0f);
+	oldLongPos  = b2Vec2(0.0f, 0.0f);
+	newLongPos  = b2Vec2(0.0f, 0.0f);
+	hasGoodShortDistance = false;
+	hasGoodLongDistance = false;
+	longCounter = 0;
 
     int spoke_index;
 	b2BodyDef m_cart_body;
@@ -182,15 +146,9 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	maxWheels = 8;//TODO - Investigate why this is 3 and if that prevents 3 wheels if they
 				  //were only on later spokes --- UPDATE: It needs to run at 8 to prevent an
 				  //uninitialized pointer problem.
-	
-	//Sensing stuff
-	//
-	nearWall = false;
-	nearWallCounter = 0;
-	cart->SetUserData( this );
 
-	cart_piece_fixture.filter.categoryBits = 0x0010;
-    wheel_fixture.filter.categoryBits = 0x0010;
+	cart_piece_fixture.filter.categoryBits = WHEELER_BODY;
+    wheel_fixture.filter.categoryBits = WHEELER_BODY;//TODO - change to something Wheeler specific, like Wheeler_Body or something.
 
 	healthDownCounter = 120;
 
@@ -265,6 +223,7 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
             axleFixture[spoke_index] = cart->CreateFixture(&cart_piece_fixture);
             wheelOn[spoke_index] = wheelIndex;
             axle[spoke_index] = myWorld->CreateBody(&m_cart_body);
+			axle[spoke_index]->SetUserData( this );
             cartWorkingPiece.SetAsBox(0.2f, 0.05f, b2Vec2(cart_piece_edge_1_x - 0.3f * cos(wshock_angle), cart_piece_edge_1_y - 0.3f * sin(wshock_angle)), wshock_angle);
             cart_piece_fixture.density = 20;
             axle[spoke_index]->CreateFixture(&cart_piece_fixture);
@@ -282,22 +241,19 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
             wheel_bodyDef.allowSleep = false;
             wheel_bodyDef.type = b2_dynamicBody;
             wheel[spoke_index] = myWorld->CreateBody(&wheel_bodyDef);
+			wheel[spoke_index]->SetUserData( this );
             wheel[spoke_index]->CreateFixture(&wheel_fixture);
             wheel_motor_joint.enableMotor = true;
             wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());
             motor[spoke_index] = (b2RevoluteJoint*)myWorld->CreateJoint(&wheel_motor_joint);
 		} else {
-            //wheel_motor_joint.enableMotor = false;
-            //wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());
             axle[spoke_index] = NULL;
             wheel[spoke_index] = NULL;
 			motor[spoke_index] = NULL;
-
 		}
         spoke_index++;
     }
     float32 totalMass = cart->GetMass();
-    float32 _loc_19 = b2_pi / 4;//Isn't used elsewhere, further checking is needed.
     wheelsOn = 0;
     spoke_index = 0;
     while (spoke_index < maxWheels) {
@@ -318,8 +274,6 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
     }
     baseSpringForce = totalMass * 7.5f;
 
-	b2BodyDef wheelerSensor;
-
 	b2CircleShape sensorCircle;
 	sensorCircle.m_radius = 5.0f;
 
@@ -327,37 +281,36 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 	fd.shape = &sensorCircle;
 	fd.density = 0.0f;
 	fd.isSensor = true;
-	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0001 | 0x0002/*WALL*/;
+	fd.filter.categoryBits = WHEELER;//Wheeler_Sensor, or something like that...
+	fd.filter.maskBits = GRASS;
 			
-	//Add the walls to the world
 	cart->CreateFixture(&fd);
 
-	//Adding sensors in on this beezy, we need one in the middle for the grass detection
-	//and one at each end of the wheeler to detect walls.
+	cart->SetUserData( this );
 
-
+	Wheeler *testWheeler = (Wheeler *)cart->GetUserData();
+	if (dynamic_cast<Wheeler*>(testWheeler) == NULL) {
+		int i = 0;
+	}
 }
 
-
+//Code for when we're loading Wheeler genes from a file
+//Note this code both loads the genes in the chromosome and builds the Wheeler
 void Wheeler::loadWheeler(vector<float32> genes) {
-
 	health = genes[4];
-
 	spinDirection = genes[3];//Probably should be called spinSpeed
 
     int spoke_index = 0;
     while (spoke_index < 8) {
-		//gene[6]
 
-		spokeAngles[spoke_index] = genes[spoke_index + 6];//parent.spokeAngles[spoke_index];    //randomNumber(0.05f, 1.0f);
+		spokeAngles[spoke_index] = genes[spoke_index + 6];
         totalAngleValue = totalAngleValue + spokeAngles[spoke_index];
 		
-		spokeLengths[spoke_index] = genes[spoke_index + 14];//parent.spokeLengths[spoke_index] + randomNumber(-0.3f, 0.3f);
+		spokeLengths[spoke_index] = genes[spoke_index + 14];
 		if (spokeLengths[spoke_index] < 0) {spokeLengths[spoke_index] = 0.3f;}
-		hasWheel[spoke_index] = genes[spoke_index + 22];//parent.hasWheel[spoke_index];//randomNumber(0.01f, 1.0f) < m_wheelProb ? (randomNumberInt(0, (VECTOR_NUM - 1))) : (-1);
-		axleAngle[spoke_index] = genes[spoke_index + 30];//parent.axleAngle[spoke_index] + randomNumber(-1.0f, 1.0f * b2_pi);
-		wheelRadius[spoke_index] = genes[spoke_index + 38];//parent.wheelRadius[spoke_index] + randomNumber(-0.2f, 0.2f);
+		hasWheel[spoke_index] = genes[spoke_index + 22];
+		axleAngle[spoke_index] = genes[spoke_index + 30];
+		wheelRadius[spoke_index] = genes[spoke_index + 38];
 
         spoke_index++;
     }
@@ -393,14 +346,10 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 				  //were only on later spokes --- UPDATE: It needs to run at 8 to prevent an
 				  //uninitialized pointer problem.
 	
-	//Sensing stuff
-	//
-	nearWall = false;
-	nearWallCounter = 0;
 	cart->SetUserData( this );
 
-	cart_piece_fixture.filter.categoryBits = 0x0010;
-    wheel_fixture.filter.categoryBits = 0x0010;
+	cart_piece_fixture.filter.categoryBits = WHEELER_BODY;
+    wheel_fixture.filter.categoryBits = WHEELER_BODY;
 
 	healthDownCounter = 120;
 
@@ -457,7 +406,6 @@ void Wheeler::loadWheeler(vector<float32> genes) {
         spoke_index++;
     }
 
-
     spoke_index = 0;
 	while (spoke_index < maxWheels) {
         if (hasWheel[spoke_index] >= 0) {//A wheel was generated for the gene
@@ -476,6 +424,7 @@ void Wheeler::loadWheeler(vector<float32> genes) {
             axleFixture[spoke_index] = cart->CreateFixture(&cart_piece_fixture);
             wheelOn[spoke_index] = wheelIndex;
             axle[spoke_index] = myWorld->CreateBody(&m_cart_body);
+			axle[spoke_index]->SetUserData( this );
             cartWorkingPiece.SetAsBox(0.2f, 0.05f, b2Vec2(cart_piece_edge_1_x - 0.3f * cos(wshock_angle), cart_piece_edge_1_y - 0.3f * sin(wshock_angle)), wshock_angle);
             cart_piece_fixture.density = 20;
             axle[spoke_index]->CreateFixture(&cart_piece_fixture);
@@ -493,22 +442,19 @@ void Wheeler::loadWheeler(vector<float32> genes) {
             wheel_bodyDef.allowSleep = false;
             wheel_bodyDef.type = b2_dynamicBody;
             wheel[spoke_index] = myWorld->CreateBody(&wheel_bodyDef);
+			wheel[spoke_index]->SetUserData( this );
             wheel[spoke_index]->CreateFixture(&wheel_fixture);
             wheel_motor_joint.enableMotor = true;
             wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());
             motor[spoke_index] = (b2RevoluteJoint*)myWorld->CreateJoint(&wheel_motor_joint);
 		} else {
-            //wheel_motor_joint.enableMotor = false;
-            //wheel_motor_joint.Initialize(axle[spoke_index], wheel[spoke_index], wheel[spoke_index]->GetWorldCenter());
             axle[spoke_index] = NULL;
             wheel[spoke_index] = NULL;
 			motor[spoke_index] = NULL;
-
 		}
         spoke_index++;
     }
     float32 totalMass = cart->GetMass();
-    float32 _loc_19 = b2_pi / 4;//Isn't used elsewhere, further checking is needed.
     wheelsOn = 0;
     spoke_index = 0;
     while (spoke_index < maxWheels) {
@@ -538,25 +484,22 @@ void Wheeler::loadWheeler(vector<float32> genes) {
 	fd.shape = &sensorCircle;
 	fd.density = 0.0f;
 	fd.isSensor = true;
-	fd.filter.categoryBits = 0x0004/*WHEELER*/;
-	fd.filter.maskBits = 0x0001 | 0x0002/*WALL*/;
+	fd.filter.categoryBits = WHEELER;
+	fd.filter.maskBits = GRASS;
 			
-	//Add the walls to the world
 	cart->CreateFixture(&fd);
 
 	cart->SetTransform(cart->GetPosition(), genes[2]);
+}
 
-    //cart->angle = 0;//genes[2];
 
-	//Adding sensors in on this beezy, we need one in the middle for the grass detection
-	//and one at each end of the wheeler to detect walls.
+void buildBody(vector<float32> genes, float32 x,float32 y, float32 angle, int age) {
 
 }
 
 
-void Wheeler::turnAround() 
-{
-
+//Function used to turn the Wheeler's wheel's rotation around
+void Wheeler::turnAround() {
 	int32 spoke_index = 0;
 	spinDirection = -spinDirection;
     while (spoke_index < 8) {
@@ -566,24 +509,14 @@ void Wheeler::turnAround()
 		}
         spoke_index++;
     }
-	return;
 }
 
-Wheeler::~Wheeler(void)
-
-{
+Wheeler::~Wheeler(void) {
 
 }
 
 void Wheeler::die() {
-
-
-	
 	myWorld->DestroyBody(cart);
-	//delete this;
-		//if (motor[i] != NULL) {
-		//	myWorld->DestroyJoint(motor[i]);	
-		//}
 	for (int i = 0; i < 8 ;i++) {
 		if (axle[i] != NULL) {
 			myWorld->DestroyBody(axle[i]);	
@@ -593,4 +526,3 @@ void Wheeler::die() {
 		}
 	}
 }
-

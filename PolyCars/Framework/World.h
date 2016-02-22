@@ -22,6 +22,8 @@
 #include <Box2D/Box2D.h>
 #include "Render.h"
 #include "Build\PolyCars\Wheeler.h"
+#include "Build\PolyCars\PowerHUD.h"
+
 
 #include <cstdlib>
 
@@ -52,12 +54,12 @@ inline float32 RandomFloat(float32 lo, float32 hi) {
 struct Settings {
 	Settings() :
 		viewCenter(0.0f, 20.0f),
-		//zoomLevel(3.5f),
+		zoomLevel(3.5f),
 		hz(60.0f),
 		grassSpawnRate(5),
 		velocityIterations(8),
 		positionIterations(3),
-		drawShapes(1),
+		drawShapes(1),//blah blah
 		drawJoints(0),
 		drawAABBs(0),
 		drawPairs(0),
@@ -73,11 +75,12 @@ struct Settings {
 		enableSubStepping(0),
 		pause(0),
 		singleStep(0),
-		followCreature(0)
+		followCreature(0),//mine
+		drawGenes(0)
 		{}
 
 	b2Vec2 viewCenter;
-	//float32 zoomLevel;
+	float32 zoomLevel;
 	float32 hz;
 	int grassSpawnRate;
 	int32 velocityIterations;
@@ -99,6 +102,7 @@ struct Settings {
 	int32 pause;
 	int32 singleStep;
 	int32 followCreature;
+	int32 drawGenes;
 };
 
 struct WorldEntry {
@@ -129,13 +133,32 @@ struct ContactPoint {
 	b2PointState state;
 };
 
+enum State {
+	MainMenuS = 1,
+	LiveGameS = 2
+};
+
 class World : public b2ContactListener {
 public:
 
+	//Pure virtual functions to tie the UI in with functions in the world files.
 	virtual void nextWheeler() = 0;
 	virtual void previusWheeler() = 0;
+	virtual void destroyCreature() = 0;
 	virtual void saveWorld() = 0;
 	virtual void loadWorld() = 0;
+	virtual void exportCreature() = 0;
+	virtual void importCreature() = 0;
+
+	//Powers and HUD stuff
+	_power activePower;
+	PowerHUD powerHUD;
+	//virtual void RenderUI(Settings*) = 0;
+	int hudX;
+	int hudY;
+
+	int top, left, bottom, right;
+
 
 	Wheeler* activeWheeler;
 
