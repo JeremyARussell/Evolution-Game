@@ -28,8 +28,8 @@
 #include <cstring>
 using namespace std;
 
-#include "SandboxWorld.h"
-#include "Universes\Abiogenesis_Universe.h"
+#include "Universes/SandboxWorld.h"
+#include "Universes/Abiogenesis_Universe.h"
 
 WorldEntry g_worldEntries[] =
 {	

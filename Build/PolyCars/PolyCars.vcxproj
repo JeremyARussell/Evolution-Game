@@ -141,7 +141,7 @@
     <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
     <ClInclude Include="..\..\PolyCars\Framework\Universes\Abiogenesis_Universe.h" />
     <ClInclude Include="..\..\PolyCars\Framework\World.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h" />
+    <ClInclude Include="..\..\PolyCars\Framework\Universes\SandboxWorld.h" />
     <ClInclude Include="collision_enums.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />
