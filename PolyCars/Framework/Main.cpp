@@ -18,8 +18,7 @@
 
 #include "Render.h"
 #include "World.h"
-#include "Build\PolyCars\MainMenu.h"
-#include "Build\PolyCars\LiveGame.h"
+#include "Build/PolyCars/MainMenu.h"
 #include "glui/glui.h"
 
 #include <cstdio>
@@ -53,7 +52,6 @@ namespace {
 	State state;
 
 	MainMenu mainMenu;
-	LiveGame liveGame;
 }
 
 static void Resize(int32 w, int32 h) {

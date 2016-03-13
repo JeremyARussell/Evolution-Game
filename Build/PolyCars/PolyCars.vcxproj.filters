@@ -28,13 +28,7 @@
     <ClCompile Include="PowerHUD.cpp">
       <Filter>Game\Interface</Filter>
     </ClCompile>
-    <ClCompile Include="Button.cpp">
-      <Filter>Game\Interface</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
-      <Filter>Game\GameStates</Filter>
-    </ClCompile>
-    <ClCompile Include="LiveGame.cpp">
       <Filter>Game\GameStates</Filter>
     </ClCompile>
     <ClCompile Include="Wall.cpp">
@@ -66,13 +60,7 @@
     <ClInclude Include="PowerHUD.h">
       <Filter>Game\Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>Game\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="MainMenu.h">
-      <Filter>Game\GameStates</Filter>
-    </ClInclude>
-    <ClInclude Include="LiveGame.h">
       <Filter>Game\GameStates</Filter>
     </ClInclude>
     <ClInclude Include="..\..\PolyCars\Framework\SandboxWorld.h">
