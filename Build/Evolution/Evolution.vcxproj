@@ -16,7 +16,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{10FEDA15-700A-4A45-9B89-43E47499A221}</ProjectGuid>
-    <RootNamespace>PolyCars</RootNamespace>
+    <RootNamespace>Evolution</RootNamespace>
     <ProjectName>Evolution</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -124,10 +124,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\PolyCars\Framework\Main.cpp" />
-    <ClCompile Include="..\..\PolyCars\Framework\Render.cpp" />
-    <ClCompile Include="..\..\PolyCars\Framework\World.cpp" />
-    <ClCompile Include="..\..\PolyCars\Framework\GameWorlds.cpp" />
+    <ClCompile Include="..\..\Evolution\Framework\Main.cpp" />
+    <ClCompile Include="..\..\Evolution\Framework\Render.cpp" />
+    <ClCompile Include="..\..\Evolution\Framework\World.cpp" />
+    <ClCompile Include="..\..\Evolution\Framework\GameWorlds.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="GrassSpawner.cpp" />
     <ClCompile Include="Ground.cpp" />
@@ -138,10 +138,10 @@
     <ClCompile Include="Wheeler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PolyCars\Framework\Render.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\Universes\Abiogenesis_Universe.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\World.h" />
-    <ClInclude Include="..\..\PolyCars\Framework\Universes\SandboxWorld.h" />
+    <ClInclude Include="..\..\Evolution\Framework\Render.h" />
+    <ClInclude Include="..\..\Evolution\Framework\Universes\Abiogenesis_Universe.h" />
+    <ClInclude Include="..\..\Evolution\Framework\World.h" />
+    <ClInclude Include="..\..\Evolution\Framework\Universes\SandboxWorld.h" />
     <ClInclude Include="collision_enums.h" />
     <ClInclude Include="Grass.h" />
     <ClInclude Include="GrassSpawner.h" />

@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\PolyCars\Framework\Main.cpp">
+    <ClCompile Include="..\..\Evolution\Framework\Main.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\PolyCars\Framework\Render.cpp">
+    <ClCompile Include="..\..\Evolution\Framework\Render.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\PolyCars\Framework\World.cpp">
+    <ClCompile Include="..\..\Evolution\Framework\World.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="Wheeler.cpp">
@@ -16,7 +16,7 @@
     <ClCompile Include="Grass.cpp">
       <Filter>Game\Creatures</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\PolyCars\Framework\GameWorlds.cpp">
+    <ClCompile Include="..\..\Evolution\Framework\GameWorlds.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
     <ClCompile Include="Seed.cpp">
@@ -39,10 +39,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PolyCars\Framework\Render.h">
+    <ClInclude Include="..\..\Evolution\Framework\Render.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\PolyCars\Framework\World.h">
+    <ClInclude Include="..\..\Evolution\Framework\World.h">
       <Filter>Framework</Filter>
     </ClInclude>
     <ClInclude Include="Wheeler.h">
@@ -72,10 +72,10 @@
     <ClInclude Include="Ground.h">
       <Filter>Game\Items</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\PolyCars\Framework\Universes\Abiogenesis_Universe.h">
+    <ClInclude Include="..\..\Evolution\Framework\Universes\Abiogenesis_Universe.h">
       <Filter>Game\Worlds</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\PolyCars\Framework\Universes\SandboxWorld.h">
+    <ClInclude Include="..\..\Evolution\Framework\Universes\SandboxWorld.h">
       <Filter>Game\Worlds</Filter>
     </ClInclude>
   </ItemGroup>
