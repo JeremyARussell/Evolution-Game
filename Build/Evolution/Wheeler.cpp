@@ -85,7 +85,7 @@ void Wheeler::generateFreshChromosome() {
 
 //Code to generate genes based off of parent, with mutation
 void Wheeler::generateChildChromosome(Wheeler parent) {
-	health = 50;
+	health = parent.health;
 
 	spinDirection = parent.spinDirection;//Probably should be called spinSpeed
 

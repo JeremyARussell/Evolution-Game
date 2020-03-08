@@ -62,10 +62,10 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 void Grass::prep() {//Later 0'd out and then a randomizer function will be born... maybe
 	second = 0;
-	maxEn = 20.0f;
+	maxEn = 40.0f;
 	en = 1;
-	growthPoint = 5.0f;
-	maxHp = 10.0f;
+	growthPoint = 0.0f;
+	maxHp = 15.0f;
 	hp = 1;
 	seeding = false;
 	beingEaten = false;
@@ -80,9 +80,9 @@ void Grass::step() {
 	if (second < 120) {
 		second++;
 	} else {//Two seconds went by
+		grow(hp);
 
 		if (en > (int)growthPoint && hp != (int)maxHp && !crowded) {
-			grow(hp);
 			hp++;
 		}
 
@@ -144,17 +144,35 @@ void Grass::grow(int) {
 
 }
 
-int Grass::bitten(int) {
+int Grass::bitten(int x) {
 	//Take hp to remove
 
 	//return how much was given, not always the hp removed if the grass's hp was less than 
 	//what was removed.
 
+	int amountBitten = 0;
 
+	
 
-	///Eruekeka alsk nalkdjchnzsldkjhvbs kj
-	///If the grass returns less HP than the Wheeler bit, it's added to the dead list. :)
-	return 1;
+	if (hp >= x) {
+		hp = hp - x;
+		amountBitten = x;
+	}
+	else {
+		amountBitten = hp;
+		hp = 0;
+	}
+
+	fresh = true;
+
+	if (hp < 3)
+	{
+		en = 0;
+	}
+
+	//grow(hp);
+	//If the grass returns less HP than the Wheeler bit, it's added to the dead list. :)
+	return amountBitten;
 }
 
 void Grass::seed() {
@@ -167,8 +185,11 @@ void Grass::seed() {
 }
 
 void Grass::die() {
-	myWorld->DestroyBody(stalk);
-	myWorld->DestroyBody(stalkSensor);
+	//myWorld->DestroyBody(stalk);
+	//myWorld->DestroyBody(stalkSensor);
+	en = en = 1;
+	hp = hp = 1;
+	grow(hp);
 }
 
 Grass::~Grass(void) {

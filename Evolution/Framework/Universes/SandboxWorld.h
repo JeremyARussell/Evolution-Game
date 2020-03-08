@@ -29,11 +29,14 @@ class WheelerContactListener : public b2ContactListener {
 			Grass* activeGrass = (Grass *)fixtureA->GetBody()->GetUserData();
 			Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
 
-			if (activeWheeler->health < 30) {
+			if (activeWheeler->health < 50) {
 				if (activeGrass->fresh)	return;
-				activeGrass->beingEaten = true;
-				activeWheeler->needsToReproduce = true;
-				activeWheeler->health = 50;
+				//activeGrass->beingEaten = true;
+				int tempHealth = activeWheeler->health;
+				activeWheeler->health = tempHealth + (activeGrass->bitten(10) * 2);
+				if (activeWheeler->health > 49) {
+					activeWheeler->needsToReproduce = true;
+				}
 			}
 		}		
 		//When a SEED touches the GROUND
@@ -811,9 +814,11 @@ public:
 			}
 
 			if (grasses[i]->beingEaten) {
-				Grass *dying = grasses[i];
-				grassToDelete.push_back(*dying);
-				grasses.erase( std::find(grasses.begin(), grasses.end(), dying ) );
+				//Grass *dying = grasses[i];
+				//grassToDelete.push_back(*dying);
+				//grasses[i]->beingEaten = false;
+				//grasses[i]->bitten(5);
+				//grasses.erase( std::find(grasses.begin(), grasses.end(), dying ) );
 			}
 		}
 
@@ -892,7 +897,7 @@ public:
 			groundToDelete[i].destroy();
 		}
 		for (int i = 0; i < grassToDelete.size(); i ++) {
-			grassToDelete[i].die();
+			//grassToDelete[i].die();
 		}		
 		for (int i = 0; i < grassSpawnersToDelete.size(); i ++) {
 			grassSpawnersToDelete[i].destroy();
