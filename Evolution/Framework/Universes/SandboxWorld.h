@@ -29,11 +29,14 @@ class WheelerContactListener : public b2ContactListener {
 			Grass* activeGrass = (Grass *)fixtureA->GetBody()->GetUserData();
 			Wheeler* activeWheeler = (Wheeler *)fixtureB->GetBody()->GetUserData();
 
-			if (activeWheeler->health < 30) {
+			if (activeWheeler->health < 50) {
 				if (activeGrass->fresh)	return;
-				activeGrass->beingEaten = true;
-				activeWheeler->needsToReproduce = true;
-				activeWheeler->health = 50;
+				//activeGrass->beingEaten = true;
+				int tempHealth = activeWheeler->health;
+				activeWheeler->health = tempHealth + (activeGrass->bitten(10) * 2);
+				if (activeWheeler->health > 49) {
+					activeWheeler->needsToReproduce = true;
+				}
 			}
 		}		
 		//When a SEED touches the GROUND
@@ -131,11 +134,11 @@ public:
 			saveFile << "grassSpawnerPos" << ' ' << grassSpawners[i]->spx << ' ' << grassSpawners[i]->spy << endl;
 		}
 
-		//For each grass - Save the grass position
+		//For each grass - Save the grass position and HP
 		for (int i = 0; i < grasses.size(); i ++) {
 			b2Vec2 grassPosition = grasses[i]->stalk->GetPosition();
-			saveFile << "grassPos" << ' ' << grassPosition.x << ' ' << grassPosition.y << endl;
-			//TODO - BUG
+			saveFile << "grassPos" << ' ' << grassPosition.x << ' ' << (grassPosition.y - (0.2f * grasses[i]->HP())) << endl;
+			saveFile << "grassHP" << ' ' << grasses[i]->HP() << ' ' << 0/*Placeholder since the data is written to come in sets, will probably switch to HP and MaxHP or something like that.*/ << endl;
 		}
 
 		//For each Wheeler ----- Save the wheeler stuff
@@ -190,6 +193,11 @@ public:
 		vector<float32> genes;
 		bool readyToWheel = false;
 
+		//Grass Loading
+		float32 grassY, grassX;
+		int grassHP;
+		bool readyToSprout = false;
+
 		while (loadFile >> loadType >> var1 >> var2 ) {
 			//Load the Walls
 			if (loadType == "wallPosA") { 
@@ -230,7 +238,18 @@ public:
 
 			//Load the grass
 			if (loadType == "grassPos") {
-				grasses.push_back(new Grass(m_world, var1, var2 ));
+				grassX = var1;
+				grassY = var2;
+			}
+			if (loadType == "grassHP") {
+				grassHP = var1;
+				readyToSprout = true;
+			}
+			if (readyToSprout) {
+				grasses.push_back(new Grass(m_world, grassX, grassY, grassHP));
+				grassHP = 1;
+				grassX, grassY = 0;
+				readyToSprout = false;
 			}
 
 			//Load the Wheelers
@@ -270,6 +289,9 @@ public:
 			}
 		}
 		loadFile.close();
+		for (int i = 0; i < grasses.size(); i++) {
+			grasses[i]->grow(0);
+		}
 	}
 
 	void exportCreature() {
@@ -786,7 +808,7 @@ public:
 					float32 yt2 = dying->seed->GetPosition().y;
 					seedsToDelete.push_back(*dying);
 					seeds.erase( std::find(seeds.begin(), seeds.end(), dying ) );
-					grasses.push_back(new Grass(m_world, xt2,  yt2));
+					grasses.push_back(new Grass(m_world, xt2,  yt2, 1));
 				}
 			}
 		}
@@ -811,9 +833,11 @@ public:
 			}
 
 			if (grasses[i]->beingEaten) {
-				Grass *dying = grasses[i];
-				grassToDelete.push_back(*dying);
-				grasses.erase( std::find(grasses.begin(), grasses.end(), dying ) );
+				//Grass *dying = grasses[i];
+				//grassToDelete.push_back(*dying);
+				//grasses[i]->beingEaten = false;
+				//grasses[i]->bitten(5);
+				//grasses.erase( std::find(grasses.begin(), grasses.end(), dying ) );
 			}
 		}
 
@@ -892,7 +916,7 @@ public:
 			groundToDelete[i].destroy();
 		}
 		for (int i = 0; i < grassToDelete.size(); i ++) {
-			grassToDelete[i].die();
+			//grassToDelete[i].die();
 		}		
 		for (int i = 0; i < grassSpawnersToDelete.size(); i ++) {
 			grassSpawnersToDelete[i].destroy();

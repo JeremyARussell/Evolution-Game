@@ -15,6 +15,7 @@ public:
 	void step();
 	void grow(int);
 	int bitten(int);
+	int HP();
 
 	b2Body* stalk;
 	b2Body* stalkSensor;
@@ -25,7 +26,7 @@ public:
 	bool crowded;
 	bool fresh;
 
-	Grass(b2World *m_world, float32 x,float32 y);
+	Grass(b2World *m_world, float32 x,float32 y, int hp);
 	void die();
 	~Grass(void);
 
@@ -36,7 +37,7 @@ protected:
         return retNum;
     }
 
-	void prep();
+	void prep(int);
 	void seed();
 
 	//Grass class function variables
