@@ -3,8 +3,8 @@
 
 //Use collision of seeds to find the ground anchor point to grow the new grass.
 
-Grass::Grass(b2World *m_world, float32 x,float32 y) {
-	prep();
+Grass::Grass(b2World *m_world, float32 x,float32 y, int hp) {
+	prep(hp);
 
 	myWorld = m_world;
 
@@ -60,13 +60,13 @@ Grass::Grass(b2World *m_world, float32 x,float32 y) {
 
 }
 
-void Grass::prep() {//Later 0'd out and then a randomizer function will be born... maybe
+void Grass::prep(int _hp) {//Later 0'd out and then a randomizer function will be born... maybe
 	second = 0;
 	maxEn = 40.0f;
 	en = 1;
 	growthPoint = 0.0f;
 	maxHp = 15.0f;
-	hp = 1;
+	hp = _hp;
 	seeding = false;
 	beingEaten = false;
 	crowded = false;
@@ -173,6 +173,10 @@ int Grass::bitten(int x) {
 	//grow(hp);
 	//If the grass returns less HP than the Wheeler bit, it's added to the dead list. :)
 	return amountBitten;
+}
+
+int Grass::HP() {
+	return hp;
 }
 
 void Grass::seed() {
