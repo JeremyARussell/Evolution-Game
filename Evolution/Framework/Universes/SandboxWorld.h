@@ -34,9 +34,6 @@ class WheelerContactListener : public b2ContactListener {
 				//activeGrass->beingEaten = true;
 				int tempHealth = activeWheeler->health;
 				activeWheeler->health = tempHealth + (activeGrass->bitten(10) * 2);
-				if (activeWheeler->health > 49) {
-					activeWheeler->needsToReproduce = true;
-				}
 			}
 		}		
 		//When a SEED touches the GROUND
@@ -780,7 +777,7 @@ public:
 			trackwsp += 15;
 			m_debugDraw.DrawString(15, trackwsp, "= #8    - %06.3f  / %06.3f =", activeWheeler->hasWheel[7], activeWheeler->wheelRadius[7]);
 			trackwsp += 15;
-
+			m_debugDraw.DrawString(15, trackwsp, "Reproduction Counter : %d / %d", activeWheeler->reproductionCounter, 1500);
 		}
 
 		for (int i = 0; i < grassSpawners.size(); i ++) {
@@ -847,7 +844,14 @@ public:
 			wheelers[i]->render();
 			
 			//REPRODUCING STUFF
-			if (!settings->pause) { wheelers[i]->reproductionCounter++; }
+			if (!settings->pause) { 
+				
+				if (wheelers[i]->health > 40) wheelers[i]->reproductionCounter++; 
+				if (wheelers[i]->health < 20 && wheelers[i]->reproductionCounter > 0) wheelers[i]->reproductionCounter--;
+				if (wheelers[i]->reproductionCounter > 1500) {//TODO - All these could be Genes
+					wheelers[i]->needsToReproduce = true;
+				}
+			}
 			if (wheelers[i]->needsToReproduce) {
 				wheelers[i]->reproductionCounter = 0;
 				wheelers[i]->needsToReproduce = false;

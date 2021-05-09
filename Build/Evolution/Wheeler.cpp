@@ -85,7 +85,7 @@ void Wheeler::generateFreshChromosome() {
 
 //Code to generate genes based off of parent, with mutation
 void Wheeler::generateChildChromosome(Wheeler parent) {
-	health = parent.health;
+	health = parent.health - 20;
 
 	spinDirection = parent.spinDirection;//Probably should be called spinSpeed
 
@@ -148,7 +148,7 @@ void Wheeler::buildWheeler(float32 x,float32 y) {
 				  //uninitialized pointer problem.
 
 	cart_piece_fixture.filter.categoryBits = WHEELER_BODY;
-    wheel_fixture.filter.categoryBits = WHEELER_BODY;//TODO - change to something Wheeler specific, like Wheeler_Body or something.
+    wheel_fixture.filter.categoryBits = WHEELER_BODY;
 
 	healthDownCounter = 120;
 
