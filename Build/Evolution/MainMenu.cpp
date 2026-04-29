@@ -93,10 +93,7 @@ void MainMenu::render() {
 	char buffer[128];
 
 	const char *string = "Sandbox Mode";
-	va_list arg;
-	va_start(arg, string);
-	vsprintf_s(buffer, string, arg);
-	va_end(arg);
+	strcpy_s(buffer, string);
 
 	glColor3f(
 		shrb + (((shra - shrb) * (sbFramesIntoHighlight * 0.033333333f))), 
