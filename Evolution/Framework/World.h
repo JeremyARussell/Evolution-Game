@@ -174,6 +174,7 @@ public:
 	void ShiftMouseDown(const b2Vec2& p);
 	virtual void MouseDown(const b2Vec2& p);
 	virtual void MouseUp(const b2Vec2& p);
+	virtual void RightMouseDown(const b2Vec2& p) { B2_NOT_USED(p); }
 	void MouseMove(const b2Vec2& p);
 	
 	// Let derived worlds know that a joint was destroyed.

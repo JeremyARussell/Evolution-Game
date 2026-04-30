@@ -476,6 +476,12 @@ public:
         }
     }
 
+    // Right-click always erases the cell under the cursor in build mode.
+    void RightMouseDown(const b2Vec2& p) {
+        if (m_mode == BM_BUILDING)
+            removeCell(gRound(p.x), gRound(p.y));
+    }
+
     void MouseUp(const b2Vec2& p) {
         World::MouseUp(p);
     }
@@ -532,8 +538,8 @@ public:
                 typeName, m_eraseMode ? "  [X] ERASE" : "");
             m_textLine += 15;
             m_debugDraw.DrawString(10, m_textLine,
-                "[G] Start simulation   [C] Clear   Cells: %d  Joints: %d",
-                (int)m_cells.size(), (int)m_joints.size());
+                "[G] Start simulation   [C] Clear   [X] Erase toggle   Right-click: erase cell   Cells: %d",
+                (int)m_cells.size());
             m_textLine += 15;
         } else {
             m_debugDraw.DrawString(10, m_textLine,

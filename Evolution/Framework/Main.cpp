@@ -287,6 +287,7 @@ static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 		if (stateM == GLUT_DOWN) {	
 			lastp = ConvertScreenToWorld(x, y);
 			rMouseDown = true;
+			world->RightMouseDown(lastp);
 		}
 
 		if (stateM == GLUT_UP) {
