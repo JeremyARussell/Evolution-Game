@@ -174,6 +174,7 @@ static void Keyboard(unsigned char key, int x, int y) {
 
 	switch (key) {
 	case ' ':
+		if (world) world->Keyboard(key);
 		break;
 	case 27://ESC key pauses
 //#ifndef __APPLE__

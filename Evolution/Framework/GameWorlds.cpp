@@ -30,10 +30,12 @@ using namespace std;
 
 #include "Universes/SandboxWorld.h"
 #include "Universes/Abiogenesis_Universe.h"
+#include "Universes/CellsAndBodies.h"
 
 WorldEntry g_worldEntries[] =
 {	
-	{"Sandbox World", SandboxWorld::Create },
-	{"Abiogenesis", Abiogenesis::Create },
+	{"Sandbox World",  SandboxWorld::Create  },
+	{"Abiogenesis",    Abiogenesis::Create   },
+	{"Cells & Bodies", CellsAndBodies::Create},
 	{NULL, NULL}
 };

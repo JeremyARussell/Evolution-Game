@@ -22,6 +22,11 @@ MainMenu::MainMenu() {
 	m_abioBtn = { {0,0,0,0}, 0, false,
 		0.06f, 0.50f, 0.44f,   // base
 		0.30f, 0.90f, 0.78f }; // highlight
+
+	// Cells & Bodies button — purple-ish
+	m_cellsBtn = { {0,0,0,0}, 0, false,
+		0.38f, 0.18f, 0.62f,   // base
+		0.65f, 0.40f, 1.00f }; // highlight
 }
 
 MainMenu::~MainMenu() {
@@ -182,23 +187,26 @@ void MainMenu::renderWorldSelect() {
 	for (const char *c = title; *c; ++c)
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
 
-	// Layout: two buttons side-by-side, centred
-	const int BW = 200, BH = 50, GAP = 30;
-	int totalW = BW * 2 + GAP;
+	// Layout: three buttons side-by-side, centred
+	const int BW = 170, BH = 50, GAP = 20;
+	int totalW = BW * 3 + GAP * 2;
 	int startX = (w - totalW) / 2;
 	int btnY    = (h / 2);
 
 	// Add +50 to Y to match the GL-coordinate convention used by the main menu
 	// button: GL_Y = screen_pixel_Y + GLUI_viewport_offset (~50px).
 	int glBtnY = btnY + 50;
-	m_wheelerBtn.rect = { startX,           glBtnY, startX + BW,        glBtnY + BH };
-	m_abioBtn.rect    = { startX + BW + GAP, glBtnY, startX + BW*2 + GAP, glBtnY + BH };
+	m_wheelerBtn.rect = { startX,                 glBtnY, startX + BW,           glBtnY + BH };
+	m_abioBtn.rect    = { startX + BW + GAP,       glBtnY, startX + BW*2 + GAP,   glBtnY + BH };
+	m_cellsBtn.rect   = { startX + BW*2 + GAP*2,  glBtnY, startX + BW*3 + GAP*2, glBtnY + BH };
 
 	updateSelectButton(m_wheelerBtn);
 	updateSelectButton(m_abioBtn);
+	updateSelectButton(m_cellsBtn);
 
-	drawSelectButton(m_wheelerBtn, "Wheeler's Universe", w, h);
+	drawSelectButton(m_wheelerBtn, "Wheeler's Universe",  w, h);
 	drawSelectButton(m_abioBtn,    "Abiogenesis Universe", w, h);
+	drawSelectButton(m_cellsBtn,   "Cells & Bodies",       w, h);
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -229,6 +237,9 @@ void MainMenu::MouseDown(int32 button, int32 stateM, int32 x, int32 y,
 		} else if (hitTestRect(m_abioBtn.rect, x, y)) {
 			worldSelection = 1;   // Abiogenesis
 			state = LiveGameS;
+		} else if (hitTestRect(m_cellsBtn.rect, x, y)) {
+			worldSelection = 2;   // Cells & Bodies
+			state = LiveGameS;
 		}
 	}
 }
@@ -246,6 +257,7 @@ void MainMenu::MouseMotion(int32 x, int32 y, State state) {
 	if (state == WorldSelectS) {
 		m_wheelerBtn.hilighted = hitTestRect(m_wheelerBtn.rect, x, y);
 		m_abioBtn.hilighted    = hitTestRect(m_abioBtn.rect, x, y);
+		m_cellsBtn.hilighted   = hitTestRect(m_cellsBtn.rect, x, y);
 	}
 }
 

@@ -41,6 +41,7 @@ private:
 
 	SelectButton m_wheelerBtn;
 	SelectButton m_abioBtn;
+	SelectButton m_cellsBtn;
 
 	void updateSelectButton(SelectButton &btn);
 	void drawSelectButton(SelectButton &btn, const char *label, int w, int h);
