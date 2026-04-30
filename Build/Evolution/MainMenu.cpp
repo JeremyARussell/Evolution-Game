@@ -13,12 +13,74 @@ MainMenu::MainMenu() {
 
 	sbFramesIntoHighlight = 0;
 
+	// Wheeler button — blue-ish
+	m_wheelerBtn = { {0,0,0,0}, 0, false,
+		0.18f, 0.36f, 0.78f,   // base
+		0.50f, 0.72f, 1.00f }; // highlight
+
+	// Abiogenesis button — teal-ish
+	m_abioBtn = { {0,0,0,0}, 0, false,
+		0.06f, 0.50f, 0.44f,   // base
+		0.30f, 0.90f, 0.78f }; // highlight
 }
 
 MainMenu::~MainMenu() {
 
 }
 
+// ---------------------------------------------------------------------------
+//  Helper: advance highlight frame counter for one button
+// ---------------------------------------------------------------------------
+void MainMenu::updateSelectButton(SelectButton &btn) {
+	if (btn.hilighted) {
+		if (btn.framesHighlight < 30) btn.framesHighlight++;
+	} else {
+		if (btn.framesHighlight > 0) btn.framesHighlight--;
+	}
+}
+
+// ---------------------------------------------------------------------------
+//  Helper: draw one world-select button with animated colour + label
+// ---------------------------------------------------------------------------
+void MainMenu::drawSelectButton(SelectButton &btn, const char *label, int w, int h) {
+	float32 t = btn.framesHighlight * 0.033333333f;
+
+	glColor3f(
+		btn.ra + (btn.rh - btn.ra) * t,
+		btn.ga + (btn.gh - btn.ga) * t,
+		btn.ba + (btn.bh - btn.ba) * t);
+
+	glBegin(GL_POLYGON);
+	glVertex2f((float32)btn.rect.left,  (float32)btn.rect.bottom);
+	glVertex2f((float32)btn.rect.right, (float32)btn.rect.bottom);
+	glVertex2f((float32)btn.rect.right, (float32)btn.rect.top);
+	glVertex2f((float32)btn.rect.left,  (float32)btn.rect.top);
+	glEnd();
+
+	// Label (white text)
+	glColor3f(1.0f, 1.0f, 1.0f);
+	// Centre the text roughly inside the button
+	int lx = btn.rect.left + 14;
+	int ly = (btn.rect.top + btn.rect.bottom) / 2 + 8;
+	glRasterPos2i(lx, ly);
+	for (const char *c = label; *c; ++c)
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+}
+
+// ---------------------------------------------------------------------------
+//  Helper: point-in-RECT test
+//
+//  The GLUI subwindow at the bottom shifts the GL viewport up by ~50px, so
+//  GL coordinate Y = screen_pixel_Y + 50.  We apply the same -50 correction
+//  the original sandbox button hit test uses to convert back to screen pixels.
+// ---------------------------------------------------------------------------
+bool MainMenu::hitTestRect(const RECT &r, int32 x, int32 y) {
+	return x > r.left && x < r.right && y > r.top - 50 && y < r.bottom - 50;
+}
+
+// ---------------------------------------------------------------------------
+//  render() — main menu screen (single "Sandbox World" button)
+// ---------------------------------------------------------------------------
 void MainMenu::render() {
 
 	glMatrixMode(GL_PROJECTION);
@@ -44,16 +106,13 @@ void MainMenu::render() {
 	}
 
 	glEnable(GL_TEXTURE_2D);
-	//
-		//Instructions for building the sandbox mode button out of the rectangle
 
-	smbRect.left = (w / 2) - 100;
-	smbRect.top = (h / 2) + 25 + 50;
-	smbRect.right = (w / 2) + 100;
+	smbRect.left   = (w / 2) - 100;
+	smbRect.top    = (h / 2) + 25 + 50;
+	smbRect.right  = (w / 2) + 100;
 	smbRect.bottom = (h / 2) - 25 + 50;
 
 	if (sandboxBt == false) {
-
 		glGenTextures(1, &sandboxButtonTex);
 		sandboxButtonTex = SOIL_load_OGL_texture("images\\White_Texture.tex",
 			SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_NTSC_SAFE_RGB );
@@ -63,41 +122,27 @@ void MainMenu::render() {
 	glBindTexture(GL_TEXTURE_2D, sandboxButtonTex);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	//if(sbFramesIntoHighlight == 30) {
-	//	int debuggte = 993939;
-	//}
-
-	//glBegin(GL_POLYGON);
-	//glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(smbRect.left + 300 + 70, smbRect.bottom);
-	//glTexCoord2f(1.0, 1.0);/*Right Bottom*/	glVertex2f(smbRect.right + 30, smbRect.bottom);	
-	//glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(smbRect.right + 30, smbRect.top + sbFramesIntoHighlight);
-	//glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(smbRect.left + 300 + 70, smbRect.top + sbFramesIntoHighlight);
-	//glEnd();								
-
 	glColor3f(
-		srb	+    (((sra - srb) * (sbFramesIntoHighlight * 0.033333333f)) )	, 
-		sgb	+    (((sga - sgb) * (sbFramesIntoHighlight * 0.033333333f)) )	, 
-		sbb	+    (((sba - sbb) * (sbFramesIntoHighlight * 0.033333333f)) )	);
+		srb + (((sra - srb) * (sbFramesIntoHighlight * 0.033333333f))),
+		sgb + (((sga - sgb) * (sbFramesIntoHighlight * 0.033333333f))),
+		sbb + (((sba - sbb) * (sbFramesIntoHighlight * 0.033333333f))));
 
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0);/*Left Bottom*/	glVertex2f(smbRect.left, smbRect.bottom);
-	glTexCoord2f(1.0, 1.0);/*Right Bottom*/	glVertex2f(smbRect.right, smbRect.bottom);	
-	glTexCoord2f(1.0, 0.0);/*Right Top*/	glVertex2f(smbRect.right, smbRect.top);
-	glTexCoord2f(0.0, 0.0);/*Left Top*/		glVertex2f(smbRect.left, smbRect.top);
-	glEnd();								
+	glTexCoord2f(0.0, 1.0); glVertex2f((float32)smbRect.left,  (float32)smbRect.bottom);
+	glTexCoord2f(1.0, 1.0); glVertex2f((float32)smbRect.right, (float32)smbRect.bottom);
+	glTexCoord2f(1.0, 0.0); glVertex2f((float32)smbRect.right, (float32)smbRect.top);
+	glTexCoord2f(0.0, 0.0); glVertex2f((float32)smbRect.left,  (float32)smbRect.top);
+	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 
-
-	// TExt
+	// Label
 	char buffer[128];
-
-	const char *string = "Sandbox Mode";
-	strcpy_s(buffer, string);
+	strcpy_s(buffer, "Sandbox Mode");
 
 	glColor3f(
-		shrb + (((shra - shrb) * (sbFramesIntoHighlight * 0.033333333f))), 
-		shgb + (((shga - shgb) * (sbFramesIntoHighlight * 0.033333333f))), 
+		shrb + (((shra - shrb) * (sbFramesIntoHighlight * 0.033333333f))),
+		shgb + (((shga - shgb) * (sbFramesIntoHighlight * 0.033333333f))),
 		shbb + (((shba - shbb) * (sbFramesIntoHighlight * 0.033333333f))));
 
 	int x = (w / 2) - 72;
@@ -114,28 +159,93 @@ void MainMenu::render() {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void MainMenu::MouseDown(int32 button, int32 stateM, int32 x, int32 y, State &state) {
-	if(button == GLUT_LEFT_BUTTON) {
-		if (	
-		x > smbRect.left &&
-		x < smbRect.right &&
-		y < smbRect.top - 50 &&
-		y > smbRect.bottom - 50
-	) {
+// ---------------------------------------------------------------------------
+//  renderWorldSelect() — sub-menu: choose which universe
+// ---------------------------------------------------------------------------
+void MainMenu::renderWorldSelect() {
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	int h = glutGet(GLUT_WINDOW_HEIGHT);
+	gluOrtho2D(0, w, h, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Title
+	glColor3f(0.9f, 0.9f, 0.9f);
+	int tx = (w / 2) - 90;
+	int ty = (h / 2) - 60;
+	glRasterPos2i(tx, ty);
+	const char *title = "Choose a Universe";
+	for (const char *c = title; *c; ++c)
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+
+	// Layout: two buttons side-by-side, centred
+	const int BW = 200, BH = 50, GAP = 30;
+	int totalW = BW * 2 + GAP;
+	int startX = (w - totalW) / 2;
+	int btnY    = (h / 2);
+
+	// Add +50 to Y to match the GL-coordinate convention used by the main menu
+	// button: GL_Y = screen_pixel_Y + GLUI_viewport_offset (~50px).
+	int glBtnY = btnY + 50;
+	m_wheelerBtn.rect = { startX,           glBtnY, startX + BW,        glBtnY + BH };
+	m_abioBtn.rect    = { startX + BW + GAP, glBtnY, startX + BW*2 + GAP, glBtnY + BH };
+
+	updateSelectButton(m_wheelerBtn);
+	updateSelectButton(m_abioBtn);
+
+	drawSelectButton(m_wheelerBtn, "Wheeler's Universe", w, h);
+	drawSelectButton(m_abioBtn,    "Abiogenesis Universe", w, h);
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
+// ---------------------------------------------------------------------------
+//  MouseDown — handles both main-menu and world-select states
+// ---------------------------------------------------------------------------
+void MainMenu::MouseDown(int32 button, int32 stateM, int32 x, int32 y,
+	                     State &state, int32 &worldSelection) {
+	if (button != GLUT_LEFT_BUTTON) return;
+
+	if (state == MainMenuS) {
+		// Hit-test sandbox button (same Y-offset as before)
+		if (x > smbRect.left  && x < smbRect.right &&
+		    y < smbRect.top - 50 && y > smbRect.bottom - 50) {
+			state = WorldSelectS;
+		}
+		return;
+	}
+
+	if (state == WorldSelectS) {
+		if (hitTestRect(m_wheelerBtn.rect, x, y)) {
+			worldSelection = 0;   // SandboxWorld (Wheeler)
+			state = LiveGameS;
+		} else if (hitTestRect(m_abioBtn.rect, x, y)) {
+			worldSelection = 1;   // Abiogenesis
 			state = LiveGameS;
 		}
 	}
 }
 
-void MainMenu::MouseMotion(int32 x, int32 y) {
-	if(	
-		x > smbRect.left &&
-		x < smbRect.right &&
-		y < smbRect.top - 50 &&
-		y > smbRect.bottom - 50
-	) {
-		sbHilighted = true;
-	} else {
-		sbHilighted = false;
+// ---------------------------------------------------------------------------
+//  MouseMotion — hover highlighting, works in both menu states
+// ---------------------------------------------------------------------------
+void MainMenu::MouseMotion(int32 x, int32 y, State state) {
+	if (state == MainMenuS) {
+		sbHilighted = (x > smbRect.left  && x < smbRect.right &&
+		               y < smbRect.top - 50 && y > smbRect.bottom - 50);
+		return;
+	}
+
+	if (state == WorldSelectS) {
+		m_wheelerBtn.hilighted = hitTestRect(m_wheelerBtn.rect, x, y);
+		m_abioBtn.hilighted    = hitTestRect(m_abioBtn.rect, x, y);
 	}
 }
+

@@ -30,7 +30,7 @@ void DestructionListener::SayGoodbye(b2Joint* joint) {
 
 World::World() {
 	b2Vec2 gravity;
-	gravity.Set(0.0f, -10.0f);
+	gravity.Set(0.0f, -0.1f);//TODO - Make this adjustable so people can try out low gravity environments. Make it so that it saves when you save your file to.
 	m_world = new b2World(gravity);
 	m_textLine = 30;
 	m_mouseJoint = NULL;

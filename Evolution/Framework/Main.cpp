@@ -106,12 +106,15 @@ static void SimulationLoop() {
 	glLoadIdentity();
 
 	//Main Menu Stuff
-	if(state == MainMenuS) {
+	if (state == MainMenuS || state == WorldSelectS) {
 		if (!gluiHidden) {
 			glui->hide();
 			gluiHidden = true;
 		}
-		mainMenu.render();
+		if (state == MainMenuS)
+			mainMenu.render();
+		else
+			mainMenu.renderWorldSelect();
 	}
 
 	//Live Game stuff
@@ -237,8 +240,8 @@ static void KeyboardUp(unsigned char key, int x, int y) {
 static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 	//Cheating and putting mouse stealing function for the Main menu here, then returning, instead of wrapping the 
 	//below stuff in extra functions or classes for a live game state.
-	if (state == MainMenuS) {
-		mainMenu.MouseDown(button, stateM, x, y, state);
+	if (state == MainMenuS || state == WorldSelectS) {
+		mainMenu.MouseDown(button, stateM, x, y, state, worldSelection);
 		return;
 	}
 	
@@ -293,8 +296,8 @@ static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 
 static void MousePassiveMotion(int32 x, int32 y) {
 	//TODO - MainMenu MouseMotion interception to allow for hovering over button animations.
-	if (state == MainMenuS) {
-		mainMenu.MouseMotion(x, y);
+	if (state == MainMenuS || state == WorldSelectS) {
+		mainMenu.MouseMotion(x, y, state);
 		return;
 	}
 }
@@ -318,7 +321,7 @@ static void MouseWheel(int wheel, int direction, int x, int y) {
 	B2_NOT_USED(wheel);
 	B2_NOT_USED(x);
 	B2_NOT_USED(y);
-	if(state == MainMenuS) return;//don't process the mouse wheel if things are at the main menu.
+	if(state == MainMenuS || state == WorldSelectS) return;//don't process the mouse wheel if things are at the main menu.
 	if (direction > 0) {
 		viewZoom /= 1.1f;
 	} else {
