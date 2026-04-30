@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <string>
 
 // ---------------------------------------------------------------------------
 // Collision filter categories
@@ -102,10 +104,47 @@ public:
     void nextWheeler()    {}
     void previusWheeler() {}
     void destroyCreature(){}
-    void saveWorld()      {}
-    void loadWorld()      {}
     void exportCreature() {}
     void importCreature() {}
+
+    void saveWorld() {
+        std::ofstream f("CellsAndBodies.sav");
+        if (!f) return;
+
+        f << "numCells " << m_cells.size() << " 0\n";
+        for (const auto& c : m_cells)
+            f << "cellType " << (int)c.type << " " << c.gx << "\n"
+              << "cellGrid " << c.gy      << " 0\n";
+    }
+
+    void loadWorld() {
+        std::ifstream f("CellsAndBodies.sav");
+        if (!f) return;
+
+        clearCreature();  // returns to build mode with empty grid
+
+        std::string token;
+        float32 v1, v2;
+        int pendingType = 0, pendingGx = 0;
+        bool hasPendingCell = false;
+
+        while (f >> token >> v1 >> v2) {
+            if (token == "cellType") {
+                pendingType = (int)v1;
+                pendingGx   = (int)v2;
+                hasPendingCell = true;
+            } else if (token == "cellGrid" && hasPendingCell) {
+                int gy = (int)v1;
+                m_selectedType = (CellType)pendingType;
+                placeCell(pendingGx, gy);
+                hasPendingCell = false;
+            }
+            // numCells is informational only — the loop naturally handles any count
+        }
+
+        // Restore default selected type
+        m_selectedType = CT_BONE;
+    }
 
     // ---- Tunable constants ----
     static const float32 WORLD_HALF;    // half-extent of the bounded area

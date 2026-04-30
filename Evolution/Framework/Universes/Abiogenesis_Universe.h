@@ -2,6 +2,9 @@
 #define ABIOGENESIS_H
 #pragma once
 
+#include <fstream>
+#include <string>
+
 // ---------------------------------------------------------------------------
 // Collision categories
 // ---------------------------------------------------------------------------
@@ -58,10 +61,76 @@ public:
     void nextWheeler()    {}
     void previusWheeler() {}
     void destroyCreature(){}
-    void saveWorld()      {}
-    void loadWorld()      {}
     void exportCreature() {}
     void importCreature() {}
+
+    void saveWorld() {
+        std::ofstream f("Abiogenesis.sav");
+        if (!f) return;
+
+        // Count water bodies and lipid bodies separately.
+        // Box2D prepends fixtures (GetFixtureList() == last-added), so we must
+        // scan ALL fixtures of a body to find its identifying category bits.
+        std::vector<b2Body*> waters, lipids;
+        for (b2Body* b = m_world->GetBodyList(); b; b = b->GetNext()) {
+            if (b->GetType() != b2_dynamicBody) continue;
+            bool isWater = false, isLipid = false;
+            for (b2Fixture* fix = b->GetFixtureList(); fix; fix = fix->GetNext()) {
+                uint16 cat = fix->GetFilterData().categoryBits;
+                if (cat == WATER_CORE) { isWater = true; break; }
+                if (cat == PHILLIC)    { isLipid = true; break; }
+            }
+            if (isWater) waters.push_back(b);
+            else if (isLipid) lipids.push_back(b);
+        }
+
+        f << "numWater " << waters.size() << " 0\n";
+        for (b2Body* b : waters) {
+            b2Vec2 p = b->GetPosition();
+            f << "waterPos " << p.x << " " << p.y << "\n";
+        }
+
+        f << "numLipid " << lipids.size() << " 0\n";
+        for (b2Body* b : lipids) {
+            b2Vec2 p = b->GetPosition();
+            f << "lipidPos "   << p.x          << " " << p.y << "\n";
+            f << "lipidAngle " << b->GetAngle() << " 0\n";
+        }
+    }
+
+    void loadWorld() {
+        std::ifstream f("Abiogenesis.sav");
+        if (!f) return;
+
+        // Destroy all dynamic bodies spawned by the constructor
+        {
+            b2Body* b = m_world->GetBodyList();
+            while (b) {
+                b2Body* next = b->GetNext();
+                if (b->GetType() == b2_dynamicBody)
+                    m_world->DestroyBody(b);
+                b = next;
+            }
+        }
+
+        std::string token;
+        float32 v1, v2;
+        b2Vec2 pendingLipidPos(0.0f, 0.0f);
+        bool   hasPendingLipid = false;
+
+        while (f >> token >> v1 >> v2) {
+            if (token == "waterPos") {
+                spawnWater(b2Vec2(v1, v2));
+            } else if (token == "lipidPos") {
+                pendingLipidPos.Set(v1, v2);
+                hasPendingLipid = true;
+            } else if (token == "lipidAngle" && hasPendingLipid) {
+                spawnPhospholipid(pendingLipidPos, v1);
+                hasPendingLipid = false;
+            }
+            // numWater / numLipid are informational only
+        }
+    }
 
     // ---- Tunable force constants ----
     //   Increase F_PHOBIC_REPEL to make bilayers form faster/tighter.
