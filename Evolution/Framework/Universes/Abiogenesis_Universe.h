@@ -144,10 +144,15 @@ public:
     b2Body* m_bounds;
     b2Vec2  ma;
 
+    // Spawn-mode state
+    enum SpawnType { SPAWN_WATER, SPAWN_LIPID };
+    SpawnType m_spawnType;
+
     // ------------------------------------------------------------------ //
     Abiogenesis() {
         activePower = GRAB;
         ma.x = 0.0f; ma.y = 0.0f;
+        m_spawnType = SPAWN_WATER;
 
         m_world->SetGravity(b2Vec2(0.0f, -0.1f));
 
@@ -284,6 +289,14 @@ public:
         body->CreateFixture(&tailDef);
     }
 
+    // Spawn whichever molecule type is currently selected at position p
+    void spawnAtCursor(const b2Vec2& p) {
+        if (m_spawnType == SPAWN_WATER)
+            spawnWater(p);
+        else
+            spawnPhospholipid(p, randomNumber(0.0f, 2.0f * b2_pi));
+    }
+
     // ------------------------------------------------------------------ //
     //  Input
     // ------------------------------------------------------------------ //
@@ -301,6 +314,7 @@ public:
         m_world->QueryAABB(&callback, aabb);
 
         if (callback.m_fixture && activePower == GRAB) {
+            // Grabbed an existing body — drag it
             b2Body* body = callback.m_fixture->GetBody();
             b2MouseJointDef md;
             md.bodyA    = m_groundBody;
@@ -309,6 +323,9 @@ public:
             md.maxForce = 1000.0f * body->GetMass();
             m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&md);
             body->SetAwake(true);
+        } else {
+            // Clicked empty space — spawn a single molecule
+            spawnAtCursor(p);
         }
     }
 
@@ -318,7 +335,8 @@ public:
 
     void Keyboard(unsigned char key) {
         switch (key) {
-        case '1': break;
+        case 'w': case 'W': m_spawnType = SPAWN_WATER; break;
+        case 'l': case 'L': m_spawnType = SPAWN_LIPID; break;
         }
     }
 
@@ -326,6 +344,12 @@ public:
     //  Step — applies continuous intermolecular forces each frame
     // ------------------------------------------------------------------ //
     void Step(Settings* settings) {
+
+        // HUD hint
+        m_debugDraw.DrawString(10, m_textLine,
+            "Click to spawn %s   [W] Water  [L] Lipid",
+            m_spawnType == SPAWN_WATER ? "Water" : "Lipid");
+        m_textLine += 15;
 
         // Walk the live contact list and apply forces between touching fixtures.
         //
