@@ -156,6 +156,9 @@ public:
     bool      m_eraseMode;
     bool      m_musclesContracted;
     bool      m_firstStep;
+    bool      m_dragActive;   // true while left button held in build mode
+    int       m_dragStartGx;  // grid coord where drag began
+    int       m_dragStartGy;
 
     std::vector<CreatureCell> m_cells;
     std::vector<CellJoint>    m_joints;   // distance joints (elastic / muscle)
@@ -170,6 +173,9 @@ public:
         , m_eraseMode(false)
         , m_musclesContracted(false)
         , m_firstStep(true)
+        , m_dragActive(false)
+        , m_dragStartGx(0)
+        , m_dragStartGy(0)
         , m_floorBody(NULL)
     {
         activePower = GRAB;
@@ -449,7 +455,14 @@ public:
         m_mouseWorld = p;
 
         if (m_mode == BM_BUILDING) {
-            placeCell(gRound(p.x), gRound(p.y));
+            m_dragActive  = true;
+            m_dragStartGx = gRound(p.x);
+            m_dragStartGy = gRound(p.y);
+            // Single click still places immediately; dragging extends to a rect
+            if (m_eraseMode)
+                removeCell(m_dragStartGx, m_dragStartGy);
+            else
+                placeCell(m_dragStartGx, m_dragStartGy);
             return;
         }
 
@@ -467,7 +480,7 @@ public:
         if (cb.m_fixture && activePower == GRAB) {
             b2Body* body = cb.m_fixture->GetBody();
             b2MouseJointDef md;
-            md.bodyA    = m_groundBody;   // base-class static anchor body
+            md.bodyA    = m_groundBody;
             md.bodyB    = body;
             md.target   = p;
             md.maxForce = 1000.0f * body->GetMass();
@@ -483,7 +496,24 @@ public:
     }
 
     void MouseUp(const b2Vec2& p) {
+        if (m_dragActive && m_mode == BM_BUILDING) {
+            // Fill (or erase) the whole rectangle from drag start to release point
+            int x0 = m_dragStartGx, x1 = gRound(p.x);
+            int y0 = m_dragStartGy, y1 = gRound(p.y);
+            if (x0 > x1) { int t = x0; x0 = x1; x1 = t; }
+            if (y0 > y1) { int t = y0; y0 = y1; y1 = t; }
+            for (int gx = x0; gx <= x1; gx++)
+                for (int gy = y0; gy <= y1; gy++) {
+                    if (m_eraseMode) removeCell(gx, gy);
+                    else             placeCell(gx, gy);
+                }
+            m_dragActive = false;
+        }
         World::MouseUp(p);
+    }
+
+    void MouseMove(const b2Vec2& p) {
+        World::MouseMove(p);  // updates m_mouseWorld
     }
 
     void Keyboard(unsigned char key) {
@@ -591,22 +621,35 @@ private:
     }
 
     void drawGhostCell() {
-        int gx = gRound(m_mouseWorld.x);
-        int gy = gRound(m_mouseWorld.y);
-
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        float32 alpha = m_eraseMode ? 0.40f : 0.35f;
         if (m_eraseMode) {
-            glColor4f(1.0f, 0.15f, 0.15f, 0.40f);
+            glColor4f(1.0f, 0.15f, 0.15f, alpha);
         } else {
             switch (m_selectedType) {
-            case CT_BONE:     glColor4f(0.85f, 0.85f, 0.85f, 0.35f); break;
-            case CT_LIGAMENT: glColor4f(0.95f, 0.85f, 0.15f, 0.35f); break;
-            case CT_MUSCLE:   glColor4f(0.90f, 0.20f, 0.20f, 0.35f); break;
+            case CT_BONE:     glColor4f(0.85f, 0.85f, 0.85f, alpha); break;
+            case CT_LIGAMENT: glColor4f(0.95f, 0.85f, 0.15f, alpha); break;
+            case CT_MUSCLE:   glColor4f(0.90f, 0.20f, 0.20f, alpha); break;
             }
         }
-        drawCircle((float32)gx, (float32)gy, CELL_RADIUS, 20);
+
+        if (m_dragActive) {
+            // Show every cell that would be placed/erased in the rectangle
+            int x0 = m_dragStartGx, x1 = gRound(m_mouseWorld.x);
+            int y0 = m_dragStartGy, y1 = gRound(m_mouseWorld.y);
+            if (x0 > x1) { int t = x0; x0 = x1; x1 = t; }
+            if (y0 > y1) { int t = y0; y0 = y1; y1 = t; }
+            for (int gx = x0; gx <= x1; gx++)
+                for (int gy = y0; gy <= y1; gy++)
+                    drawCircle((float32)gx, (float32)gy, CELL_RADIUS, 20);
+        } else {
+            // Single-cell ghost under cursor
+            drawCircle((float32)gRound(m_mouseWorld.x),
+                       (float32)gRound(m_mouseWorld.y), CELL_RADIUS, 20);
+        }
+
         glDisable(GL_BLEND);
     }
 
