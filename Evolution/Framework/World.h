@@ -137,6 +137,7 @@ enum State {
 	MainMenuS    = 1,
 	LiveGameS    = 2,
 	WorldSelectS = 3,   // sub-menu: choose which universe to load
+	PauseMenuS   = 4,   // in-game pause overlay
 };
 
 class World : public b2ContactListener {

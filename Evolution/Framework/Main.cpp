@@ -111,10 +111,24 @@ static void SimulationLoop() {
 			glui->hide();
 			gluiHidden = true;
 		}
-		if (state == MainMenuS)
+		if (state == MainMenuS) {
+			settings.pause = false;  // clear any leftover pause from a prior session
 			mainMenu.render();
-		else
+		} else
 			mainMenu.renderWorldSelect();
+	}
+
+	// Pause menu — render the world frozen, then overlay the pause UI
+	if (state == PauseMenuS) {
+		if (!gluiHidden) {
+			glui->hide();
+			gluiHidden = true;
+		}
+		world->SetTextLine(30);
+		settings.hz = settingsHz;
+		settings.pause = true;  // keep physics frozen
+		world->Step(&settings); // renders the world without advancing physics
+		mainMenu.renderPauseMenu();
 	}
 
 	//Live Game stuff
@@ -176,12 +190,15 @@ static void Keyboard(unsigned char key, int x, int y) {
 	case ' ':
 		if (world) world->Keyboard(key);
 		break;
-	case 27://ESC key pauses
-//#ifndef __APPLE__
-//		// freeglut specific function
-//		glutLeaveMainLoop();
-//#endif
-//		exit(0);
+	case 27: // ESC — toggle pause menu
+		if (state == LiveGameS) {
+			state = PauseMenuS;
+			settings.pause = true;
+		} else if (state == PauseMenuS) {
+			state = LiveGameS;
+			settings.pause = false;
+		}
+		break;
 	case 'p':
 		settings.pause = !settings.pause;
 		break;
@@ -241,12 +258,12 @@ static void KeyboardUp(unsigned char key, int x, int y) {
 static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 	//Cheating and putting mouse stealing function for the Main menu here, then returning, instead of wrapping the 
 	//below stuff in extra functions or classes for a live game state.
-	if (state == MainMenuS || state == WorldSelectS) {
+	if (state == MainMenuS || state == WorldSelectS || state == PauseMenuS) {
 		mainMenu.MouseDown(button, stateM, x, y, state, worldSelection);
+		// If exit-to-main-menu was clicked, ensure physics unfreezes on return
+		if (state == MainMenuS) settings.pause = false;
 		return;
 	}
-	
-	//TODO - Might need to cheat for the pause screen real quick to.
 
 	// Use the mouse to activate world powers.
 	if (button == GLUT_LEFT_BUTTON) {
@@ -297,15 +314,14 @@ static void Mouse(int32 button, int32 stateM, int32 x, int32 y) {
 }
 
 static void MousePassiveMotion(int32 x, int32 y) {
-	//TODO - MainMenu MouseMotion interception to allow for hovering over button animations.
-	if (state == MainMenuS || state == WorldSelectS) {
+	if (state == MainMenuS || state == WorldSelectS || state == PauseMenuS) {
 		mainMenu.MouseMotion(x, y, state);
 		return;
 	}
 }
 
 static void MouseMotion(int32 x, int32 y) {
-
+	if (state == PauseMenuS) return;  // don't drag-pan or interact with world while paused
 
 	b2Vec2 p = ConvertScreenToWorld(x, y);
 	world->MouseMove(p);

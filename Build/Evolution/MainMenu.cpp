@@ -27,6 +27,14 @@ MainMenu::MainMenu() {
 	m_cellsBtn = { {0,0,0,0}, 0, false,
 		0.38f, 0.18f, 0.62f,   // base
 		0.65f, 0.40f, 1.00f }; // highlight
+
+	// Pause menu — Resume (green) and Exit (red)
+	m_resumeBtn = { {0,0,0,0}, 0, false,
+		0.10f, 0.45f, 0.15f,   // base
+		0.25f, 0.85f, 0.35f }; // highlight
+	m_exitBtn = { {0,0,0,0}, 0, false,
+		0.50f, 0.10f, 0.10f,   // base
+		0.90f, 0.30f, 0.30f }; // highlight
 }
 
 MainMenu::~MainMenu() {
@@ -215,7 +223,64 @@ void MainMenu::renderWorldSelect() {
 }
 
 // ---------------------------------------------------------------------------
-//  MouseDown — handles both main-menu and world-select states
+//  renderPauseMenu() — translucent overlay drawn on top of the frozen world
+// ---------------------------------------------------------------------------
+void MainMenu::renderPauseMenu() {
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	int w = glutGet(GLUT_WINDOW_WIDTH);
+	int h = glutGet(GLUT_WINDOW_HEIGHT);
+	gluOrtho2D(0, w, h, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Semi-transparent dark overlay covering the whole screen
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(0.0f, 0.0f, 0.0f, 0.65f);
+	glBegin(GL_QUADS);
+	glVertex2f(0,        0);
+	glVertex2f((float32)w, 0);
+	glVertex2f((float32)w, (float32)h);
+	glVertex2f(0,        (float32)h);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	// "PAUSED" title
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRasterPos2i((w / 2) - 45, (h / 2) - 80);
+	const char *title = "PAUSED";
+	for (const char *c = title; *c; ++c)
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *c);
+
+	// Buttons — Resume above, Exit below
+	const int BW = 240, BH = 50;
+	int cx = w / 2;
+
+	// Resume: screen-pixel top at h/2 - 30
+	int glBtnY1 = (h / 2 - 30) + 50;
+	m_resumeBtn.rect = { cx - BW/2, glBtnY1, cx + BW/2, glBtnY1 + BH };
+
+	// Exit to Main Menu: screen-pixel top at h/2 + 40
+	int glBtnY2 = (h / 2 + 40) + 50;
+	m_exitBtn.rect = { cx - BW/2, glBtnY2, cx + BW/2, glBtnY2 + BH };
+
+	updateSelectButton(m_resumeBtn);
+	updateSelectButton(m_exitBtn);
+
+	drawSelectButton(m_resumeBtn, "Resume",             w, h);
+	drawSelectButton(m_exitBtn,   "Exit to Main Menu",  w, h);
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
+// ---------------------------------------------------------------------------
+//  MouseDown — handles main-menu, world-select, and pause-menu states
 // ---------------------------------------------------------------------------
 void MainMenu::MouseDown(int32 button, int32 stateM, int32 x, int32 y,
 	                     State &state, int32 &worldSelection) {
@@ -242,6 +307,14 @@ void MainMenu::MouseDown(int32 button, int32 stateM, int32 x, int32 y,
 			state = LiveGameS;
 		}
 	}
+
+	if (state == PauseMenuS) {
+		if (hitTestRect(m_resumeBtn.rect, x, y)) {
+			state = LiveGameS;
+		} else if (hitTestRect(m_exitBtn.rect, x, y)) {
+			state = MainMenuS;
+		}
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -258,6 +331,11 @@ void MainMenu::MouseMotion(int32 x, int32 y, State state) {
 		m_wheelerBtn.hilighted = hitTestRect(m_wheelerBtn.rect, x, y);
 		m_abioBtn.hilighted    = hitTestRect(m_abioBtn.rect, x, y);
 		m_cellsBtn.hilighted   = hitTestRect(m_cellsBtn.rect, x, y);
+	}
+
+	if (state == PauseMenuS) {
+		m_resumeBtn.hilighted = hitTestRect(m_resumeBtn.rect, x, y);
+		m_exitBtn.hilighted   = hitTestRect(m_exitBtn.rect, x, y);
 	}
 }
 

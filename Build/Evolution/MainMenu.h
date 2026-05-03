@@ -12,6 +12,7 @@ public:
 
 	void render();
 	void renderWorldSelect();
+	void renderPauseMenu();
 
 	void MouseDown(int32 button, int32 stateM, int32 x, int32 y, State &state, int32 &worldSelection);
 	void MouseMotion(int32 x, int32 y, State state);
@@ -42,6 +43,10 @@ private:
 	SelectButton m_wheelerBtn;
 	SelectButton m_abioBtn;
 	SelectButton m_cellsBtn;
+
+	// ---- Pause menu ----
+	SelectButton m_resumeBtn;
+	SelectButton m_exitBtn;
 
 	void updateSelectButton(SelectButton &btn);
 	void drawSelectButton(SelectButton &btn, const char *label, int w, int h);
