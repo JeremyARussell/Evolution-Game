@@ -6,6 +6,8 @@
 #include <cmath>
 #include <fstream>
 #include <string>
+#include <queue>
+#include <map>
 
 // ---------------------------------------------------------------------------
 // Collision filter categories
@@ -21,13 +23,14 @@ enum _CellCategory {
 // Cell type and mode enums / data structs
 // ---------------------------------------------------------------------------
 enum CellType  { CT_BONE = 0, CT_LIGAMENT = 1, CT_MUSCLE = 2 };
-enum BuildMode { BM_BUILDING, BM_SIMULATING };
+enum BuildMode { BM_BUILDING, BM_ASSIGNING, BM_SIMULATING };
 
 // One placed cell in the creature
 struct CreatureCell {
     b2Body*  body;
     CellType type;
-    int      gx, gy;  // integer grid position (world units)
+    int      gx, gy;       // integer grid position (world units)
+    int      muscleGroupId; // -1 for non-muscle cells or before assignment stage
 };
 
 // A distance-joint connection between two cells (ligament, muscle, bone-to-non-bone)
@@ -154,11 +157,16 @@ public:
     BuildMode m_mode;
     CellType  m_selectedType;
     bool      m_eraseMode;
-    bool      m_musclesContracted;
     bool      m_firstStep;
     bool      m_dragActive;   // true while left button held in build mode
     int       m_dragStartGx;  // grid coord where drag began
     int       m_dragStartGy;
+
+    // Muscle group assignment (populated on entering BM_ASSIGNING)
+    int       m_numMuscleGroups;  // count of distinct connected muscle groups
+    int       m_selectedGroupId;  // group highlighted in BM_ASSIGNING (-1 = none)
+    std::map<int, unsigned char> m_groupKey;       // group ID → trigger key (0 = unassigned)
+    std::map<int, bool>          m_groupContracted; // group ID → currently contracted?
 
     std::vector<CreatureCell> m_cells;
     std::vector<CellJoint>    m_joints;   // distance joints (elastic / muscle)
@@ -171,12 +179,13 @@ public:
         : m_mode(BM_BUILDING)
         , m_selectedType(CT_BONE)
         , m_eraseMode(false)
-        , m_musclesContracted(false)
         , m_firstStep(true)
         , m_dragActive(false)
         , m_dragStartGx(0)
         , m_dragStartGy(0)
         , m_floorBody(NULL)
+        , m_numMuscleGroups(0)
+        , m_selectedGroupId(-1)
     {
         activePower = GRAB;
 
@@ -300,10 +309,11 @@ public:
         body->CreateFixture(&fd);
 
         CreatureCell cell;
-        cell.body = body;
-        cell.type = m_selectedType;
-        cell.gx   = gx;
-        cell.gy   = gy;
+        cell.body          = body;
+        cell.type          = m_selectedType;
+        cell.gx            = gx;
+        cell.gy            = gy;
+        cell.muscleGroupId = -1;  // assigned later in BM_ASSIGNING
         int newIdx = (int)m_cells.size();
         m_cells.push_back(cell);
 
@@ -366,8 +376,11 @@ public:
         m_cells.clear();
 
         m_mode             = BM_BUILDING;
-        m_musclesContracted = false;
         m_eraseMode        = false;
+        m_numMuscleGroups  = 0;
+        m_selectedGroupId  = -1;
+        m_groupKey.clear();
+        m_groupContracted.clear();
     }
 
     // ------------------------------------------------------------------ //
@@ -427,23 +440,89 @@ public:
     //  Simulation controls
     // ------------------------------------------------------------------ //
 
-    // Convert all cells from static → dynamic and start the simulation
+    // BFS flood-fill: assign every muscle cell a connected-component group ID.
+    // Called when the user presses [G] from build mode.
+    void computeMuscleGroups() {
+        for (auto& c : m_cells)
+            c.muscleGroupId = -1;
+        m_numMuscleGroups = 0;
+        m_groupKey.clear();
+        m_groupContracted.clear();
+
+        for (int start = 0; start < (int)m_cells.size(); start++) {
+            if (m_cells[start].type != CT_MUSCLE) continue;
+            if (m_cells[start].muscleGroupId >= 0) continue;
+
+            int groupId = m_numMuscleGroups++;
+            std::queue<int> q;
+            q.push(start);
+            m_cells[start].muscleGroupId = groupId;
+
+            while (!q.empty()) {
+                int cur = q.front(); q.pop();
+                for (const auto& j : m_joints) {
+                    int other = -1;
+                    if (j.idxA == cur && m_cells[j.idxB].type == CT_MUSCLE)
+                        other = j.idxB;
+                    else if (j.idxB == cur && m_cells[j.idxA].type == CT_MUSCLE)
+                        other = j.idxA;
+                    if (other >= 0 && m_cells[other].muscleGroupId < 0) {
+                        m_cells[other].muscleGroupId = groupId;
+                        q.push(other);
+                    }
+                }
+            }
+
+            m_groupKey[groupId]        = 0;     // unassigned
+            m_groupContracted[groupId] = false;
+        }
+    }
+
+    // [G] from build mode: compute groups and enter the assignment stage.
+    // If there are no muscle cells skip straight to simulation.
+    void startAssigning() {
+        if (m_cells.empty()) return;
+        computeMuscleGroups();
+        if (m_numMuscleGroups == 0) {
+            startSimulation();
+            return;
+        }
+        m_mode            = BM_ASSIGNING;
+        m_selectedGroupId = -1;
+    }
+
+    // [G] from assignment mode: convert all cells to dynamic and start physics.
     void startSimulation() {
         if (m_cells.empty()) return;
         for (auto& c : m_cells)
             c.body->SetType(b2_dynamicBody);
-        m_mode              = BM_SIMULATING;
-        m_musclesContracted = false;
+        m_mode = BM_SIMULATING;
     }
 
-    // Toggle all muscle joints between contracted and relaxed rest lengths
-    void toggleMuscles() {
-        m_musclesContracted = !m_musclesContracted;
+    // Toggle the contracted state of a single muscle group.
+    void toggleMuscleGroup(int groupId) {
+        bool& contracted = m_groupContracted[groupId];
+        contracted = !contracted;
         for (auto& cj : m_joints) {
-            if (cj.isMuscle) {
-                cj.joint->SetLength(
-                    m_musclesContracted ? cj.contractedLen : cj.relaxedLen);
-            }
+            if (!cj.isMuscle) continue;
+            // The muscle endpoint determines which group owns this joint.
+            int muscleIdx = (m_cells[cj.idxA].type == CT_MUSCLE) ? cj.idxA : cj.idxB;
+            if (m_cells[muscleIdx].muscleGroupId != groupId) continue;
+            cj.joint->SetLength(contracted ? cj.contractedLen : cj.relaxedLen);
+        }
+    }
+
+    // [Space] shortcut: toggle every group at once.
+    void toggleAllMuscles() {
+        for (auto& kv : m_groupContracted)
+            toggleMuscleGroup(kv.first);
+    }
+
+    // Fire all groups whose assigned key matches.
+    void toggleGroupsForKey(unsigned char key) {
+        for (auto& kv : m_groupKey) {
+            if (kv.second == key)
+                toggleMuscleGroup(kv.first);
         }
     }
 
@@ -463,6 +542,16 @@ public:
                 removeCell(m_dragStartGx, m_dragStartGy);
             else
                 placeCell(m_dragStartGx, m_dragStartGy);
+            return;
+        }
+
+        if (m_mode == BM_ASSIGNING) {
+            // Select the muscle group under the cursor (cells are still static here)
+            int idx = findCell(gRound(p.x), gRound(p.y));
+            if (idx >= 0 && m_cells[idx].type == CT_MUSCLE)
+                m_selectedGroupId = m_cells[idx].muscleGroupId;
+            else
+                m_selectedGroupId = -1;
             return;
         }
 
@@ -517,6 +606,39 @@ public:
     }
 
     void Keyboard(unsigned char key) {
+        if (m_mode == BM_ASSIGNING) {
+            switch (key) {
+            case 'g': case 'G':
+                startSimulation();
+                break;
+            case 'c': case 'C':
+                clearCreature();
+                break;
+            default:
+                // Any other key becomes the trigger key for the selected group
+                if (m_selectedGroupId >= 0)
+                    m_groupKey[m_selectedGroupId] = key;
+                break;
+            }
+            return;
+        }
+
+        if (m_mode == BM_SIMULATING) {
+            switch (key) {
+            case 'c': case 'C':
+                clearCreature();
+                break;
+            case ' ':
+                toggleAllMuscles();
+                break;
+            default:
+                toggleGroupsForKey(key);
+                break;
+            }
+            return;
+        }
+
+        // BM_BUILDING
         switch (key) {
         case '1': m_selectedType = CT_BONE;     m_eraseMode = false; break;
         case '2': m_selectedType = CT_LIGAMENT; m_eraseMode = false; break;
@@ -525,15 +647,11 @@ public:
             m_eraseMode = !m_eraseMode;
             break;
         case 'g': case 'G':
-            if (m_mode == BM_BUILDING && !m_cells.empty())
-                startSimulation();
+            if (!m_cells.empty())
+                startAssigning();
             break;
         case 'c': case 'C':
             clearCreature();
-            break;
-        case ' ':
-            if (m_mode == BM_SIMULATING)
-                toggleMuscles();
             break;
         }
     }
@@ -556,8 +674,9 @@ public:
             settings->velocityIterations = 20;
 
         // --- HUD text (drawn before World::Step, same pattern as other worlds) ---
-        m_debugDraw.DrawString(10, m_textLine, "Cells & Bodies  |  %s",
-            m_mode == BM_BUILDING ? "BUILD MODE" : "SIMULATE MODE");
+        const char* modeName = (m_mode == BM_BUILDING)  ? "BUILD MODE"  :
+                               (m_mode == BM_ASSIGNING) ? "ASSIGN KEYS" : "SIMULATE MODE";
+        m_debugDraw.DrawString(10, m_textLine, "Cells & Bodies  |  %s", modeName);
         m_textLine += 15;
 
         if (m_mode == BM_BUILDING) {
@@ -568,18 +687,47 @@ public:
                 typeName, m_eraseMode ? "  [X] ERASE" : "");
             m_textLine += 15;
             m_debugDraw.DrawString(10, m_textLine,
-                "[G] Start simulation   [C] Clear   [X] Erase toggle   Right-click: erase cell   Cells: %d",
+                "[G] Assign muscle keys   [C] Clear   [X] Erase toggle   Right-click: erase   Cells: %d",
                 (int)m_cells.size());
             m_textLine += 15;
+        } else if (m_mode == BM_ASSIGNING) {
+            m_debugDraw.DrawString(10, m_textLine,
+                "Click a muscle group to select it, then press the key you want to trigger it.");
+            m_textLine += 15;
+            m_debugDraw.DrawString(10, m_textLine, "[G] Start simulation   [C] Clear");
+            m_textLine += 15;
+            for (int gid = 0; gid < m_numMuscleGroups; gid++) {
+                unsigned char k = m_groupKey[gid];
+                const char* sel = (gid == m_selectedGroupId) ? "  <-- selected" : "";
+                if (k != 0)
+                    m_debugDraw.DrawString(10, m_textLine,
+                        "  Group %d: key [%c]%s", gid + 1, (char)k, sel);
+                else
+                    m_debugDraw.DrawString(10, m_textLine,
+                        "  Group %d: (unassigned)%s", gid + 1, sel);
+                m_textLine += 15;
+            }
         } else {
             m_debugDraw.DrawString(10, m_textLine,
-                "[Space] Muscles: %s   [C] Clear & rebuild",
-                m_musclesContracted ? "CONTRACTED" : "relaxed");
+                "[Space] Toggle all muscles   [C] Clear & rebuild");
             m_textLine += 15;
+            for (int gid = 0; gid < m_numMuscleGroups; gid++) {
+                unsigned char k = m_groupKey[gid];
+                bool contracted = m_groupContracted[gid];
+                if (k != 0)
+                    m_debugDraw.DrawString(10, m_textLine,
+                        "  Group %d [%c]: %s", gid + 1, (char)k,
+                        contracted ? "CONTRACTED" : "relaxed");
+                else
+                    m_debugDraw.DrawString(10, m_textLine,
+                        "  Group %d (no key): %s", gid + 1,
+                        contracted ? "CONTRACTED" : "relaxed");
+                m_textLine += 15;
+            }
         }
 
         // --- Background grid in build mode (drawn under everything else) ---
-        if (m_mode == BM_BUILDING)
+        if (m_mode == BM_BUILDING || m_mode == BM_ASSIGNING)
             drawGrid();
 
         // --- Ghost cell preview under mouse in build mode ---
@@ -653,6 +801,24 @@ private:
         glDisable(GL_BLEND);
     }
 
+    // Map a muscle group ID to a distinct colour from a fixed 8-colour palette.
+    static void getGroupColor(int gid, float32& r, float32& g, float32& b) {
+        static const float32 PALETTE[8][3] = {
+            {0.90f, 0.15f, 0.15f},  // red
+            {0.15f, 0.70f, 0.90f},  // cyan
+            {0.15f, 0.90f, 0.15f},  // green
+            {0.90f, 0.55f, 0.10f},  // orange
+            {0.70f, 0.15f, 0.90f},  // purple
+            {0.90f, 0.90f, 0.10f},  // yellow
+            {0.15f, 0.50f, 0.90f},  // blue
+            {0.90f, 0.15f, 0.70f},  // pink
+        };
+        int idx = gid % 8;
+        r = PALETTE[idx][0];
+        g = PALETTE[idx][1];
+        b = PALETTE[idx][2];
+    }
+
     // Draw a solid-colour disc over each cell so they're easily identified
     void drawCellOverlays() {
         if (m_cells.empty()) return;
@@ -662,19 +828,31 @@ private:
 
         for (int i = 0; i < (int)m_cells.size(); i++) {
             b2Vec2 pos = m_cells[i].body->GetPosition();
-            switch (m_cells[i].type) {
-            case CT_BONE:
-                glColor4f(0.80f, 0.80f, 0.80f, 0.65f);
-                break;
-            case CT_LIGAMENT:
-                glColor4f(0.95f, 0.85f, 0.10f, 0.65f);
-                break;
-            case CT_MUSCLE:
-                if (m_musclesContracted)
-                    glColor4f(1.00f, 0.08f, 0.08f, 0.75f);  // bright red when firing
-                else
-                    glColor4f(0.75f, 0.20f, 0.20f, 0.65f);  // dark red when relaxed
-                break;
+
+            if (m_cells[i].type == CT_MUSCLE &&
+                (m_mode == BM_ASSIGNING || m_mode == BM_SIMULATING) &&
+                m_cells[i].muscleGroupId >= 0)
+            {
+                int gid = m_cells[i].muscleGroupId;
+                float32 r, g, b;
+                getGroupColor(gid, r, g, b);
+                bool contracted = m_groupContracted.count(gid) && m_groupContracted.at(gid);
+                bool selected   = (m_mode == BM_ASSIGNING && gid == m_selectedGroupId);
+                float32 alpha   = (contracted || selected) ? 0.90f : 0.65f;
+                float32 scale   = (contracted || selected) ? 1.00f : 0.65f;
+                glColor4f(r * scale, g * scale, b * scale, alpha);
+            } else {
+                switch (m_cells[i].type) {
+                case CT_BONE:
+                    glColor4f(0.80f, 0.80f, 0.80f, 0.65f);
+                    break;
+                case CT_LIGAMENT:
+                    glColor4f(0.95f, 0.85f, 0.10f, 0.65f);
+                    break;
+                case CT_MUSCLE:
+                    glColor4f(0.75f, 0.20f, 0.20f, 0.65f);
+                    break;
+                }
             }
             drawCircle(pos.x, pos.y, CELL_RADIUS * 0.82f, 16);
         }
