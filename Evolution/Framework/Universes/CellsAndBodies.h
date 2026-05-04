@@ -114,6 +114,7 @@ public:
         std::ofstream f("CellsAndBodies.sav");
         if (!f) return;
 
+        f << "gravity " << m_world->GetGravity().y << " 0\n";
         f << "numCells " << m_cells.size() << " 0\n";
         for (const auto& c : m_cells)
             f << "cellType " << (int)c.type << " " << c.gx << "\n"
@@ -132,7 +133,9 @@ public:
         bool hasPendingCell = false;
 
         while (f >> token >> v1 >> v2) {
-            if (token == "cellType") {
+            if (token == "gravity") {
+                m_world->SetGravity(b2Vec2(0.0f, v1));
+            } else if (token == "cellType") {
                 pendingType = (int)v1;
                 pendingGx   = (int)v2;
                 hasPendingCell = true;

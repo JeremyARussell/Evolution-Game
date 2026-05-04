@@ -142,6 +142,8 @@ public:
 		}
 
 		//For each Wheeler ----- Save the wheeler stuff
+		saveFile << "gravity" << ' ' << m_world->GetGravity().y << " 0" << endl;
+
 		for (int i = 0; i < wheelers.size(); i ++) {
 			b2Vec2 wheelerPos = wheelers[i]->cart->GetPosition();
 
@@ -229,6 +231,11 @@ public:
 				endA, endB = b2Vec2(0.0f, 0.0f);
 
 				readyToBuild = false;
+			}
+
+			//Load gravity
+			if (loadType == "gravity") {
+				m_world->SetGravity(b2Vec2(0.0f, var1));
 			}
 
 			//Load the GrassSpawner

@@ -84,6 +84,7 @@ public:
             else if (isLipid) lipids.push_back(b);
         }
 
+        f << "gravity " << m_world->GetGravity().y << " 0\n";
         f << "numWater " << waters.size() << " 0\n";
         for (b2Body* b : waters) {
             b2Vec2 p = b->GetPosition();
@@ -119,7 +120,9 @@ public:
         bool   hasPendingLipid = false;
 
         while (f >> token >> v1 >> v2) {
-            if (token == "waterPos") {
+            if (token == "gravity") {
+                m_world->SetGravity(b2Vec2(0.0f, v1));
+            } else if (token == "waterPos") {
                 spawnWater(b2Vec2(v1, v2));
             } else if (token == "lipidPos") {
                 pendingLipidPos.Set(v1, v2);

@@ -42,6 +42,7 @@ namespace {
 	int32 mainWindow;
 	float settingsHz = 60.0;
 	GLUI *glui;
+	GLUI_StaticText* gravityLabel;
 	bool gluiHidden;
 	float32 viewZoom = 3.5f;
 	int tx, ty, tw, th;
@@ -156,6 +157,13 @@ static void SimulationLoop() {
 		//settings.zoomLevel = viewZoom; -- Disable scroll when paused in mouse area. - Can still zoom after latest changes
 		world->Step(&settings);
 		world->powerHUD.render();
+
+		// Update the live gravity readout
+		{
+			char buf[32];
+			snprintf(buf, sizeof(buf), "G: %.2f", settings.gravityY);
+			gravityLabel->set_text(buf);
+		}
 		//}
 		//TODO - Test comment this below part out to see if main menu will resize still
 		if (oldCenter.x != settings.viewCenter.x || oldCenter.y != settings.viewCenter.y)//If size of window has changed
@@ -175,6 +183,7 @@ static void SimulationLoop() {
 			delete world;
 			entry = g_worldEntries + worldIndex;
 			world = entry->createFcn();
+			settings.gravityY = world->GetGravityY();
 			viewZoom = 1.0f;
 			settings.viewCenter.Set(0.0f, 20.0f);
 			Resize(width, height);
@@ -352,6 +361,7 @@ static void Restart(int) {
 	delete world;
 	entry = g_worldEntries + worldIndex;
 	world = entry->createFcn();
+	settings.gravityY = world->GetGravityY();
     Resize(width, height);
 }
 
@@ -365,6 +375,8 @@ static void Save(int) {
 static void Load(int) {
 	Restart(1);
 	world->loadWorld();
+	settings.gravityY = world->GetGravityY();
+	glui->sync_live();
 }
 
 static void Exit(int code) {
@@ -378,6 +390,11 @@ static void Exit(int code) {
 static void SingleStep(int) {
 	settings.pause = 1;
 	settings.singleStep = 1;
+}
+
+static void ResetGravity(int) {
+	settings.gravityY = 0.0f;
+	glui->sync_live();
 }
 
 static void nextWheeler(int) {
@@ -410,6 +427,7 @@ int main(int argc, char** argv) {
 
 	entry = g_worldEntries + worldIndex;
 	world = entry->createFcn();
+	settings.gravityY = world->GetGravityY();
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
@@ -477,8 +495,15 @@ int main(int argc, char** argv) {
 	///*#endif*/
 	glui->add_button("Restart", 0, Restart);
 	glui->add_button("Quit", 0,(GLUI_Update_CB)Exit);
-		
+	
 	glui->add_separator();
+
+	glui->add_column(true);
+	gravityLabel = glui->add_statictext("G: --");
+	glui->add_button("Reset G", 0, ResetGravity);
+	GLUI_Scrollbar* gravitySlider =
+		new GLUI_Scrollbar(glui, "gravityY", GLUI_SCROLL_VERTICAL, &settings.gravityY);
+	gravitySlider->set_float_limits(-10.0f, 10.0f);
 
 	glui->set_main_gfx_window( mainWindow );
 	

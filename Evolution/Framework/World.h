@@ -56,6 +56,7 @@ struct Settings {
 		viewCenter(0.0f, 20.0f),
 		zoomLevel(3.5f),
 		hz(60.0f),
+		gravityY(-10.0f),
 		grassSpawnRate(5),
 		velocityIterations(8),
 		positionIterations(3),
@@ -82,6 +83,7 @@ struct Settings {
 	b2Vec2 viewCenter;
 	float32 zoomLevel;
 	float32 hz;
+	float32 gravityY;
 	int grassSpawnRate;
 	int32 velocityIterations;
 	int32 positionIterations;
@@ -166,6 +168,8 @@ public:
 
 	World();
 	virtual ~World();
+
+	float32 GetGravityY() const { return m_world->GetGravity().y; }
 
 	void SetTextLine(int32 line) { m_textLine = line; }
     void DrawTitle(int x, int y, const char *string);

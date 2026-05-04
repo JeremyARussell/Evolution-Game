@@ -8,6 +8,6 @@
 6. Also Cells and Bodies needs reproduction.
 7. And C and B needs challenge modes where we try and make a creature that can jump high or move from left to right the fastest... etc.
 8. Look into releasing on Steam.
-9. Implement adjustable gravity across all the worlds.
+9. ~~Implement adjustable gravity across all the worlds.~~
 10. Implement the other controls, like specific creature export, for universe/worlds that include whole creatures. (Wheelers and C and B)
 11. Eventual multiplayer
