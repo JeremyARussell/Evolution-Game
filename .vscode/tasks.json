@@ -35,6 +35,22 @@
                 "panel": "shared"
             },
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "CMake: Build Release",
+            "type": "shell",
+            "command": "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+            "args": [
+                "--build", "${workspaceFolder}/out/build",
+                "--config", "Release"
+            ],
+            "group": "build",
+            "dependsOn": "CMake: Configure",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
         }
     ]
 }
